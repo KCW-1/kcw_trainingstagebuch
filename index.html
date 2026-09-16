@@ -238,8 +238,11 @@ window.TB_STANDALONE = true;
   .nl.open{color:var(--text-muted);}
   @media (max-width:560px){.nl{display:block;min-width:0;}}
 
-  .note-row{display:flex;gap:8px;margin-top:14px;align-items:center;flex-wrap:wrap;}
+  .note-wrap{display:flex;flex-direction:column;gap:6px;}
+  .note-wrap.span{grid-column:1/-1;margin-top:4px;}
+  .note-row{display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap;}
   .note-row input{flex:1;min-width:170px;}
+  .note-row input.missing{border-color:var(--status-absent);box-shadow:0 0 0 3px var(--status-absent-soft);}
 
   /* session list */
   .sess{display:grid;grid-template-columns:118px 1fr auto;gap:4px 16px;align-items:center;
@@ -302,6 +305,9 @@ window.TB_STANDALONE = true;
   .rchip .pinless{font:600 11px/1 var(--font-narrow);letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);}
   .rchip button{border:0;background:transparent;color:var(--text-muted);cursor:pointer;font-size:13px;padding:3px 5px;border-radius:var(--radius-pill);}
   .rchip button:hover{color:var(--status-absent);background:var(--status-absent-soft);}
+  .rchip button.confirm,.btn.confirm{color:var(--status-absent);background:var(--status-absent-soft);
+    font:700 12px/1 var(--font-sans);padding:5px 9px;}
+  .btn.confirm{height:32px;}
   .days{display:flex;flex-wrap:wrap;gap:6px;}
   .day{font:600 13px/1 var(--font-sans);height:36px;padding:0 13px;border-radius:var(--radius-control);
     border:1.5px solid var(--border-strong);background:var(--surface-card);color:var(--text-muted);cursor:pointer;}
@@ -315,6 +321,14 @@ window.TB_STANDALONE = true;
   .banner{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
     background:var(--status-excused-soft);color:var(--sand-700);border-radius:var(--radius-card);padding:12px 16px;font-size:14px;font-weight:600;}
   .banner .btn{background:transparent;border-color:currentColor;color:inherit;}
+  .banner.info{background:var(--info-soft);color:var(--info);}
+  .plist{display:flex;flex-direction:column;border:1px solid var(--border-subtle);border-radius:var(--radius-control);}
+  .prow{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;padding:10px 12px;border-top:1px solid var(--border-subtle);}
+  .prow:first-child{border-top:0;}
+  .prow .pn{font-size:15px;color:var(--text-strong);}
+  .prow .mine{display:flex;gap:6px;}
+  .prow .note-wrap{grid-column:1/-1;}
+  .prow .note-row{margin-top:0;}
   @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .banner{color:var(--status-excused);}}
   :root[data-theme="dark"] .banner{color:var(--status-excused);}
   .csvbox{width:100%;min-height:120px;font:400 12px/1.4 ui-monospace,Menlo,Consolas,monospace;
@@ -398,6 +412,8 @@ window.TB_STANDALONE = true;
       </span>
     </div>
 
+    <div id="nudge" hidden class="banner info"><span id="nudgeText"></span></div>
+
     <section>
       <h2>Nächster Termin</h2>
       <div class="card pad" id="nextCard"></div>
@@ -472,6 +488,41 @@ window.TB_STANDALONE = true;
         </div>
 
         <div class="block">
+          <h3>Termin abhaken und Gründe pflegen</h3>
+          <p class="hint">Nach dem Training hier durchgehen: Status setzen, Grund ergänzen oder korrigieren. Was du änderst, ist in der Tabelle blau umrandet.</p>
+          <div class="row">
+            <label for="sessPick">Termin</label>
+            <select id="sessPick" style="flex:1;min-width:220px"></select>
+          </div>
+          <div class="plist" id="sessEdit"></div>
+        </div>
+
+        <div class="block">
+          <h3>Zeitraum absagen oder löschen</h3>
+          <p class="hint">Für Ferien, gesperrte Halle oder eine Turnierpause. Absagen behält die Termine samt Einträgen und markiert sie als ausgefallen, löschen entfernt sie ganz.</p>
+          <div class="row">
+            <label for="rangeFrom">von</label><input type="date" id="rangeFrom">
+            <label for="rangeTo">bis</label><input type="date" id="rangeTo">
+            <input type="text" id="rangeReason" placeholder="Grund, zum Beispiel Sommerferien" style="flex:1;min-width:190px">
+            <button class="btn" id="rangeCancel" type="button">Termine absagen</button>
+            <button class="btn danger" id="rangeDelete" type="button">Termine löschen</button>
+          </div>
+          <p class="msg ok" id="rangeMsg"></p>
+        </div>
+
+        <div class="block">
+          <h3>Sicherung</h3>
+          <p class="hint">Der komplette Stand als Datei, inklusive Kader, Termine, Einträge und Gründe. Einspielen ersetzt alles, was gerade in der Datenbank steht.</p>
+          <div class="row">
+            <button class="btn" id="backupSave" type="button">Sicherung herunterladen</button>
+            <button class="btn" id="backupPick" type="button">Sicherung einspielen</button>
+            <input type="file" id="backupFile" accept="application/json,.json" hidden>
+            <span class="msg ok" id="backupMsg"></span>
+          </div>
+          <textarea class="csvbox" id="backupBox" hidden readonly aria-label="Sicherung zum Kopieren"></textarea>
+        </div>
+
+        <div class="block">
           <h3>Termine bearbeiten und löschen</h3>
           <p class="hint">„bearbeiten" öffnet Datum, Uhrzeit, Bezeichnung und Ort des Termins. Eine Absage sehen alle sofort auf der Seite, gelöschte Termine verschwinden mit allen Einträgen.</p>
           <div class="slist" id="adminSessions"></div>
@@ -524,6 +575,7 @@ window.TB_STANDALONE = true;
   var FB = null, fbPending = 0;
   var state = null, art = null, readOnly = false, me = null;
   var saveTimer = null, queue = [], rhythmDays = [], editing = null;
+  var focusNote = null, armed = null, pickSid = null, rangeArmed = null, restoreArmed = false;
 
   function $(id){ return document.getElementById(id); }
   function el(tag, cls, txt){ var n = document.createElement(tag); if(cls) n.className = cls; if(txt != null) n.textContent = txt; return n; }
@@ -599,6 +651,13 @@ window.TB_STANDALONE = true;
     } else if (op.t === "delSession") {
       st.sessions = st.sessions.filter(function(s){ return s.id !== op.id; });
       delete st.att[op.id];
+    } else if (op.t === "restore") {
+      st.team = op.st.team;
+      st.trainerPin = op.st.trainerPin;
+      st.players = op.st.players;
+      st.sessions = op.st.sessions;
+      st.att = op.st.att;
+      st.demo = false;
     } else if (op.t === "clearDemo") {
       st.demo = false;
       st.players = st.players.filter(function(p){ return p.id.indexOf("demo-") !== 0; });
@@ -656,6 +715,12 @@ window.TB_STANDALONE = true;
     } else if (op.t === "delSession") {
       fbDo(FB.child("sessions/" + op.id).remove());
       FB.child("att/" + op.id).remove();
+    } else if (op.t === "restore") {
+      var payload = { team: op.st.team, trainerPin: op.st.trainerPin || null, players: {}, sessions: {}, att: op.st.att || {} };
+      op.st.players.forEach(function(p){ payload.players[p.id] = { name: p.name, pin: p.pin || null }; });
+      op.st.sessions.forEach(function(s){ payload.sessions[s.id] = { date:s.date, time:s.time, end:s.end || "",
+        label:s.label || "Training", place:s.place || "", cancelled: !!s.cancelled, reason: s.reason || "" }; });
+      fbDo(FB.set(payload));
     }
   }
 
@@ -677,6 +742,7 @@ window.TB_STANDALONE = true;
 
   function mutate(op){
     if (readOnly) return;
+    armed = null;
     applyOp(state, op);
     if (mode === "fb") { render(); fbApply(op); return; }
     queue.push(op);
@@ -882,10 +948,22 @@ window.TB_STANDALONE = true;
         ? "Diese Ansicht ist nur lesend. Zum Eintragen brauchst du einen Link mit Bearbeitungsrecht."
         : "Jeder trägt sich selbst ein. Änderungen sind sofort für alle sichtbar.";
 
+    renderNudge();
     renderNext();
     renderUpcoming();
     renderStats();
     if (isTrainer()) renderAdmin();
+
+    if (focusNote) {
+      var fn = focusNote;
+      focusNote = null;
+      [0, 300].forEach(function(delay){
+        setTimeout(function(){
+          var n = document.getElementById("note-" + fn);
+          if (n && !n.value && document.activeElement !== n) { try { n.focus(); } catch (e) {} }
+        }, delay);
+      });
+    }
   }
 
   function pickButtons(sid, pid, big){
@@ -906,12 +984,48 @@ window.TB_STANDALONE = true;
       b.disabled = readOnly;
       b.addEventListener("click", function(){
         var e = entry(sid, pid);
-        if (e && e.v === v) mutate({ t:"att", sid:sid, pid:pid, v:null });
-        else mutate({ t:"att", sid:sid, pid:pid, v:v, n:(e ? e.n : ""), by: isTrainer() && pid !== me.id ? "t" : "" });
+        if (e && e.v === v) { mutate({ t:"att", sid:sid, pid:pid, v:null }); return; }
+        if (v === "exc") focusNote = sid + "-" + pid;
+        mutate({ t:"att", sid:sid, pid:pid, v:v, n:(e ? e.n : ""), by: isTrainer() && pid !== me.id ? "t" : "" });
       });
       box.appendChild(b);
     });
     return box;
+  }
+
+  function reasonRow(sid, pid){
+    var cur = entry(sid, pid);
+    if (!cur || cur.v !== "exc") return null;
+    var wrap = el("div","note-wrap");
+    var row = el("div","note-row");
+    var id = "note-" + sid + "-" + pid;
+    var lab = el("label", null, "Grund");
+    lab.setAttribute("for", id);
+    var inp = el("input");
+    inp.type = "text";
+    inp.id = id;
+    inp.value = cur.n || "";
+    inp.placeholder = "zum Beispiel Spätschicht, Urlaub, verletzt";
+    inp.disabled = readOnly;
+    if (!cur.n) inp.className = "missing";
+    var done = false;
+    var commit = function(){
+      if (done) return;
+      var v = inp.value.trim();
+      if (v === (cur.n || "")) return;
+      done = true;
+      mutate({ t:"att", sid: sid, pid: pid, v:"exc", n: v, by: cur.by || "" });
+    };
+    inp.addEventListener("change", commit);
+    inp.addEventListener("blur", commit);
+    inp.addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); inp.blur(); } });
+    row.appendChild(lab);
+    row.appendChild(inp);
+    wrap.appendChild(row);
+    wrap.appendChild(el("p", cur.n ? "hint" : "hint warn", cur.n
+      ? "Den Grund sieht nur der Trainer."
+      : "Bitte trage einen Grund ein, ohne ihn gilt die Entschuldigung als unvollständig."));
+    return wrap;
   }
 
   function tally(sid){
@@ -944,24 +1058,8 @@ window.TB_STANDALONE = true;
       card.appendChild(el("p","hint","Als Trainer trägst du dich hier nicht selbst ein. Korrekturen für einzelne Spieler machst du in der Tabelle unten."));
     } else {
       card.appendChild(pickButtons(next.id, me.id, true));
-      var cur = entry(next.id, me.id);
-      if (cur && cur.v === "exc") {
-        var row = el("div","note-row");
-        var lab = el("label", null, "Grund");
-        lab.setAttribute("for","noteInput");
-        var inp = el("input");
-        inp.type = "text"; inp.id = "noteInput";
-        inp.value = cur.n || "";
-        inp.placeholder = "zum Beispiel Spätschicht";
-        inp.disabled = readOnly;
-        inp.addEventListener("change", function(){
-          mutate({ t:"att", sid: next.id, pid: me.id, v:"exc", n: inp.value.trim(), by: cur.by || "" });
-        });
-        row.appendChild(lab);
-        row.appendChild(inp);
-        card.appendChild(row);
-        card.appendChild(el("p","hint","Den Grund sieht nur der Trainer."));
-      }
+      var rr = reasonRow(next.id, me.id);
+      if (rr) card.appendChild(rr);
     }
 
     card.appendChild(tally(next.id));
@@ -981,7 +1079,8 @@ window.TB_STANDALONE = true;
       line.appendChild(el("b", "nl " + kind, pair[1]));
       line.appendChild(document.createTextNode(members.map(function(p){
         var e = entry(sid, p.id);
-        var reason = (e && e.v === "exc" && e.n && mayNote(p.id)) ? " (" + e.n + ")" : "";
+        var reason = "";
+        if (e && e.v === "exc" && mayNote(p.id)) reason = e.n ? " (" + e.n + ")" : " (Grund fehlt)";
         return p.name + reason;
       }).join(", ")));
       box.appendChild(line);
@@ -1016,6 +1115,10 @@ window.TB_STANDALONE = true;
         var c = tally(s.id);
         c.className = "counts";
         row.appendChild(c);
+        if (!isTrainer()) {
+          var rr = reasonRow(s.id, me.id);
+          if (rr) { rr.className = "note-wrap span"; row.appendChild(rr); }
+        }
       }
       box.appendChild(row);
     });
@@ -1105,6 +1208,7 @@ window.TB_STANDALONE = true;
 
   function renderAdmin(){
     $("teamInput").value = state.team || "";
+    renderSessionEditor();
 
     var r = $("rosterList");
     r.innerHTML = "";
@@ -1119,10 +1223,14 @@ window.TB_STANDALONE = true;
         rp.addEventListener("click", function(){ mutate({ t:"pin", who: p.id, h: null }); });
         chip.appendChild(rp);
       }
-      var x = el("button", null, "×");
+      var isArmed = !!armed && armed.k === "p" && armed.id === p.id;
+      var x = el("button", isArmed ? "confirm" : null, isArmed ? "wirklich löschen?" : "×");
       x.type = "button";
       x.title = p.name + " aus dem Kader entfernen";
-      x.addEventListener("click", function(){ mutate({ t:"delPlayer", id: p.id }); });
+      x.addEventListener("click", function(){
+        if (isArmed) { armed = null; mutate({ t:"delPlayer", id: p.id }); }
+        else { armed = { k:"p", id: p.id }; renderAdmin(); }
+      });
       chip.appendChild(x);
       r.appendChild(chip);
     });
@@ -1158,9 +1266,13 @@ window.TB_STANDALONE = true;
       });
       row.appendChild(cancel);
 
-      var del = el("button","btn quiet danger","löschen");
+      var armedS = !!armed && armed.k === "s" && armed.id === s.id;
+      var del = el("button","btn quiet danger" + (armedS ? " confirm" : ""), armedS ? "wirklich löschen?" : "löschen");
       del.type = "button";
-      del.addEventListener("click", function(){ mutate({ t:"delSession", id:s.id }); });
+      del.addEventListener("click", function(){
+        if (armedS) { armed = null; mutate({ t:"delSession", id:s.id }); }
+        else { armed = { k:"s", id:s.id }; renderAdmin(); }
+      });
       row.appendChild(del);
 
       if (editing === s.id) {
@@ -1192,6 +1304,98 @@ window.TB_STANDALONE = true;
     if (!state.sessions.length) list.appendChild(el("div","empty","Noch keine Termine."));
   }
 
+  /* ---------- Hinweis oben ---------- */
+  function renderNudge(){
+    var box = $("nudge"), txt = $("nudgeText");
+    var t = todayISO();
+    var limit = isoOf(new Date(Date.now() + 8 * 86400000));
+    var soon = upcoming().filter(function(s){ return !s.cancelled && s.date >= t && s.date <= limit; });
+    if (!soon.length || !state.players.length) { box.hidden = true; return; }
+
+    if (isTrainer()) {
+      var offen = soon.map(function(s){
+        var c = counts(s.id);
+        return c.open ? fmtShort(s.date) + ": " + c.open : null;
+      }).filter(Boolean);
+      if (!offen.length) { box.hidden = true; return; }
+      txt.textContent = "Es fehlen noch Rückmeldungen. " + offen.join(", ") + ".";
+      box.hidden = false;
+      return;
+    }
+    var mine = soon.filter(function(s){ return !entry(s.id, me.id); });
+    if (!mine.length) { box.hidden = true; return; }
+    txt.textContent = mine.length === 1
+      ? "Für " + fmtShort(mine[0].date) + " hast du dich noch nicht eingetragen."
+      : "Für " + mine.length + " Termine fehlt noch deine Rückmeldung: " + mine.map(function(s){ return fmtShort(s.date); }).join(", ") + ".";
+    box.hidden = false;
+  }
+
+  /* ---------- Termin abhaken ---------- */
+  function renderSessionEditor(){
+    var sel = $("sessPick"), box = $("sessEdit");
+    var t = todayISO();
+    var sorted = byDate(state.sessions);
+    var past = sorted.filter(function(s){ return s.date <= t; }).reverse();
+    var future = sorted.filter(function(s){ return s.date > t; });
+    var ordered = past.concat(future);
+
+    sel.innerHTML = "";
+    ordered.forEach(function(s){
+      var o = el("option", null, fmtShort(s.date) + " " + span(s) + " · " + (s.label || "Training") + (s.cancelled ? " (abgesagt)" : ""));
+      o.value = s.id;
+      sel.appendChild(o);
+    });
+    if (!ordered.length) {
+      box.innerHTML = "";
+      box.appendChild(el("div","empty","Noch keine Termine angelegt."));
+      return;
+    }
+    if (!pickSid || !ordered.some(function(s){ return s.id === pickSid; })) pickSid = ordered[0].id;
+    sel.value = pickSid;
+
+    box.innerHTML = "";
+    if (!state.players.length) { box.appendChild(el("div","empty","Noch kein Kader angelegt.")); return; }
+    state.players.slice().sort(function(a,b){ return a.name.localeCompare(b.name, "de"); }).forEach(function(p){
+      var row = el("div","prow");
+      var e = entry(pickSid, p.id);
+      var name = el("span","pn", p.name);
+      if (e && e.by === "t") name.title = "zuletzt vom Trainer gesetzt";
+      row.appendChild(name);
+      row.appendChild(pickButtons(pickSid, p.id, false));
+      var rr = reasonRow(pickSid, p.id);
+      if (rr) row.appendChild(rr);
+      box.appendChild(row);
+    });
+  }
+
+  /* ---------- Datei ausgeben ---------- */
+  function downloadText(name, text, msgEl, boxEl){
+    var fail = function(){
+      if (boxEl) { boxEl.hidden = false; boxEl.value = text; }
+      if (msgEl) msgEl.textContent = "Download nicht möglich, hier zum Kopieren:";
+    };
+    var ok = function(){ if (msgEl) msgEl.textContent = "Datei gespeichert."; };
+    if (mode === "artifact" && window.claude && window.claude.use) {
+      window.claude.use("downloads").then(function(dl){
+        if (!dl) { fail(); return; }
+        dl.save({ filename: name, data: text }).then(ok, fail);
+      }, fail);
+      return;
+    }
+    try {
+      var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 3000);
+      ok();
+    } catch (e) { fail(); }
+  }
+
   /* ---------- CSV ---------- */
   function buildCsv(){
     var held = heldSessions();
@@ -1212,21 +1416,51 @@ window.TB_STANDALONE = true;
   }
 
   function exportCsv(){
-    var csv = buildCsv();
-    var name = "trainingsbeteiligung-" + todayISO() + ".csv";
-    var msg = $("csvMsg");
-    msg.textContent = "";
-    var done = function(){ msg.textContent = "Datei gespeichert."; };
-    var fallback = function(){
-      $("csvBox").hidden = false;
-      $("csvBox").value = csv;
-      msg.textContent = "Download nicht möglich, hier zum Kopieren:";
-    };
-    var use = (window.claude && window.claude.use) ? window.claude.use("downloads") : Promise.resolve(null);
-    use.then(function(dl){
-      if (!dl) { fallback(); return; }
-      dl.save({ filename: name, data: csv }).then(done, fallback);
-    }, fallback);
+    $("csvMsg").textContent = "";
+    downloadText("trainingsbeteiligung-" + todayISO() + ".csv", buildCsv(), $("csvMsg"), $("csvBox"));
+  }
+
+  /* ---------- Zeitraum ---------- */
+  function rangeAction(del){
+    var msg = $("rangeMsg");
+    var from = $("rangeFrom").value, to = $("rangeTo").value;
+    if (!from || !to) { msg.className = "msg"; msg.textContent = "Bitte beide Daten angeben."; return; }
+    if (to < from) { var swap = from; from = to; to = swap; }
+    var hit = state.sessions.filter(function(s){ return s.date >= from && s.date <= to; });
+    if (!hit.length) { msg.className = "msg"; msg.textContent = "In diesem Zeitraum liegt kein Termin."; return; }
+    if (del && rangeArmed !== from + to) {
+      rangeArmed = from + to;
+      msg.className = "msg";
+      msg.textContent = hit.length + (hit.length === 1 ? " Termin wird" : " Termine werden") + " mit allen Einträgen gelöscht. Zum Bestätigen noch einmal auf löschen.";
+      return;
+    }
+    rangeArmed = null;
+    var reason = $("rangeReason").value.trim();
+    hit.forEach(function(s){
+      if (del) mutate({ t:"delSession", id: s.id });
+      else mutate({ t:"updSession", id: s.id, patch: { cancelled: true, reason: reason } });
+    });
+    msg.className = "msg ok";
+    msg.textContent = hit.length + (hit.length === 1 ? " Termin " : " Termine ") + (del ? "gelöscht." : "abgesagt.");
+  }
+
+  /* ---------- Sicherung ---------- */
+  function backupJson(){
+    return JSON.stringify({ v:2, team: state.team, trainerPin: state.trainerPin,
+      players: state.players, sessions: state.sessions, att: state.att }, null, 2);
+  }
+
+  function restoreFrom(text){
+    var msg = $("backupMsg");
+    var raw;
+    try { raw = JSON.parse(text); } catch (e) { msg.className = "msg"; msg.textContent = "Das ist keine gültige Sicherungsdatei."; return; }
+    var st = normalize({ demo:false, team: raw.team, trainerPin: raw.trainerPin,
+      players: raw.players, sessions: raw.sessions, att: raw.att });
+    if (!st.players.length && !st.sessions.length) { msg.className = "msg"; msg.textContent = "Die Datei enthält weder Kader noch Termine."; return; }
+    mutate({ t:"restore", st: st });
+    msg.className = "msg ok";
+    msg.textContent = "Eingespielt: " + st.players.length + (st.players.length === 1 ? " Spieler, " : " Spieler, ")
+      + st.sessions.length + (st.sessions.length === 1 ? " Termin." : " Termine.");
   }
 
   /* ---------- wiring ---------- */
@@ -1294,6 +1528,43 @@ window.TB_STANDALONE = true;
     linkTimes("oneTime","oneEnd");
 
     $("csvBtn").addEventListener("click", exportCsv);
+
+    $("sessPick").addEventListener("change", function(){ pickSid = this.value; renderSessionEditor(); });
+
+    $("rangeCancel").addEventListener("click", function(){ rangeAction(false); });
+    $("rangeDelete").addEventListener("click", function(){ rangeAction(true); });
+
+    $("backupSave").addEventListener("click", function(){
+      var msg = $("backupMsg");
+      msg.className = "msg ok";
+      msg.textContent = "";
+      downloadText("trainingsbeteiligung-sicherung-" + todayISO() + ".json", backupJson(), msg, $("backupBox"));
+    });
+
+    $("backupPick").addEventListener("click", function(){
+      var msg = $("backupMsg");
+      if (restoreArmed) {
+        restoreArmed = false;
+        $("backupPick").textContent = "Sicherung einspielen";
+        msg.textContent = "";
+        $("backupFile").click();
+        return;
+      }
+      restoreArmed = true;
+      $("backupPick").textContent = "wirklich ersetzen?";
+      msg.className = "msg";
+      msg.textContent = "Noch einmal klicken, dann die Datei auswählen. Der aktuelle Stand wird dabei überschrieben.";
+    });
+
+    $("backupFile").addEventListener("change", function(){
+      var f = this.files && this.files[0];
+      this.value = "";
+      if (!f) return;
+      var r = new FileReader();
+      r.onload = function(){ restoreFrom(String(r.result)); };
+      r.onerror = function(){ $("backupMsg").className = "msg"; $("backupMsg").textContent = "Die Datei konnte nicht gelesen werden."; };
+      r.readAsText(f);
+    });
 
     $("setTrainerPin").addEventListener("click", function(){
       var v = $("newTrainerPin").value.trim();
