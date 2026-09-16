@@ -28,9 +28,6 @@ window.TB_STANDALONE = true;
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-</head>
-<body>
-<title>Trainingsbeteiligung</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Narrow:wght@400;500;600;700&display=swap">
@@ -43,7 +40,7 @@ window.TB_STANDALONE = true;
     --ink-950:#0B0D0B; --ink-900:#141815; --ink-800:#242A25; --ink-700:#3A413B;
     --ink-600:#565E57; --ink-500:#737B74; --ink-400:#9AA19B; --ink-300:#BFC5C0;
     --ink-200:#DCE0DC; --ink-100:#EBEEEB; --ink-50:#F6F8F6; --white:#FFFFFF;
-    --sand-700:#8A681F; --sand-600:#A98430; --sand-500:#C9A24B; --sand-100:#F7EFDC;
+    --sand-700:#8A681F; --sand-600:#A98430; --sand-500:#C9A24B; --sand-400:#DCBC78; --sand-100:#F7EFDC;
     --red-700:#8C271F; --red-600:#B4342B; --red-100:#F8E2DF;
     --blue-600:#2F6C8F; --blue-100:#E1EDF3;
 
@@ -52,6 +49,7 @@ window.TB_STANDALONE = true;
     --surface-sunken:var(--ink-100);
     --surface-brand:var(--green-600);
     --surface-brand-soft:var(--green-50);
+    --surface-inverse:var(--green-900);
     --text-strong:var(--ink-950);
     --text-body:var(--ink-800);
     --text-muted:var(--ink-500);
@@ -74,7 +72,8 @@ window.TB_STANDALONE = true;
     --font-sans:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
     --font-narrow:"Archivo Narrow","Archivo",system-ui,sans-serif;
     --radius-control:8px; --radius-card:14px; --radius-pill:999px;
-    --dur-fast:140ms; --ease-out:cubic-bezier(.22,.8,.28,1);
+    --dur-fast:140ms; --dur-slow:320ms; --ease-out:cubic-bezier(.22,.8,.28,1);
+    --rail-w:248px; --topbar-h:64px; --tabbar-h:62px;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
@@ -83,6 +82,7 @@ window.TB_STANDALONE = true;
       --surface-sunken:#11271A;
       --surface-brand:var(--green-500);
       --surface-brand-soft:#132A1C;
+      --surface-inverse:#071309;
       --text-strong:#EAF3EC;
       --text-body:#D3E2D7;
       --text-muted:#8FA295;
@@ -107,6 +107,7 @@ window.TB_STANDALONE = true;
     --surface-sunken:#11271A;
     --surface-brand:var(--green-500);
     --surface-brand-soft:#132A1C;
+    --surface-inverse:#071309;
     --text-strong:#EAF3EC;
     --text-body:#D3E2D7;
     --text-muted:#8FA295;
@@ -131,30 +132,77 @@ window.TB_STANDALONE = true;
   h1,h2,h3,p{margin:0;}
   .num{font-variant-numeric:tabular-nums;}
   ::selection{background:var(--green-200);color:var(--green-950);}
-
-  .wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 72px;
-    display:flex;flex-direction:column;gap:20px;}
-  @media (min-width:760px){.wrap{padding-inline:32px;}}
-
   .eyebrow{font:700 11px/1.2 var(--font-narrow);letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);}
-
   .card{background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-card);overflow:hidden;}
   .pad{padding:20px;}
+  svg.lu{width:18px;height:18px;flex:none;stroke-width:1.9;}
 
-  /* header */
-  .masthead{position:relative;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 24px;padding:22px 20px 20px;}
-  .masthead::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;
-    background:linear-gradient(90deg,var(--green-600) 0 38%,var(--pennant-b) 38% 100%);}
-  .masthead h1{font:800 clamp(26px,5vw,36px)/1.04 var(--font-sans);letter-spacing:-.022em;color:var(--text-strong);text-wrap:balance;}
-  .stat{text-align:right;}
-  .stat b{display:block;font:800 36px/1 var(--font-sans);letter-spacing:-.022em;color:var(--text-strong);font-variant-numeric:tabular-nums;}
-  .stat span{font:600 12px/1.3 var(--font-narrow);letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);display:block;max-width:170px;margin-left:auto;margin-top:4px;}
+  /* ---------- Hülle ---------- */
+  .shell{display:flex;min-height:100vh;align-items:stretch;}
+  .rail{display:none;width:var(--rail-w);flex:none;background:var(--surface-inverse);color:var(--green-50);
+    position:sticky;top:0;height:100vh;flex-direction:column;gap:6px;padding:0 14px 18px;}
+  .rail::before{content:"";display:block;height:3px;margin:0 -14px 22px;
+    background:linear-gradient(90deg,var(--green-600) 0 38%,#FFFFFF 38% 100%);}
+  .rail .brand{padding:0 10px 18px;display:flex;flex-direction:column;gap:2px;}
+  .rail .brand .eyebrow{color:rgba(255,255,255,.55);}
+  .rail .brand b{font:800 21px/1.1 var(--font-sans);letter-spacing:-.018em;color:#fff;overflow-wrap:anywhere;}
+  .rail nav{display:flex;flex-direction:column;gap:3px;}
+  .navitem{display:flex;align-items:center;gap:11px;width:100%;text-align:left;cursor:pointer;
+    font:600 14.5px/1.2 var(--font-sans);color:rgba(255,255,255,.72);background:transparent;border:0;
+    height:44px;padding:0 10px;border-radius:var(--radius-control);
+    transition:background-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out);}
+  .navitem:hover{background:rgba(255,255,255,.10);color:#fff;}
+  .navitem[aria-current="page"]{background:rgba(255,255,255,.18);color:#fff;}
+  .navitem .dot{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:var(--radius-pill);
+    background:var(--sand-500);color:var(--green-950);font:700 11px/20px var(--font-narrow);text-align:center;}
+  .rail .foot{margin-top:auto;font-size:12px;color:rgba(255,255,255,.45);padding:0 10px;}
 
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .topbar{position:sticky;top:0;z-index:20;height:var(--topbar-h);display:flex;align-items:center;gap:10px;
+    padding:0 16px;background:var(--surface-card);border-bottom:1px solid var(--border-subtle);}
+  @media (min-width:900px){.topbar{padding:0 32px;}}
+  .topbar .tname{font:800 18px/1.1 var(--font-sans);letter-spacing:-.014em;color:var(--text-strong);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .topbar .spacer{flex:1;}
+  .topbar .who{display:none;align-items:center;gap:8px;font-size:14px;color:var(--text-body);}
+  @media (min-width:640px){.topbar .who{display:flex;}}
+  .who b{font-weight:700;color:var(--text-strong);}
+  .tag{font:700 11px/1 var(--font-narrow);letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;
+    border-radius:var(--radius-pill);background:var(--surface-brand-soft);color:var(--text-brand);}
+  .save{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-muted);white-space:nowrap;}
+  .led{width:7px;height:7px;border-radius:50%;background:var(--status-unknown);flex:none;}
+  .save.ok .led{background:var(--status-present);}
+  .save.busy .led{background:var(--status-excused);}
+  .save.bad .led{background:var(--status-absent);}
+  @media (max-width:520px){.save span{display:none;}}
+
+  .content{width:100%;max-width:1180px;margin:0 auto;padding:20px 16px calc(var(--tabbar-h) + 28px);
+    display:flex;flex-direction:column;gap:20px;}
+  @media (min-width:900px){.content{padding:28px 32px 56px;}}
+  .view{display:flex;flex-direction:column;gap:20px;}
+  .view[hidden]{display:none!important;}
   section{display:flex;flex-direction:column;gap:10px;}
   h2{font:700 11px/1.2 var(--font-narrow);letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);}
   h3{font:700 18px/1.18 var(--font-sans);letter-spacing:-.012em;color:var(--text-strong);}
+  .viewhead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;}
+  .viewhead h1{font:800 clamp(24px,4.4vw,32px)/1.06 var(--font-sans);letter-spacing:-.022em;color:var(--text-strong);}
+  .viewhead p{font-size:13.5px;color:var(--text-muted);}
 
-  /* controls */
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;height:var(--tabbar-h);
+    display:flex;background:var(--surface-card);border-top:1px solid var(--border-subtle);
+    padding-bottom:env(safe-area-inset-bottom);}
+  @media (min-width:900px){.rail{display:flex;} .tabbar{display:none;}}
+  .tabitem{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    border:0;background:transparent;cursor:pointer;color:var(--text-muted);position:relative;
+    font:600 11px/1.1 var(--font-narrow);letter-spacing:.04em;text-transform:uppercase;padding:0 2px;}
+  .tabitem[aria-current="page"]{color:var(--text-brand);}
+  .tabitem[aria-current="page"]::before{content:"";position:absolute;top:0;left:22%;right:22%;height:3px;
+    border-radius:0 0 3px 3px;background:var(--surface-brand);}
+  .tabitem .dot{position:absolute;top:8px;left:50%;margin-left:6px;min-width:16px;height:16px;padding:0 4px;
+    border-radius:var(--radius-pill);background:var(--sand-500);color:var(--green-950);
+    font:700 10px/16px var(--font-narrow);text-align:center;}
+
+  /* ---------- Steuerelemente ---------- */
   input[type=text],input[type=date],input[type=time],input[type=number],input[type=password],select{
     font:400 15px/1.2 var(--font-sans);color:var(--text-body);background:var(--surface-card);
     border:1px solid var(--border-strong);border-radius:var(--radius-control);padding:0 10px;height:40px;min-width:0;max-width:100%;}
@@ -162,6 +210,7 @@ window.TB_STANDALONE = true;
     background-position:calc(100% - 17px) 18px,calc(100% - 12px) 18px;background-size:5px 5px;background-repeat:no-repeat;padding-right:32px;}
   a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible{
     outline:1px solid var(--surface-brand);outline-offset:0;box-shadow:var(--ring-focus);}
+  .rail .navitem:focus-visible{outline:1px solid #fff;box-shadow:0 0 0 3px rgba(255,255,255,.25);}
   label{font:600 13px/1.2 var(--font-sans);color:var(--text-muted);}
 
   .btn{font:600 14px/1 var(--font-sans);height:40px;padding:0 15px;border-radius:var(--radius-control);
@@ -179,8 +228,16 @@ window.TB_STANDALONE = true;
   .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
   .hint{font-size:13.5px;color:var(--text-muted);max-width:66ch;}
   .hint.warn{color:var(--sand-700);}
+  .msg{font:600 13.5px/1.35 var(--font-sans);color:var(--status-absent);}
+  .msg.ok{color:var(--text-brand);}
 
-  /* login */
+  /* ---------- Anmeldung ---------- */
+  .gatewrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;}
+  .gatewrap .inner{width:100%;max-width:960px;display:flex;flex-direction:column;gap:20px;}
+  .gatemast{position:relative;padding:24px 20px 20px;}
+  .gatemast::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;
+    background:linear-gradient(90deg,var(--green-600) 0 38%,var(--pennant-b) 38% 100%);}
+  .gatemast h1{font:800 clamp(26px,5vw,36px)/1.04 var(--font-sans);letter-spacing:-.022em;color:var(--text-strong);}
   .gate{display:grid;gap:16px;grid-template-columns:1fr;}
   @media (min-width:720px){.gate{grid-template-columns:1.1fr .9fr;align-items:start;}}
   .gate .form{display:flex;flex-direction:column;gap:12px;}
@@ -188,22 +245,8 @@ window.TB_STANDALONE = true;
   .gate .field input,.gate .field select{width:100%;}
   .aside{background:var(--surface-brand-soft);border:1px solid var(--border-subtle);border-radius:var(--radius-card);padding:18px;display:flex;flex-direction:column;gap:9px;}
   .aside ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13.5px;color:var(--text-body);}
-  .msg{font:600 13.5px/1.35 var(--font-sans);color:var(--status-absent);}
-  .msg.ok{color:var(--text-brand);}
 
-  /* identity strip */
-  .idbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;justify-content:space-between;
-    background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-pill);padding:8px 8px 8px 16px;}
-  .who{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--text-body);min-width:0;}
-  .who b{font-weight:700;color:var(--text-strong);}
-  .tag{font:700 11px/1 var(--font-narrow);letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border-radius:var(--radius-pill);background:var(--surface-brand-soft);color:var(--text-brand);}
-  .save{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-muted);white-space:nowrap;}
-  .led{width:7px;height:7px;border-radius:50%;background:var(--status-unknown);}
-  .save.ok .led{background:var(--status-present);}
-  .save.busy .led{background:var(--status-excused);}
-  .save.bad .led{background:var(--status-absent);}
-
-  /* next session */
+  /* ---------- nächster Termin ---------- */
   .next-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;align-items:baseline;}
   .next-meta{color:var(--text-muted);font-size:14px;font-variant-numeric:tabular-nums;}
   .picks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;}
@@ -230,8 +273,7 @@ window.TB_STANDALONE = true;
 
   .names{display:flex;flex-direction:column;gap:6px;margin-top:14px;}
   .nameline{font-size:14px;color:var(--text-body);}
-  .nl{display:inline-block;min-width:112px;font:700 11px/1.6 var(--font-narrow);letter-spacing:.1em;text-transform:uppercase;
-    vertical-align:baseline;}
+  .nl{display:inline-block;min-width:112px;font:700 11px/1.6 var(--font-narrow);letter-spacing:.1em;text-transform:uppercase;vertical-align:baseline;}
   .nl.yes{color:var(--status-present);}
   .nl.exc{color:var(--status-excused);}
   .nl.no{color:var(--status-absent);}
@@ -244,7 +286,7 @@ window.TB_STANDALONE = true;
   .note-row input{flex:1;min-width:170px;}
   .note-row input.missing{border-color:var(--status-absent);box-shadow:0 0 0 3px var(--status-absent-soft);}
 
-  /* session list */
+  /* ---------- Terminliste ---------- */
   .sess{display:grid;grid-template-columns:118px 1fr auto;gap:4px 16px;align-items:center;
     padding:13px 18px;border-top:1px solid var(--border-subtle);}
   .sess:first-child{border-top:0;}
@@ -265,7 +307,7 @@ window.TB_STANDALONE = true;
   .mini:disabled{opacity:.42;cursor:not-allowed;}
   .empty{padding:20px;color:var(--text-muted);font-size:14px;}
 
-  /* table */
+  /* ---------- Tabelle ---------- */
   .scroll{overflow-x:auto;}
   table{border-collapse:collapse;width:100%;font-size:14px;}
   th,td{padding:0 8px;height:44px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--border-subtle);}
@@ -276,7 +318,7 @@ window.TB_STANDALONE = true;
   tbody tr:hover td,tbody tr:hover td.name{background:var(--surface-brand-soft);}
   td.q{text-align:right;padding-right:18px;font-variant-numeric:tabular-nums;font-weight:700;color:var(--text-strong);}
   .bar{display:block;height:4px;border-radius:2px;background:var(--surface-sunken);margin-top:5px;overflow:hidden;}
-  .bar i{display:block;height:100%;background:var(--surface-brand);}
+  .bar i{display:block;height:100%;background:var(--surface-brand);transition:width var(--dur-slow) var(--ease-out);}
   th.split,td.split{border-left:2px solid var(--border-strong);}
   th.future{color:var(--text-brand);}
   td.future{background:var(--surface-brand-soft);}
@@ -290,15 +332,76 @@ window.TB_STANDALONE = true;
   .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--text-muted);align-items:center;}
   .legend span{display:inline-flex;align-items:center;gap:6px;}
 
-  /* trainer area */
-  details.admin{background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-card);}
-  details.admin>summary{font:700 16px/1.2 var(--font-sans);color:var(--text-strong);padding:16px 18px;cursor:pointer;
-    list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px;}
-  details.admin>summary::-webkit-details-marker{display:none;}
-  details.admin>summary::after{content:"+";font:400 20px/1 var(--font-sans);color:var(--text-muted);}
-  details.admin[open]>summary::after{content:"\2013";}
-  .admin-body{padding:18px;border-top:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:26px;}
+  /* ---------- Wertung ---------- */
+  .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+  @media (min-width:720px){.tiles{grid-template-columns:repeat(4,1fr);}}
+  .tile{background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-card);
+    padding:16px 16px 14px;display:flex;flex-direction:column;gap:3px;}
+  .tile b{font:800 30px/1.05 var(--font-sans);letter-spacing:-.022em;color:var(--text-strong);font-variant-numeric:tabular-nums;}
+  .tile b small{font:700 15px/1 var(--font-sans);color:var(--text-muted);letter-spacing:0;}
+  .tile em{font-style:normal;font-size:12.5px;color:var(--text-muted);}
+  .tile.brand{background:var(--surface-inverse);border-color:transparent;}
+  .tile.brand .eyebrow{color:rgba(255,255,255,.6);}
+  .tile.brand b{color:#fff;}
+  .tile.brand b small{color:rgba(255,255,255,.65);}
+  .tile.brand em{color:rgba(255,255,255,.7);}
+
+  .goal{display:flex;flex-direction:column;gap:14px;}
+  .goalrow{display:flex;flex-direction:column;gap:7px;}
+  .goalrow .lbl{display:flex;justify-content:space-between;gap:12px;align-items:baseline;font-size:14px;color:var(--text-body);}
+  .goalrow .lbl b{font:700 15px/1 var(--font-sans);color:var(--text-strong);font-variant-numeric:tabular-nums;}
+  .track{position:relative;height:10px;border-radius:var(--radius-pill);background:var(--surface-sunken);overflow:hidden;}
+  .track i{display:block;height:100%;border-radius:var(--radius-pill);background:var(--surface-brand);
+    transition:width var(--dur-slow) var(--ease-out);}
+  .track.warm i{background:var(--sand-500);}
+  .track .goalmark{position:absolute;top:-3px;width:2px;height:16px;background:var(--text-strong);opacity:.45;}
+
+  .podium{display:grid;gap:10px;grid-template-columns:1fr;}
+  @media (min-width:640px){.podium{grid-template-columns:repeat(3,1fr);}}
+  .prank{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--radius-card);
+    border:1px solid var(--border-subtle);background:var(--surface-card);}
+  .prank .pos{width:32px;height:32px;flex:none;border-radius:var(--radius-pill);display:grid;place-items:center;
+    font:800 15px/1 var(--font-sans);background:var(--surface-sunken);color:var(--text-muted);}
+  .prank.p1{border-color:var(--sand-500);background:var(--surface-accent-soft,var(--sand-100));}
+  .prank.p1 .pos{background:var(--sand-500);color:var(--green-950);}
+  .prank.p2 .pos{background:var(--ink-300);color:var(--ink-900);}
+  .prank.p3 .pos{background:var(--sand-300,#E9D3A3);color:var(--ink-900);}
+  .prank .pinfo{min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .prank .pinfo b{font:700 15.5px/1.2 var(--font-sans);color:var(--text-strong);overflow-wrap:anywhere;}
+  .prank .pinfo em{font-style:normal;font-size:12.5px;color:var(--text-muted);font-variant-numeric:tabular-nums;}
+
+  .badges{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));}
+  .badge{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:var(--radius-card);
+    border:1px solid var(--border-subtle);background:var(--surface-card);}
+  .badge .pin{width:34px;height:34px;flex:none;border-radius:var(--radius-pill);display:grid;place-items:center;
+    background:var(--surface-sunken);color:var(--text-faint,var(--ink-400));}
+  .badge.got{border-color:var(--green-300);background:var(--surface-brand-soft);}
+  .badge.got .pin{background:var(--surface-brand);color:var(--text-on-brand);}
+  .badge .bt{min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .badge .bt b{font:700 14.5px/1.2 var(--font-sans);color:var(--text-strong);}
+  .badge .bt em{font-style:normal;font-size:12.5px;color:var(--text-muted);}
+  .badge .bt .bp{font:600 11.5px/1.2 var(--font-narrow);letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);
+    font-variant-numeric:tabular-nums;margin-top:3px;}
+
+  .streakline{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
+  .sdot{width:13px;height:13px;border-radius:4px;background:var(--status-unknown-soft);}
+  .sdot.yes{background:var(--status-present);}
+  .sdot.exc{background:var(--status-excused);}
+  .sdot.no{background:var(--status-absent);}
+
+  .rules{border:1px solid var(--border-subtle);border-radius:var(--radius-card);background:var(--surface-card);}
+  .rules>summary{font:600 14px/1.2 var(--font-sans);color:var(--text-body);padding:14px 18px;cursor:pointer;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .rules>summary::-webkit-details-marker{display:none;}
+  .rules>summary::after{content:"+";font:400 20px/1 var(--font-sans);color:var(--text-muted);}
+  .rules[open]>summary::after{content:"\2013";}
+  .rules .rbody{padding:0 18px 18px;display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:var(--text-muted);}
+  .rules .rbody ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;}
+
+  /* ---------- Trainerbereich ---------- */
   .block{display:flex;flex-direction:column;gap:10px;}
+  .adminblock{background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-card);padding:18px;
+    display:flex;flex-direction:column;gap:10px;}
   .roster{display:flex;flex-wrap:wrap;gap:6px;}
   .rchip{display:inline-flex;align-items:center;gap:4px;background:var(--surface-sunken);border:1px solid var(--border-subtle);
     border-radius:var(--radius-pill);padding:4px 6px 4px 13px;font-size:14px;color:var(--text-strong);}
@@ -333,7 +436,7 @@ window.TB_STANDALONE = true;
   :root[data-theme="dark"] .banner{color:var(--status-excused);}
   .csvbox{width:100%;min-height:120px;font:400 12px/1.4 ui-monospace,Menlo,Consolas,monospace;
     border:1px solid var(--border-strong);border-radius:var(--radius-control);padding:10px;background:var(--surface-card);color:var(--text-body);}
-  footer{font-size:12.5px;color:var(--text-muted);text-align:center;}
+  footer{font-size:12.5px;color:var(--text-muted);text-align:center;padding-top:6px;}
 
   @media (max-width:560px){
     .sess{grid-template-columns:1fr auto;}
@@ -341,37 +444,24 @@ window.TB_STANDALONE = true;
     .sess .what{grid-column:1;}
     .sess .mine{grid-column:2;grid-row:1/3;}
     .sess .counts{grid-column:1/-1;}
-    .stat{text-align:left;}
-    .stat span{margin-left:0;}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
 </style>
+</head>
+<body>
 
-<div class="wrap">
-
-  <header class="card masthead">
-    <div>
+<!-- ================= ANMELDUNG ================= -->
+<div class="gatewrap" id="gateWrap">
+  <div class="inner">
+    <header class="card gatemast">
       <p class="eyebrow">Trainingsbeteiligung</p>
-      <h1 id="teamName">Team</h1>
+      <h1 id="gateTeamName">Team</h1>
+    </header>
+
+    <div id="gateLocalBanner" hidden class="banner">
+      <span>Noch keine Datenbank hinterlegt. Einträge bleiben nur in diesem Browser.</span>
     </div>
-    <div class="stat">
-      <b class="num" id="teamQuota">&ndash;</b>
-      <span id="teamQuotaLabel">noch keine Termine gewertet</span>
-    </div>
-  </header>
 
-  <div id="localBanner" hidden class="banner">
-    <span id="localBannerText">Noch keine Datenbank hinterlegt. Einträge bleiben nur in diesem Browser. Trage oben in der Datei index.html die Firebase-Daten ein, dann teilen sich alle Geräte denselben Stand.</span>
-  </div>
-
-  <div id="demoBanner" hidden class="banner">
-    <span>Beispieldaten zum Ausprobieren. Der Button entfernt nur die Beispiele, deine eigenen Einträge bleiben.</span>
-    <button class="btn" id="clearDemo" type="button">Beispieldaten entfernen</button>
-  </div>
-
-  <!-- LOGIN -->
-  <section id="gate">
-    <h2>Anmeldung</h2>
     <div class="gate">
       <div class="card pad form">
         <h3>Wer bist du?</h3>
@@ -394,64 +484,173 @@ window.TB_STANDALONE = true;
         <ul>
           <li>Beim ersten Mal legst du deine PIN selbst fest.</li>
           <li>Du trägst nur für dich ein: anwesend, entschuldigt oder gefehlt.</li>
+          <li>Jede Rückmeldung bringt Punkte, jede Anwesenheit verlängert deine Serie.</li>
           <li>Der Trainer pflegt Kader und Termine und kann Einträge nachträglich korrigieren.</li>
           <li>PIN vergessen? Der Trainer setzt sie zurück, dann vergibst du beim nächsten Login eine neue.</li>
         </ul>
       </div>
     </div>
-  </section>
+  </div>
+</div>
 
-  <!-- APP -->
-  <div id="app" hidden style="display:flex;flex-direction:column;gap:20px;">
+<!-- ================= APP ================= -->
+<div class="shell" id="shell" hidden>
 
-    <div class="idbar">
-      <span class="who">Angemeldet als <b id="whoName">&nbsp;</b><span class="tag" id="whoTag" hidden>Trainer</span></span>
-      <span class="row" style="gap:6px">
-        <span class="save" id="saveStatus"><i class="led"></i><span id="saveText">bereit</span></span>
-        <button class="btn quiet" id="logoutBtn" type="button">Abmelden</button>
-      </span>
+  <aside class="rail">
+    <div class="brand">
+      <span class="eyebrow">Trainingsbeteiligung</span>
+      <b id="railTeam">Team</b>
     </div>
+    <nav id="railNav" aria-label="Bereiche"></nav>
+    <div class="foot" id="railFoot"></div>
+  </aside>
 
-    <div id="nudge" hidden class="banner info"><span id="nudgeText"></span></div>
+  <div class="main">
+    <header class="topbar">
+      <span class="tname" id="topTeam">Team</span>
+      <span class="spacer"></span>
+      <span class="who">Angemeldet als <b id="whoName">&nbsp;</b><span class="tag" id="whoTag" hidden>Trainer</span></span>
+      <span class="save" id="saveStatus"><i class="led"></i><span id="saveText">bereit</span></span>
+      <button class="btn quiet" id="logoutBtn" type="button">Abmelden</button>
+    </header>
 
-    <section>
-      <h2>Nächster Termin</h2>
-      <div class="card pad" id="nextCard"></div>
-    </section>
+    <main class="content">
 
-    <section>
-      <h2>Kommende Termine</h2>
-      <div class="card" id="upcomingList"></div>
-    </section>
-
-    <section>
-      <h2>Beteiligung</h2>
-      <div class="card scroll"><table id="statsTable"></table></div>
-      <div class="legend">
-        <span><i class="mark yes"></i> anwesend</span>
-        <span><i class="mark exc"></i> entschuldigt</span>
-        <span><i class="mark no"></i> gefehlt</span>
-        <span><i class="mark"></i> nichts eingetragen</span>
-        <span id="legendTrainer" hidden><i class="mark yes byt"></i> vom Trainer korrigiert</span>
-        <span>Grün hinterlegte Spalten sind geplante Termine, sie zählen noch nicht in die Quote</span>
-        <span>Quote = anwesend geteilt durch eingetragene Termine</span>
+      <div id="localBanner" hidden class="banner">
+        <span>Noch keine Datenbank hinterlegt. Einträge bleiben nur in diesem Browser. Trage oben in der Datei index.html die Firebase-Daten ein, dann teilen sich alle Geräte denselben Stand.</span>
       </div>
-      <p class="hint" id="tableHint"></p>
-    </section>
 
-    <details class="admin" id="adminBox" hidden>
-      <summary>Trainerbereich</summary>
-      <div class="admin-body">
+      <div id="demoBanner" hidden class="banner">
+        <span>Beispieldaten zum Ausprobieren. Der Button entfernt nur die Beispiele, deine eigenen Einträge bleiben.</span>
+        <button class="btn" id="clearDemo" type="button">Beispieldaten entfernen</button>
+      </div>
 
-        <div class="block">
+      <!-- ---------- HEUTE ---------- -->
+      <section class="view" id="view-heute" hidden>
+        <div class="viewhead">
+          <h1>Heute</h1>
+          <p id="heuteSub"></p>
+        </div>
+
+        <div id="nudge" hidden class="banner info"><span id="nudgeText"></span></div>
+
+        <div class="tiles" id="heuteTiles"></div>
+
+        <section>
+          <h2>Nächster Termin</h2>
+          <div class="card pad" id="nextCard"></div>
+        </section>
+      </section>
+
+      <!-- ---------- TERMINE ---------- -->
+      <section class="view" id="view-termine" hidden>
+        <div class="viewhead">
+          <h1>Termine</h1>
+          <p>Trage dich für kommende Einheiten ein, vergangene stehen darunter.</p>
+        </div>
+
+        <section>
+          <h2>Kommende Termine</h2>
+          <div class="card" id="upcomingList"></div>
+        </section>
+
+        <section>
+          <h2>Vergangene Termine</h2>
+          <div class="card" id="pastList"></div>
+        </section>
+      </section>
+
+      <!-- ---------- TEAM ---------- -->
+      <section class="view" id="view-team" hidden>
+        <div class="viewhead">
+          <h1>Team</h1>
+          <p id="teamSub"></p>
+        </div>
+
+        <div class="tiles" id="teamTiles"></div>
+
+        <section>
+          <h2>Mannschaftsziel</h2>
+          <div class="card pad goal" id="goalCard"></div>
+        </section>
+
+        <section>
+          <h2>Podium des Monats</h2>
+          <div class="podium" id="podiumBox"></div>
+          <p class="hint" id="podiumHint"></p>
+        </section>
+
+        <section>
+          <h2>Beteiligung</h2>
+          <div class="card scroll"><table id="statsTable"></table></div>
+          <div class="legend">
+            <span><i class="mark yes"></i> anwesend</span>
+            <span><i class="mark exc"></i> entschuldigt</span>
+            <span><i class="mark no"></i> gefehlt</span>
+            <span><i class="mark"></i> nichts eingetragen</span>
+            <span id="legendTrainer" hidden><i class="mark yes byt"></i> vom Trainer korrigiert</span>
+            <span>Grün hinterlegte Spalten sind geplante Termine, sie zählen noch nicht in die Quote</span>
+            <span>Quote = anwesend geteilt durch eingetragene Termine</span>
+          </div>
+          <p class="hint" id="tableHint"></p>
+        </section>
+      </section>
+
+      <!-- ---------- MEIN PROFIL ---------- -->
+      <section class="view" id="view-ich" hidden>
+        <div class="viewhead">
+          <h1 id="ichName">Mein Profil</h1>
+          <p id="ichSub"></p>
+        </div>
+
+        <div class="tiles" id="ichTiles"></div>
+
+        <section>
+          <h2>Stufe</h2>
+          <div class="card pad goal" id="levelCard"></div>
+        </section>
+
+        <section>
+          <h2>Abzeichen</h2>
+          <div class="badges" id="badgeBox"></div>
+        </section>
+
+        <details class="rules">
+          <summary>Wie gezählt wird</summary>
+          <div class="rbody">
+            <ul>
+              <li>Anwesend bringt 10 Punkte, entschuldigt 3 Punkte, gefehlt 0 Punkte.</li>
+              <li>Wer sich vor Trainingsbeginn eintragt, bekommt 2 Punkte Bonus. Auch eine Absage zählt, solange sie rechtzeitig kommt.</li>
+              <li>Wer sich gar nicht eintragt, bekommt keine Punkte und die Serie reißt.</li>
+              <li>Die Serie zählt Einheiten in Folge, bei denen du anwesend warst. Eine Entschuldigung pausiert die Serie, sie setzt sie nicht zurück.</li>
+              <li>Die Quote ist anwesend geteilt durch eingetragene Termine. Geplante Termine zählen erst, wenn sie vorbei sind.</li>
+              <li>Die Stufe braucht mindestens fünf gewertete Einheiten: Bronze ab 70 Prozent, Silber ab 80, Gold ab 90.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <!-- ---------- TRAINER ---------- -->
+      <section class="view" id="view-trainer" hidden>
+        <div class="viewhead">
+          <h1>Trainerbereich</h1>
+          <p>Kader, Termine, Korrekturen und Sicherung.</p>
+        </div>
+
+        <div class="adminblock">
           <h3>Team</h3>
           <div class="row">
             <label for="teamInput">Name</label>
             <input type="text" id="teamInput" style="flex:1;min-width:200px">
           </div>
+          <div class="row">
+            <label for="goalInput">Mannschaftsziel in Prozent</label>
+            <input type="number" id="goalInput" min="0" max="100" step="5" style="width:96px">
+            <span class="hint">Das Ziel steht als Marke im Balken auf der Team-Seite.</span>
+          </div>
         </div>
 
-        <div class="block">
+        <div class="adminblock">
           <h3>Kader</h3>
           <p class="hint">Wer hier steht, kann sich anmelden und selbst eintragen. Ohne PIN heißt: hat sich noch nie angemeldet.</p>
           <div class="roster" id="rosterList"></div>
@@ -461,7 +660,7 @@ window.TB_STANDALONE = true;
           </div>
         </div>
 
-        <div class="block">
+        <div class="adminblock">
           <h3>Fester Rhythmus</h3>
           <p class="hint">Wochentage wählen, Uhrzeit setzen, Zeitraum angeben. Termine, die schon im Plan stehen, werden nicht doppelt angelegt.</p>
           <div class="days" id="dayPicker"></div>
@@ -475,7 +674,7 @@ window.TB_STANDALONE = true;
           <p class="msg ok" id="rhythmMsg"></p>
         </div>
 
-        <div class="block">
+        <div class="adminblock">
           <h3>Einzeltermin</h3>
           <div class="row">
             <input type="date" id="oneDate">
@@ -487,7 +686,7 @@ window.TB_STANDALONE = true;
           </div>
         </div>
 
-        <div class="block">
+        <div class="adminblock">
           <h3>Termin abhaken und Gründe pflegen</h3>
           <p class="hint">Nach dem Training hier durchgehen: Status setzen, Grund ergänzen oder korrigieren. Was du änderst, ist in der Tabelle blau umrandet.</p>
           <div class="row">
@@ -497,7 +696,7 @@ window.TB_STANDALONE = true;
           <div class="plist" id="sessEdit"></div>
         </div>
 
-        <div class="block">
+        <div class="adminblock">
           <h3>Zeitraum absagen oder löschen</h3>
           <p class="hint">Für Ferien, gesperrte Halle oder eine Turnierpause. Absagen behält die Termine samt Einträgen und markiert sie als ausgefallen, löschen entfernt sie ganz.</p>
           <div class="row">
@@ -510,7 +709,7 @@ window.TB_STANDALONE = true;
           <p class="msg ok" id="rangeMsg"></p>
         </div>
 
-        <div class="block">
+        <div class="adminblock">
           <h3>Sicherung</h3>
           <p class="hint">Der komplette Stand als Datei, inklusive Kader, Termine, Einträge und Gründe. Einspielen ersetzt alles, was gerade in der Datenbank steht.</p>
           <div class="row">
@@ -522,13 +721,13 @@ window.TB_STANDALONE = true;
           <textarea class="csvbox" id="backupBox" hidden readonly aria-label="Sicherung zum Kopieren"></textarea>
         </div>
 
-        <div class="block">
+        <div class="adminblock">
           <h3>Termine bearbeiten und löschen</h3>
           <p class="hint">„bearbeiten" öffnet Datum, Uhrzeit, Bezeichnung und Ort des Termins. Eine Absage sehen alle sofort auf der Seite, gelöschte Termine verschwinden mit allen Einträgen.</p>
           <div class="slist" id="adminSessions"></div>
         </div>
 
-        <div class="block">
+        <div class="adminblock">
           <h3>Export</h3>
           <p class="hint">Komplette Beteiligung als CSV, mit Semikolon getrennt, damit Excel die Spalten direkt erkennt.</p>
           <div class="row">
@@ -538,7 +737,7 @@ window.TB_STANDALONE = true;
           <textarea class="csvbox" id="csvBox" hidden readonly aria-label="CSV zum Kopieren"></textarea>
         </div>
 
-        <div class="block">
+        <div class="adminblock">
           <h3>Trainercode</h3>
           <p class="hint">Der Code schützt diesen Bereich. Ändere ihn, wenn ihn zu viele kennen.</p>
           <div class="row">
@@ -547,22 +746,30 @@ window.TB_STANDALONE = true;
             <span class="msg ok" id="trainerPinMsg"></span>
           </div>
         </div>
+      </section>
 
-      </div>
-    </details>
-
-    <footer id="foot">Jeder trägt sich selbst ein. Änderungen sind sofort für alle sichtbar.</footer>
+      <footer id="foot">Jeder trägt sich selbst ein. Änderungen sind sofort für alle sichtbar.</footer>
+    </main>
   </div>
+
+  <nav class="tabbar" id="tabbar" aria-label="Bereiche"></nav>
 </div>
 
 <script id="tb-seed" type="application/json">{"v":2,"demo":true}</script>
 
+<script src="https://unpkg.com/lucide@0.544.0/dist/umd/lucide.js"></script>
+<style>
+  .navitem svg,.tabitem svg{width:18px;height:18px;flex:none;stroke-width:1.9;}
+  .tabitem svg{width:20px;height:20px;}
+  .badge .pin svg{width:17px;height:17px;stroke-width:1.9;}
+</style>
 <script>
 (function () {
   "use strict";
 
   var WD = ["So","Mo","Di","Mi","Do","Fr","Sa"];
   var MON = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+  var MONLONG = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
   var WORD = { yes:"Anwesend", exc:"Entschuldigt", no:"Gefehlt" };
   var CYCLE = [null,"yes","exc","no"];
   var AUTHKEY = "tb:auth:v2";
@@ -576,6 +783,22 @@ window.TB_STANDALONE = true;
   var state = null, art = null, readOnly = false, me = null;
   var saveTimer = null, queue = [], rhythmDays = [], editing = null;
   var focusNote = null, armed = null, pickSid = null, rangeArmed = null, restoreArmed = false;
+  var route = "heute";
+
+  /* Wertung */
+  var PTS = { yes:10, exc:3, no:0 };
+  var BONUS = 2;
+  var LEVELS = [ { name:"Gold", min:90 }, { name:"Silber", min:80 }, { name:"Bronze", min:70 } ];
+  var LEVEL_MIN = 5;
+  var DEFAULT_GOAL = 85;
+
+  var NAV = [
+    { k:"heute",   label:"Heute",   icon:"calendar-check" },
+    { k:"termine", label:"Termine", icon:"clock" },
+    { k:"team",    label:"Team",    icon:"users" },
+    { k:"ich",     label:"Ich",     icon:"user-round" },
+    { k:"trainer", label:"Trainer", icon:"settings" }
+  ];
 
   function $(id){ return document.getElementById(id); }
   function el(tag, cls, txt){ var n = document.createElement(tag); if(cls) n.className = cls; if(txt != null) n.textContent = txt; return n; }
@@ -607,6 +830,8 @@ window.TB_STANDALONE = true;
   function player(id){ for (var i=0;i<state.players.length;i++) if (state.players[i].id===id) return state.players[i]; return null; }
   function entry(sid,pid){ var m = state.att[sid]; return (m && m[pid]) || null; }
   function isTrainer(){ return !!me && me.role === "trainer"; }
+  function icon(name){ var i = el("i"); i.setAttribute("data-lucide", name); i.setAttribute("aria-hidden","true"); return i; }
+  function paintIcons(){ safe(function(){ if (window.lucide && lucide.createIcons) lucide.createIcons(); }); }
 
   /* ---------- PIN ---------- */
   function hashPin(pin){
@@ -624,14 +849,16 @@ window.TB_STANDALONE = true;
     return h.toString(16);
   }
 
-  /* ---------- state ---------- */
+  /* ---------- Zustand ---------- */
   function applyOp(st, op){
     if (op.t === "att") {
       if (!st.att[op.sid]) st.att[op.sid] = {};
       if (op.v === null) delete st.att[op.sid][op.pid];
-      else st.att[op.sid][op.pid] = { v: op.v, n: op.n || "", by: op.by || "" };
+      else st.att[op.sid][op.pid] = { v: op.v, n: op.n || "", by: op.by || "", ts: op.ts || 0 };
     } else if (op.t === "team") {
       st.team = op.name;
+    } else if (op.t === "goal") {
+      st.goal = op.v;
     } else if (op.t === "pin") {
       if (op.who === "trainer") st.trainerPin = op.h;
       else { var p = null; for (var i=0;i<st.players.length;i++) if (st.players[i].id===op.who) p = st.players[i]; if (p) p.pin = op.h; }
@@ -653,6 +880,7 @@ window.TB_STANDALONE = true;
       delete st.att[op.id];
     } else if (op.t === "restore") {
       st.team = op.st.team;
+      st.goal = op.st.goal;
       st.trainerPin = op.st.trainerPin;
       st.players = op.st.players;
       st.sessions = op.st.sessions;
@@ -696,9 +924,11 @@ window.TB_STANDALONE = true;
   function fbApply(op){
     if (op.t === "att") {
       var r = FB.child("att/" + op.sid + "/" + op.pid);
-      fbDo(op.v === null ? r.remove() : r.set({ v: op.v, n: op.n || "", by: op.by || "" }));
+      fbDo(op.v === null ? r.remove() : r.set({ v: op.v, n: op.n || "", by: op.by || "", ts: op.ts || 0 }));
     } else if (op.t === "team") {
       fbDo(FB.child("team").set(op.name));
+    } else if (op.t === "goal") {
+      fbDo(FB.child("goal").set(op.v));
     } else if (op.t === "pin") {
       fbDo(FB.child(op.who === "trainer" ? "trainerPin" : "players/" + op.who + "/pin").set(op.h));
     } else if (op.t === "addPlayer") {
@@ -716,7 +946,8 @@ window.TB_STANDALONE = true;
       fbDo(FB.child("sessions/" + op.id).remove());
       FB.child("att/" + op.id).remove();
     } else if (op.t === "restore") {
-      var payload = { team: op.st.team, trainerPin: op.st.trainerPin || null, players: {}, sessions: {}, att: op.st.att || {} };
+      var payload = { team: op.st.team, goal: op.st.goal || DEFAULT_GOAL, trainerPin: op.st.trainerPin || null,
+        players: {}, sessions: {}, att: op.st.att || {} };
       op.st.players.forEach(function(p){ payload.players[p.id] = { name: p.name, pin: p.pin || null }; });
       op.st.sessions.forEach(function(s){ payload.sessions[s.id] = { date:s.date, time:s.time, end:s.end || "",
         label:s.label || "Training", place:s.place || "", cancelled: !!s.cancelled, reason: s.reason || "" }; });
@@ -736,13 +967,14 @@ window.TB_STANDALONE = true;
       sessions.push({ id: id, date: s.date, time: s.time, end: s.end || "", label: s.label || "Training",
         place: s.place || "", cancelled: !!s.cancelled, reason: s.reason || "" });
     });
-    return normalize({ demo:false, team: v.team, trainerPin: v.trainerPin || null,
+    return normalize({ demo:false, team: v.team, goal: v.goal, trainerPin: v.trainerPin || null,
       players: players, sessions: sessions, att: v.att || {} });
   }
 
   function mutate(op){
     if (readOnly) return;
     armed = null;
+    if (op.t === "att" && op.v !== null && op.ts === undefined) op.ts = Date.now();
     applyOp(state, op);
     if (mode === "fb") { render(); fbApply(op); return; }
     queue.push(op);
@@ -793,7 +1025,7 @@ window.TB_STANDALONE = true;
     });
   }
 
-  /* ---------- derived ---------- */
+  /* ---------- abgeleitete Werte ---------- */
   function heldSessions(){
     var t = todayISO();
     return byDate(state.sessions).filter(function(s){ return !s.cancelled && s.date <= t; });
@@ -820,9 +1052,202 @@ window.TB_STANDALONE = true;
     });
     return { y:y, tot:tot, pct: tot ? Math.round(y/tot*100) : null };
   }
+  function teamQuota(){
+    var y = 0, tot = 0;
+    state.players.forEach(function(p){ var q = quota(p.id); y += q.y; tot += q.tot; });
+    return { y:y, tot:tot, pct: tot ? Math.round(y/tot*100) : null };
+  }
   function mayNote(pid){ return isTrainer() || (me && me.id === pid); }
 
-  /* ---------- login ---------- */
+  /* ---------- Punkte, Serie, Stufe, Abzeichen ---------- */
+  function startMs(s){
+    var d = parseISO(s.date);
+    var p = String(s.time || "00:00").split(":");
+    d.setHours(+p[0] || 0, +p[1] || 0, 0, 0);
+    return d.getTime();
+  }
+  function onTime(e, s){ if (!e || !e.ts) return true; return e.ts < startMs(s); }
+  function pointsFor(e, s){
+    if (!e || PTS[e.v] == null) return 0;
+    var p = PTS[e.v];
+    if (e.v !== "no" && onTime(e, s)) p += BONUS;
+    return p;
+  }
+  function scoreIn(pid, list){
+    var sum = 0;
+    list.forEach(function(s){ sum += pointsFor(entry(s.id, pid), s); });
+    return sum;
+  }
+  function points(pid){ return scoreIn(pid, heldSessions()); }
+  function monthSessions(){
+    var now = new Date(), y = now.getFullYear(), m = now.getMonth();
+    return heldSessions().filter(function(s){ var d = parseISO(s.date); return d.getFullYear() === y && d.getMonth() === m; });
+  }
+  function monthPoints(pid){ return scoreIn(pid, monthSessions()); }
+
+  function streakOf(pid){
+    var cur = 0, best = 0;
+    heldSessions().forEach(function(s){
+      var e = entry(s.id, pid);
+      if (e && e.v === "yes") { cur++; if (cur > best) best = cur; }
+      else if (e && e.v === "exc") { /* Entschuldigung pausiert die Serie */ }
+      else cur = 0;
+    });
+    return { cur:cur, best:best };
+  }
+
+  function levelOf(pid){
+    var q = quota(pid);
+    var out = { name:null, pct:q.pct, tot:q.tot, ready: q.tot >= LEVEL_MIN, next:null, need:null };
+    if (!out.ready || q.pct === null) { out.next = LEVELS[LEVELS.length-1]; return out; }
+    for (var i=0;i<LEVELS.length;i++) if (q.pct >= LEVELS[i].min) { out.name = LEVELS[i].name; break; }
+    for (var j=LEVELS.length-1;j>=0;j--) if (q.pct < LEVELS[j].min) { out.next = LEVELS[j]; break; }
+    if (out.next) {
+      var n = Math.ceil((out.next.min * q.tot - 100 * q.y) / (100 - out.next.min));
+      out.need = n > 0 ? n : 1;
+    }
+    return out;
+  }
+
+  function badgesOf(pid){
+    var held = heldSessions();
+    var yes = 0, early = 0;
+    held.forEach(function(s){
+      var e = entry(s.id, pid);
+      if (e && e.v === "yes") yes++;
+      if (e && e.ts && onTime(e, s)) early++;
+    });
+    var st = streakOf(pid);
+
+    var months = {};
+    held.forEach(function(s){
+      var key = s.date.slice(0,7);
+      if (!months[key]) months[key] = { tot:0, miss:0 };
+      months[key].tot++;
+      if (!entry(s.id, pid)) months[key].miss++;
+    });
+    var cleanMonths = 0;
+    Object.keys(months).forEach(function(k){ if (months[k].tot >= 3 && months[k].miss === 0) cleanMonths++; });
+
+    var win = 0, winBad = 0;
+    held.forEach(function(s){
+      var m = +s.date.slice(5,7);
+      if (m !== 12 && m !== 1 && m !== 2) return;
+      win++;
+      var e = entry(s.id, pid);
+      if (!e || e.v === "no") winBad++;
+    });
+
+    return [
+      { name:"Erste Einheit",   desc:"Einmal anwesend gewesen.",                     cur:Math.min(yes,1),  target:1,  icon:"check" },
+      { name:"Zehn Einheiten",  desc:"Zehnmal auf dem Wasser.",                      cur:Math.min(yes,10), target:10, icon:"waves" },
+      { name:"Fünfundzwanzig",  desc:"Fünfundzwanzigmal anwesend.",                  cur:Math.min(yes,25), target:25, icon:"waves" },
+      { name:"Fünfzig",         desc:"Fünfzigmal anwesend.",                         cur:Math.min(yes,50), target:50, icon:"trophy" },
+      { name:"Serie von fünf",  desc:"Fünf Einheiten in Folge anwesend.",            cur:Math.min(st.best,5),  target:5,  icon:"chart-column" },
+      { name:"Serie von zehn",  desc:"Zehn Einheiten in Folge anwesend.",            cur:Math.min(st.best,10), target:10, icon:"chart-column" },
+      { name:"Immer gemeldet",  desc:"Ein ganzer Monat ohne fehlende Rückmeldung.",  cur:Math.min(cleanMonths,1), target:1, icon:"bell" },
+      { name:"Frühmelder",      desc:"Zehnmal vor Trainingsbeginn eingetragen.",     cur:Math.min(early,10), target:10, icon:"clock" },
+      { name:"Wintertraining",  desc:"Alle Einheiten im Winter mitgemacht oder rechtzeitig abgesagt.",
+        cur: (win >= 5 && winBad === 0) ? 1 : 0, target:1, icon:"trophy", locked: win < 5 }
+    ];
+  }
+
+  function ranking(){
+    return state.players.slice().map(function(p){ return { p:p, pts: monthPoints(p.id) }; })
+      .sort(function(a,b){
+        if (b.pts !== a.pts) return b.pts - a.pts;
+        return a.p.name.localeCompare(b.p.name, "de");
+      });
+  }
+  function rankOf(pid){
+    var list = ranking();
+    for (var i=0;i<list.length;i++) if (list[i].p.id === pid) return { pos:i+1, of:list.length, pts:list[i].pts };
+    return null;
+  }
+
+  function weekRange(){
+    var d = new Date(); d.setHours(0,0,0,0);
+    var wd = (d.getDay() + 6) % 7;
+    var mon = new Date(d.getTime() - wd*86400000);
+    var sun = new Date(mon.getTime() + 6*86400000);
+    return { from: isoOf(mon), to: isoOf(sun) };
+  }
+  function weekStats(){
+    var r = weekRange();
+    var inWeek = byDate(state.sessions).filter(function(s){ return !s.cancelled && s.date >= r.from && s.date <= r.to; });
+    var held = inWeek.filter(function(s){ return s.date <= todayISO(); });
+    var yes = 0, poss = held.length * state.players.length;
+    held.forEach(function(s){ yes += counts(s.id).yes; });
+    return { sessions: inWeek.length, held: held.length, yes: yes, poss: poss,
+             pct: poss ? Math.round(yes/poss*100) : null };
+  }
+  function goalPct(){ return typeof state.goal === "number" ? state.goal : DEFAULT_GOAL; }
+
+  /* ---------- Navigation ---------- */
+  function navKeys(){
+    return isTrainer() ? ["heute","termine","team","trainer"] : ["heute","termine","team","ich"];
+  }
+  function openCount(){
+    if (!me) return 0;
+    var t = todayISO();
+    var limit = isoOf(new Date(Date.now() + 8*86400000));
+    var soon = upcoming().filter(function(s){ return !s.cancelled && s.date >= t && s.date <= limit; });
+    if (isTrainer()) {
+      var n = 0;
+      soon.forEach(function(s){ n += counts(s.id).open; });
+      return n;
+    }
+    return soon.filter(function(s){ return !entry(s.id, me.id); }).length;
+  }
+  function go(k){
+    if (navKeys().indexOf(k) === -1) k = "heute";
+    route = k;
+    safe(function(){ if (location.hash !== "#/" + k) history.replaceState(null, "", "#/" + k); });
+    render();
+    safe(function(){ window.scrollTo(0, 0); });
+  }
+  function buildNav(){
+    var keys = navKeys();
+    if (keys.indexOf(route) === -1) route = "heute";
+    var open = openCount();
+
+    var rail = $("railNav"), tabs = $("tabbar");
+    rail.innerHTML = "";
+    tabs.innerHTML = "";
+
+    keys.forEach(function(k){
+      var def = null;
+      NAV.forEach(function(n){ if (n.k === k) def = n; });
+      var label = def.label;
+      if (k === "ich" && me && !isTrainer()) label = "Mein Profil";
+
+      var b = el("button","navitem");
+      b.type = "button";
+      b.appendChild(icon(def.icon));
+      b.appendChild(el("span", null, label));
+      if (k === "heute" && open) b.appendChild(el("span","dot", String(open)));
+      if (route === k) b.setAttribute("aria-current","page");
+      b.addEventListener("click", function(){ go(k); });
+      rail.appendChild(b);
+
+      var t = el("button","tabitem");
+      t.type = "button";
+      t.appendChild(icon(def.icon));
+      t.appendChild(el("span", null, def.label));
+      if (k === "heute" && open) t.appendChild(el("span","dot", String(open)));
+      if (route === k) t.setAttribute("aria-current","page");
+      t.addEventListener("click", function(){ go(k); });
+      tabs.appendChild(t);
+    });
+
+    ["heute","termine","team","ich","trainer"].forEach(function(k){
+      var v = $("view-" + k);
+      if (v) v.hidden = (k !== route);
+    });
+    paintIcons();
+  }
+
+  /* ---------- Anmeldung ---------- */
   function renderGate(){
     var sel = $("loginWho");
     var keep = sel.value;
@@ -889,6 +1314,7 @@ window.TB_STANDALONE = true;
       $("loginPin").value = "";
       me = { role: who === "trainer" ? "trainer" : "player", id: who === "trainer" ? "trainer" : who, tok: h };
       safe(function(){ localStorage.setItem(AUTHKEY, JSON.stringify(me)); });
+      route = "heute";
       render();
     });
   }
@@ -912,46 +1338,48 @@ window.TB_STANDALONE = true;
     render();
   }
 
-  /* ---------- render ---------- */
+  /* ---------- Hauptrender ---------- */
   function render(){
     if (me && me.role === "player" && !player(me.id)) {
       me = null;
       safe(function(){ localStorage.removeItem(AUTHKEY); });
     }
-    $("teamName").textContent = state.team || "Team";
+    var name = state.team || "Team";
+    $("gateTeamName").textContent = name;
+    $("railTeam").textContent = name;
+    $("topTeam").textContent = name;
     $("demoBanner").hidden = !state.demo;
 
-    var ty = 0, tt = 0;
-    state.players.forEach(function(p){ var q = quota(p.id); ty += q.y; tt += q.tot; });
-    $("teamQuota").textContent = tt ? Math.round(ty/tt*100) + " %" : "–";
-    $("teamQuotaLabel").textContent = tt
-      ? "Beteiligung über " + heldSessions().length + (heldSessions().length === 1 ? " Termin" : " Termine")
-      : "noch keine Termine gewertet";
-
     var loggedIn = !!me;
-    $("gate").hidden = loggedIn;
-    $("app").hidden = !loggedIn;
+    $("gateWrap").hidden = loggedIn;
+    $("shell").hidden = !loggedIn;
     if (!loggedIn) { renderGate(); return; }
 
     $("whoName").textContent = isTrainer() ? "Trainer" : ((player(me.id) || {}).name || "unbekannt");
     $("whoTag").hidden = !isTrainer();
-    $("adminBox").hidden = !isTrainer();
     $("legendTrainer").hidden = !isTrainer();
     $("tableHint").textContent = isTrainer()
       ? "Auf ein Feld tippen ändert den Eintrag: nichts, anwesend, entschuldigt, gefehlt. Korrekturen von dir sind blau umrandet."
-      : "Eintragen kannst du dich oben beim jeweiligen Termin.";
-    $("foot").textContent = mode === "fb"
+      : "Eintragen kannst du dich unter Termine.";
+    var footText = mode === "fb"
       ? "Jeder trägt sich selbst ein. Änderungen sind sofort für alle sichtbar."
       : mode === "local"
       ? "Ohne Datenbank: Einträge bleiben in diesem Browser."
       : readOnly
         ? "Diese Ansicht ist nur lesend. Zum Eintragen brauchst du einen Link mit Bearbeitungsrecht."
         : "Jeder trägt sich selbst ein. Änderungen sind sofort für alle sichtbar.";
+    $("foot").textContent = footText;
+    $("railFoot").textContent = footText;
 
+    buildNav();
     renderNudge();
+    renderHeute();
     renderNext();
     renderUpcoming();
+    renderPast();
+    renderTeamView();
     renderStats();
+    renderIch();
     if (isTrainer()) renderAdmin();
 
     if (focusNote) {
@@ -964,6 +1392,83 @@ window.TB_STANDALONE = true;
         }, delay);
       });
     }
+  }
+
+  function tile(box, eyebrow, value, small, note, brand){
+    var t = el("div","tile" + (brand ? " brand" : ""));
+    t.appendChild(el("p","eyebrow", eyebrow));
+    var b = el("b");
+    b.appendChild(document.createTextNode(value));
+    if (small) b.appendChild(el("small", null, " " + small));
+    t.appendChild(b);
+    if (note) t.appendChild(el("em", null, note));
+    box.appendChild(t);
+    return t;
+  }
+
+  function trackBar(pct, goal, warm){
+    var tr = el("div","track" + (warm ? " warm" : ""));
+    var i = el("i");
+    i.style.width = Math.max(0, Math.min(100, pct || 0)) + "%";
+    tr.appendChild(i);
+    if (goal != null) {
+      var m = el("span","goalmark");
+      m.style.left = Math.max(0, Math.min(100, goal)) + "%";
+      m.title = "Ziel " + goal + " Prozent";
+      tr.appendChild(m);
+    }
+    return tr;
+  }
+
+  function goalRow(box, label, valueText, pct, goal, warm){
+    var row = el("div","goalrow");
+    var lbl = el("div","lbl");
+    lbl.appendChild(el("span", null, label));
+    lbl.appendChild(el("b", null, valueText));
+    row.appendChild(lbl);
+    row.appendChild(trackBar(pct, goal, warm));
+    box.appendChild(row);
+    return row;
+  }
+
+  /* ---------- Ansicht: Heute ---------- */
+  function renderHeute(){
+    var box = $("heuteTiles");
+    box.innerHTML = "";
+    var sub = $("heuteSub");
+    var held = heldSessions();
+
+    if (isTrainer()) {
+      sub.textContent = "Überblick über Kader und Rückmeldungen.";
+      var tq = teamQuota();
+      tile(box, "Teamquote", tq.pct === null ? "–" : tq.pct + " %", null, held.length + (held.length === 1 ? " Einheit gewertet" : " Einheiten gewertet"), true);
+      tile(box, "Kader", String(state.players.length), null, "im Team");
+      var w = weekStats();
+      tile(box, "Diese Woche", w.held ? w.yes + " von " + w.poss : "–", null, w.held ? "Teilnahmen" : "noch keine Einheit");
+      var open = openCount();
+      tile(box, "Offen", String(open), null, open ? "fehlende Rückmeldungen" : "alles gemeldet");
+      return;
+    }
+
+    var q = quota(me.id);
+    var st = streakOf(me.id);
+    var lv = levelOf(me.id);
+    sub.textContent = "Dein Stand auf einen Blick.";
+    var t1 = tile(box, "Serie", String(st.cur), st.cur === 1 ? "Einheit" : "Einheiten",
+      st.best > st.cur ? "beste Serie: " + st.best : "in Folge anwesend", true);
+    var trail = el("div","streakline");
+    held.slice(-10).forEach(function(s){
+      var e = entry(s.id, me.id);
+      var d = el("i","sdot" + (e ? " " + e.v : ""));
+      d.title = fmtShort(s.date) + ": " + (e ? WORD[e.v] : "nichts eingetragen");
+      trail.appendChild(d);
+    });
+    if (held.length) t1.appendChild(trail);
+    tile(box, "Punkte", String(points(me.id)), null, "diesen Monat: " + monthPoints(me.id));
+    tile(box, "Quote", q.pct === null ? "–" : q.pct + " %", null, q.y + " von " + q.tot + " anwesend");
+    tile(box, "Stufe", lv.name || "–", null, lv.name
+      ? (lv.next ? "noch " + lv.need + " bis " + lv.next.name : "höchste Stufe")
+      : (lv.ready ? "ab 70 Prozent Bronze" : "ab " + LEVEL_MIN + " gewerteten Einheiten"));
   }
 
   function pickButtons(sid, pid, big){
@@ -986,7 +1491,10 @@ window.TB_STANDALONE = true;
         var e = entry(sid, pid);
         if (e && e.v === v) { mutate({ t:"att", sid:sid, pid:pid, v:null }); return; }
         if (v === "exc") focusNote = sid + "-" + pid;
-        mutate({ t:"att", sid:sid, pid:pid, v:v, n:(e ? e.n : ""), by: isTrainer() && pid !== me.id ? "t" : "" });
+        var byTrainer = isTrainer() && pid !== me.id;
+        var op = { t:"att", sid:sid, pid:pid, v:v, n:(e ? e.n : ""), by: byTrainer ? "t" : "" };
+        if (byTrainer) op.ts = (e && e.ts) || 0;
+        mutate(op);
       });
       box.appendChild(b);
     });
@@ -1014,7 +1522,7 @@ window.TB_STANDALONE = true;
       var v = inp.value.trim();
       if (v === (cur.n || "")) return;
       done = true;
-      mutate({ t:"att", sid: sid, pid: pid, v:"exc", n: v, by: cur.by || "" });
+      mutate({ t:"att", sid: sid, pid: pid, v:"exc", n: v, by: cur.by || "", ts: cur.ts || 0 });
     };
     inp.addEventListener("change", commit);
     inp.addEventListener("blur", commit);
@@ -1045,7 +1553,7 @@ window.TB_STANDALONE = true;
     var next = upcoming().filter(function(s){ return !s.cancelled; })[0];
     if (!next) {
       card.appendChild(el("p","hint", isTrainer()
-        ? "Kein Termin im Plan. Leg unten im Trainerbereich den Rhythmus oder einen Einzeltermin an."
+        ? "Kein Termin im Plan. Leg im Trainerbereich den Rhythmus oder einen Einzeltermin an."
         : "Kein Termin im Plan. Der Trainer trägt die nächsten Einheiten ein."));
       return;
     }
@@ -1055,9 +1563,11 @@ window.TB_STANDALONE = true;
     card.appendChild(head);
 
     if (isTrainer()) {
-      card.appendChild(el("p","hint","Als Trainer trägst du dich hier nicht selbst ein. Korrekturen für einzelne Spieler machst du in der Tabelle unten."));
+      card.appendChild(el("p","hint","Als Trainer trägst du dich hier nicht selbst ein. Korrekturen für einzelne Spieler machst du im Trainerbereich oder in der Beteiligungstabelle."));
     } else {
       card.appendChild(pickButtons(next.id, me.id, true));
+      var mine = entry(next.id, me.id);
+      if (!mine) card.appendChild(el("p","hint warn","Noch nicht eingetragen. Wer sich vor Trainingsbeginn meldet, bekommt " + BONUS + " Punkte Bonus."));
       var rr = reasonRow(next.id, me.id);
       if (rr) card.appendChild(rr);
     }
@@ -1092,13 +1602,11 @@ window.TB_STANDALONE = true;
     var box = $("upcomingList");
     box.innerHTML = "";
     var list = upcoming();
-    var first = list.filter(function(s){ return !s.cancelled; })[0];
-    var rest = list.filter(function(s){ return !first || s.id !== first.id; });
-    if (!rest.length) {
-      box.appendChild(el("p","empty","Danach steht noch nichts im Plan."));
+    if (!list.length) {
+      box.appendChild(el("p","empty","Es steht noch nichts im Plan."));
       return;
     }
-    rest.slice(0,14).forEach(function(s){
+    list.slice(0,20).forEach(function(s){
       var row = el("div","sess" + (s.cancelled ? " off" : ""));
       var when = el("div","when");
       when.appendChild(document.createTextNode(fmtShort(s.date)));
@@ -1122,6 +1630,91 @@ window.TB_STANDALONE = true;
       }
       box.appendChild(row);
     });
+  }
+
+  function renderPast(){
+    var box = $("pastList");
+    box.innerHTML = "";
+    var list = heldSessions().slice().reverse().slice(0,20);
+    if (!list.length) {
+      box.appendChild(el("p","empty","Noch keine Einheit gewertet."));
+      return;
+    }
+    list.forEach(function(s){
+      var row = el("div","sess");
+      var when = el("div","when");
+      when.appendChild(document.createTextNode(fmtShort(s.date)));
+      when.appendChild(el("em", null, span(s)));
+      row.appendChild(when);
+      var what = el("div","what");
+      what.appendChild(document.createTextNode(s.label || "Training"));
+      if (!isTrainer()) {
+        var e = entry(s.id, me.id);
+        what.appendChild(el("em", null, e ? WORD[e.v] + (e.v !== "no" ? " · " + pointsFor(e, s) + " Punkte" : " · 0 Punkte")
+          : "nichts eingetragen · 0 Punkte"));
+      } else if (s.place) {
+        what.appendChild(el("em", null, s.place));
+      }
+      row.appendChild(what);
+      row.appendChild(el("div","mine"));
+      var c = tally(s.id);
+      c.className = "counts";
+      row.appendChild(c);
+      box.appendChild(row);
+    });
+  }
+
+  /* ---------- Ansicht: Team ---------- */
+  function renderTeamView(){
+    var held = heldSessions();
+    $("teamSub").textContent = held.length
+      ? "Beteiligung über " + held.length + (held.length === 1 ? " gewertete Einheit" : " gewertete Einheiten")
+      : "Noch keine Einheit gewertet.";
+
+    var box = $("teamTiles");
+    box.innerHTML = "";
+    var tq = teamQuota();
+    var w = weekStats();
+    tile(box, "Teamquote", tq.pct === null ? "–" : tq.pct + " %", null, "Ziel " + goalPct() + " Prozent", true);
+    tile(box, "Diese Woche", w.held ? w.yes + " von " + w.poss : "–", null,
+      w.sessions ? w.sessions + (w.sessions === 1 ? " Einheit angesetzt" : " Einheiten angesetzt") : "keine Einheit angesetzt");
+    tile(box, "Kader", String(state.players.length), null, "im Team");
+    tile(box, "Einheiten", String(held.length), null, "gewertet");
+
+    var g = $("goalCard");
+    g.innerHTML = "";
+    goalRow(g, "Saisonquote der Mannschaft", (tq.pct === null ? "–" : tq.pct + " %"), tq.pct || 0, goalPct());
+    goalRow(g, "Diese Woche auf dem Wasser", w.poss ? w.yes + " von " + w.poss : "noch keine Einheit",
+      w.pct || 0, null, true);
+    g.appendChild(el("p","hint", tq.pct === null
+      ? "Sobald die ersten Einheiten gewertet sind, füllt sich der Balken."
+      : tq.pct >= goalPct()
+        ? "Das Mannschaftsziel ist erreicht. Weiter so."
+        : "Noch " + (goalPct() - tq.pct) + " Prozentpunkte bis zum Mannschaftsziel."));
+
+    var pb = $("podiumBox");
+    pb.innerHTML = "";
+    var now = new Date();
+    var list = ranking().filter(function(r){ return r.pts > 0; }).slice(0,3);
+    if (!list.length) {
+      var e0 = el("div","card");
+      e0.appendChild(el("p","empty","In diesem Monat wurde noch nichts gewertet."));
+      e0.style.gridColumn = "1/-1";
+      pb.appendChild(e0);
+    } else {
+      list.forEach(function(r, i){
+        var c = el("div","prank p" + (i+1));
+        c.appendChild(el("div","pos", String(i+1)));
+        var info = el("div","pinfo");
+        info.appendChild(el("b", null, r.p.name));
+        info.appendChild(el("em", null, r.pts + " Punkte"));
+        c.appendChild(info);
+        pb.appendChild(c);
+      });
+    }
+    $("podiumHint").textContent = "Punkte im " + MONLONG[now.getMonth()] + ". Jeden Monatsanfang beginnt die Wertung neu. "
+      + (isTrainer() ? "Die vollständige Reihenfolge sieht niemand, jeder sieht nur seinen eigenen Platz."
+                     : "Deinen eigenen Platz siehst du unter Mein Profil.");
   }
 
   function renderStats(){
@@ -1183,7 +1776,7 @@ window.TB_STANDALONE = true;
             var idx = CYCLE.indexOf(e ? e.v : null);
             var nextVal = CYCLE[(idx + 1) % CYCLE.length];
             if (nextVal === null) mutate({ t:"att", sid:s.id, pid:p.id, v:null });
-            else mutate({ t:"att", sid:s.id, pid:p.id, v:nextVal, n:(e ? e.n : ""), by:"t" });
+            else mutate({ t:"att", sid:s.id, pid:p.id, v:nextVal, n:(e ? e.n : ""), by:"t", ts:(e && e.ts) || 0 });
           });
           td.appendChild(b);
         } else {
@@ -1206,8 +1799,64 @@ window.TB_STANDALONE = true;
     t.appendChild(tbody);
   }
 
+  /* ---------- Ansicht: Mein Profil ---------- */
+  function renderIch(){
+    if (!me || isTrainer()) return;
+    var p = player(me.id);
+    if (!p) return;
+    var q = quota(me.id);
+    var st = streakOf(me.id);
+    var lv = levelOf(me.id);
+    var rk = rankOf(me.id);
+    var now = new Date();
+
+    $("ichName").textContent = p.name;
+    $("ichSub").textContent = "Deine Serie, deine Punkte, deine Abzeichen.";
+
+    var box = $("ichTiles");
+    box.innerHTML = "";
+    tile(box, "Serie", String(st.cur), st.cur === 1 ? "Einheit" : "Einheiten", "beste Serie: " + st.best, true);
+    tile(box, "Punkte gesamt", String(points(me.id)), null, MONLONG[now.getMonth()] + ": " + monthPoints(me.id));
+    tile(box, "Quote", q.pct === null ? "–" : q.pct + " %", null, q.y + " von " + q.tot + " anwesend");
+    tile(box, "Platz im Monat", rk ? String(rk.pos) : "–", rk ? "von " + rk.of : null,
+      rk && rk.pts ? rk.pts + " Punkte" : "noch keine Punkte diesen Monat");
+
+    var lc = $("levelCard");
+    lc.innerHTML = "";
+    if (!lv.ready) {
+      lc.appendChild(el("h3", null, "Noch keine Stufe"));
+      lc.appendChild(el("p","hint","Ab " + LEVEL_MIN + " gewerteten Einheiten bekommst du eine Stufe. Bisher sind es " + q.tot + "."));
+    } else {
+      lc.appendChild(el("h3", null, lv.name ? "Stufe " + lv.name : "Noch keine Stufe"));
+      goalRow(lc, lv.next ? "Fortschritt bis " + lv.next.name : "Höchste Stufe erreicht",
+        (q.pct === null ? "–" : q.pct + " %"), q.pct || 0, lv.next ? lv.next.min : null);
+      lc.appendChild(el("p","hint", lv.next
+        ? "Noch " + lv.need + (lv.need === 1 ? " Einheit" : " Einheiten") + " in Folge anwesend, dann steht " + lv.next.name + "."
+        : "Mehr geht nicht. Halte die Quote über 90 Prozent."));
+    }
+
+    var bb = $("badgeBox");
+    bb.innerHTML = "";
+    badgesOf(me.id).forEach(function(b){
+      var got = !b.locked && b.cur >= b.target;
+      var c = el("div","badge" + (got ? " got" : ""));
+      var pin = el("div","pin");
+      pin.appendChild(icon(got ? "check" : b.icon));
+      c.appendChild(pin);
+      var bt = el("div","bt");
+      bt.appendChild(el("b", null, b.name));
+      bt.appendChild(el("em", null, b.desc));
+      bt.appendChild(el("span","bp", got ? "erreicht" : (b.locked ? "noch nicht möglich" : b.cur + " von " + b.target)));
+      c.appendChild(bt);
+      bb.appendChild(c);
+    });
+    paintIcons();
+  }
+
+  /* ---------- Trainerbereich ---------- */
   function renderAdmin(){
     $("teamInput").value = state.team || "";
+    $("goalInput").value = goalPct();
     renderSessionEditor();
 
     var r = $("rosterList");
@@ -1400,7 +2049,8 @@ window.TB_STANDALONE = true;
   function buildCsv(){
     var held = heldSessions();
     var sep = ";";
-    var head = ["Spieler"].concat(held.map(function(s){ return fmtShort(s.date) + " " + span(s) + " " + (s.label || "Training"); })).concat(["Anwesend","Eingetragen","Quote in Prozent"]);
+    var head = ["Spieler"].concat(held.map(function(s){ return fmtShort(s.date) + " " + span(s) + " " + (s.label || "Training"); }))
+      .concat(["Anwesend","Eingetragen","Quote in Prozent","Punkte","Serie","Stufe"]);
     var lines = [head.join(sep)];
     state.players.forEach(function(p){
       var cells = [p.name];
@@ -1409,7 +2059,8 @@ window.TB_STANDALONE = true;
         cells.push(e ? WORD[e.v] + (e.v === "exc" && e.n ? " (" + e.n.replace(/[;\r\n]/g," ") + ")" : "") : "Offen");
       });
       var q = quota(p.id);
-      cells.push(q.y, q.tot, q.pct === null ? "" : q.pct);
+      var lv = levelOf(p.id);
+      cells.push(q.y, q.tot, q.pct === null ? "" : q.pct, points(p.id), streakOf(p.id).cur, lv.name || "");
       lines.push(cells.map(function(c){ return String(c).indexOf(sep) >= 0 ? '"' + c + '"' : c; }).join(sep));
     });
     return "﻿" + lines.join("\r\n");
@@ -1446,7 +2097,7 @@ window.TB_STANDALONE = true;
 
   /* ---------- Sicherung ---------- */
   function backupJson(){
-    return JSON.stringify({ v:2, team: state.team, trainerPin: state.trainerPin,
+    return JSON.stringify({ v:3, team: state.team, goal: goalPct(), trainerPin: state.trainerPin,
       players: state.players, sessions: state.sessions, att: state.att }, null, 2);
   }
 
@@ -1454,16 +2105,16 @@ window.TB_STANDALONE = true;
     var msg = $("backupMsg");
     var raw;
     try { raw = JSON.parse(text); } catch (e) { msg.className = "msg"; msg.textContent = "Das ist keine gültige Sicherungsdatei."; return; }
-    var st = normalize({ demo:false, team: raw.team, trainerPin: raw.trainerPin,
+    var st = normalize({ demo:false, team: raw.team, goal: raw.goal, trainerPin: raw.trainerPin,
       players: raw.players, sessions: raw.sessions, att: raw.att });
     if (!st.players.length && !st.sessions.length) { msg.className = "msg"; msg.textContent = "Die Datei enthält weder Kader noch Termine."; return; }
     mutate({ t:"restore", st: st });
     msg.className = "msg ok";
-    msg.textContent = "Eingespielt: " + st.players.length + (st.players.length === 1 ? " Spieler, " : " Spieler, ")
-      + st.sessions.length + (st.sessions.length === 1 ? " Termin." : " Termine.");
+    msg.textContent = "Eingespielt: " + st.players.length + " Spieler, " + st.sessions.length
+      + (st.sessions.length === 1 ? " Termin." : " Termine.");
   }
 
-  /* ---------- wiring ---------- */
+  /* ---------- Verdrahtung ---------- */
   function wire(){
     $("loginWho").addEventListener("change", function(){ $("loginMsg").textContent = ""; syncPinLabel(); });
     $("loginBtn").addEventListener("click", doLogin);
@@ -1472,6 +2123,11 @@ window.TB_STANDALONE = true;
     $("clearDemo").addEventListener("click", function(){ mutate({ t:"clearDemo" }); });
 
     $("teamInput").addEventListener("change", function(){ mutate({ t:"team", name: this.value.trim() || "Team" }); });
+    $("goalInput").addEventListener("change", function(){
+      var v = Math.max(0, Math.min(100, parseInt(this.value, 10)));
+      if (isNaN(v)) { this.value = goalPct(); return; }
+      mutate({ t:"goal", v: v });
+    });
 
     $("addPlayer").addEventListener("click", function(){
       var inp = $("newPlayer"), name = inp.value.trim();
@@ -1580,16 +2236,21 @@ window.TB_STANDALONE = true;
         msg.textContent = "Code geändert.";
       });
     });
+
+    window.addEventListener("hashchange", function(){
+      var k = String(location.hash || "").replace(/^#\/?/, "");
+      if (k && k !== route) go(k);
+    });
   }
 
-  /* ---------- boot ---------- */
+  /* ---------- Start ---------- */
   function demoSeed(){
     var base = new Date(); base.setHours(0,0,0,0);
     var names = ["Lena Brandt","Jonas Weiss","Mira Köhler","Tim Hoffmann","Paul Ahrens","Sophie Reiter","Nils Kaminski","Hanna Ludwig"];
     var players = names.map(function(n,i){ return { id:"demo-p" + i, name:n, pin:null }; });
     var sessions = [], att = {};
     var k = 0;
-    for (var off = -28; off <= 21; off++) {
+    for (var off = -56; off <= 21; off++) {
       var d = new Date(base.getTime() + off*86400000);
       var wd = d.getDay();
       if (wd !== 2 && wd !== 4) continue;
@@ -1600,22 +2261,24 @@ window.TB_STANDALONE = true;
       att[s.id] = {};
       players.forEach(function(p, pi){
         var r = (k*7 + pi*13) % 10;
-        if (r < 7) att[s.id][p.id] = { v:"yes", n:"", by:"" };
-        else if (r < 9) att[s.id][p.id] = { v:"exc", n: pi % 2 ? "Arbeit" : "Urlaub", by:"" };
-        else att[s.id][p.id] = { v:"no", n:"", by:"" };
+        if (r < 7) att[s.id][p.id] = { v:"yes", n:"", by:"", ts:0 };
+        else if (r < 9) att[s.id][p.id] = { v:"exc", n: pi % 2 ? "Arbeit" : "Urlaub", by:"", ts:0 };
+        else att[s.id][p.id] = { v:"no", n:"", by:"", ts:0 };
       });
     }
     var extra = new Date(base.getTime() + 10*86400000);
     sessions.push({ id:"demo-extra", date: isoOf(extra), time:"10:00", end:"12:00", label:"Zusatztraining", place:"", cancelled:false, reason:"" });
-    return { v:2, demo:true, team:"Beispielteam", trainerPin:null, players:players, sessions:sessions, att:att };
+    return { v:3, demo:true, team:"Beispielteam", goal:DEFAULT_GOAL, trainerPin:null, players:players, sessions:sessions, att:att };
   }
 
   function normalize(raw){
     var st = raw && typeof raw === "object" ? raw : {};
+    var g = parseInt(st.goal, 10);
     var out = {
-      v: 2,
+      v: 3,
       demo: !!st.demo,
       team: typeof st.team === "string" ? st.team : "Team",
+      goal: isNaN(g) ? DEFAULT_GOAL : Math.max(0, Math.min(100, g)),
       trainerPin: typeof st.trainerPin === "string" ? st.trainerPin : null,
       players: Array.isArray(st.players) ? st.players.filter(function(p){ return p && p.id; }).map(function(p){
         return { id:p.id, name:String(p.name || "?"), pin: typeof p.pin === "string" ? p.pin : null }; }) : [],
@@ -1633,16 +2296,23 @@ window.TB_STANDALONE = true;
     return out;
   }
 
+  function initRoute(){
+    var k = String(location.hash || "").replace(/^#\/?/, "");
+    if (k) route = k;
+  }
+
   function boot(raw){
     state = normalize(raw);
     queue = safe(function(){ return JSON.parse(sessionStorage.getItem(QKEY) || "[]"); }, []) || [];
     if (queue.length) queue.forEach(function(op){ applyOp(state, op); });
     restoreLogin();
+    initRoute();
     wire();
     render();
 
     if (mode === "local") {
       $("localBanner").hidden = false;
+      $("gateLocalBanner").hidden = false;
       setSave("ok", "in diesem Browser gespeichert");
       if (queue.length) doSave(false);
       return;
@@ -1663,6 +2333,7 @@ window.TB_STANDALONE = true;
   function bootFirebase(){
     mode = "fb";
     state = fromDb(null);
+    initRoute();
     wire();
     render();
     setSave("busy","verbindet");
