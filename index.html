@@ -210,7 +210,7 @@
   .note-row input{flex:1;min-width:170px;}
 
   /* session list */
-  .sess{display:grid;grid-template-columns:96px 1fr auto;gap:4px 16px;align-items:center;
+  .sess{display:grid;grid-template-columns:118px 1fr auto;gap:4px 16px;align-items:center;
     padding:13px 18px;border-top:1px solid var(--border-subtle);}
   .sess:first-child{border-top:0;}
   .sess .when{font:600 14px/1.25 var(--font-narrow);font-variant-numeric:tabular-nums;color:var(--text-strong);}
@@ -414,7 +414,8 @@
           <p class="hint">Wochentage wählen, Uhrzeit setzen, Zeitraum angeben. Termine, die schon im Plan stehen, werden nicht doppelt angelegt.</p>
           <div class="days" id="dayPicker"></div>
           <div class="row">
-            <label for="rhythmTime">Uhrzeit</label><input type="time" id="rhythmTime" value="19:30">
+            <label for="rhythmTime">von</label><input type="time" id="rhythmTime" value="19:30">
+            <label for="rhythmEnd">bis</label><input type="time" id="rhythmEnd" value="21:00">
             <label for="rhythmWeeks">Wochen</label><input type="number" id="rhythmWeeks" value="8" min="1" max="52" style="width:88px">
             <label for="rhythmPlace">Ort</label><input type="text" id="rhythmPlace" placeholder="optional" style="width:150px">
             <button class="btn primary" id="genRhythm" type="button">Termine anlegen</button>
@@ -426,7 +427,8 @@
           <h3>Einzeltermin</h3>
           <div class="row">
             <input type="date" id="oneDate">
-            <input type="time" id="oneTime" value="19:30">
+            <label for="oneTime">von</label><input type="time" id="oneTime" value="19:30">
+            <label for="oneEnd">bis</label><input type="time" id="oneEnd" value="21:00">
             <input type="text" id="oneLabel" placeholder="Bezeichnung, zum Beispiel Zusatztraining" style="flex:1;min-width:190px">
             <input type="text" id="onePlace" placeholder="Ort" style="width:150px">
             <button class="btn primary" id="addOne" type="button">Hinzufügen</button>
@@ -434,8 +436,8 @@
         </div>
 
         <div class="block">
-          <h3>Alle Termine</h3>
-          <p class="hint">Verlegen, absagen oder löschen. Eine Absage sehen alle sofort auf der Seite.</p>
+          <h3>Termine bearbeiten und löschen</h3>
+          <p class="hint">„bearbeiten" öffnet Datum, Uhrzeit, Bezeichnung und Ort des Termins. Eine Absage sehen alle sofort auf der Seite, gelöschte Termine verschwinden mit allen Einträgen.</p>
           <div class="slist" id="adminSessions"></div>
         </div>
 
@@ -494,6 +496,22 @@
   function fmtLong(iso){ var d = parseISO(iso); return WD[d.getDay()] + ", " + d.getDate() + ". " + MON[d.getMonth()] + " " + d.getFullYear(); }
   function fmtShort(iso){ var d = parseISO(iso); return WD[d.getDay()] + " " + d.getDate() + "." + MON[d.getMonth()]; }
   function uid(p){ return p + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+  function span(s){ return s.time + (s.end ? " bis " + s.end : ""); }
+  function plusMinutes(t, mins){
+    var p = String(t || "").split(":");
+    if (p.length < 2) return "";
+    var total = ((+p[0] * 60 + +p[1]) + mins) % 1440;
+    if (total < 0) total += 1440;
+    return pad(Math.floor(total/60)) + ":" + pad(total % 60);
+  }
+  function linkTimes(startId, endId){
+    var s = $(startId), e = $(endId);
+    if (!s || !e) return;
+    s.addEventListener("change", function(){
+      if (!s.value) return;
+      if (!e.value || e.value <= s.value) e.value = plusMinutes(s.value, 90);
+    });
+  }
   function safe(fn, fb){ try { return fn(); } catch(e){ return fb; } }
   function byDate(list){ return list.slice().sort(function(a,b){ return (a.date+a.time) < (b.date+b.time) ? -1 : 1; }); }
   function player(id){ for (var i=0;i<state.players.length;i++) if (state.players[i].id===id) return state.players[i]; return null; }
@@ -814,7 +832,7 @@
     }
     var head = el("div","next-head");
     head.appendChild(el("h3", null, next.label || "Training"));
-    head.appendChild(el("div","next-meta", fmtLong(next.date) + " · " + next.time + (next.place ? " · " + next.place : "")));
+    head.appendChild(el("div","next-meta", fmtLong(next.date) + " · " + span(next) + " Uhr" + (next.place ? " · " + next.place : "")));
     card.appendChild(head);
 
     if (isTrainer()) {
@@ -873,7 +891,7 @@
       var row = el("div","sess" + (s.cancelled ? " off" : ""));
       var when = el("div","when");
       when.appendChild(document.createTextNode(fmtShort(s.date)));
-      when.appendChild(el("em", null, s.time));
+      when.appendChild(el("em", null, span(s)));
       row.appendChild(when);
       var what = el("div","what");
       what.appendChild(document.createTextNode(s.label || "Training"));
@@ -900,7 +918,7 @@
     held.forEach(function(s){
       var th = el("th");
       th.appendChild(document.createTextNode(fmtShort(s.date)));
-      th.title = (s.label || "Training") + " · " + fmtLong(s.date);
+      th.title = (s.label || "Training") + " · " + fmtLong(s.date) + " · " + span(s) + " Uhr";
       hr.appendChild(th);
     });
     var qh = el("th","q","Quote");
@@ -994,9 +1012,20 @@
 
     var list = $("adminSessions");
     list.innerHTML = "";
-    byDate(state.sessions).forEach(function(s){
+    var t = todayISO();
+    var sorted = byDate(state.sessions);
+    var future = sorted.filter(function(s){ return s.date >= t; });
+    var past = sorted.filter(function(s){ return s.date < t; }).reverse();
+    var ordered = future.concat(past);
+
+    ordered.forEach(function(s, i){
+      if (i === future.length && past.length) {
+        var sep = el("div","srow");
+        sep.appendChild(el("span","eyebrow","Vergangene Termine"));
+        list.appendChild(sep);
+      }
       var row = el("div","srow" + (s.cancelled ? " off" : ""));
-      row.appendChild(el("span","g", fmtShort(s.date) + " " + s.time + " · " + (s.label || "Training") + (s.place ? " · " + s.place : "")));
+      row.appendChild(el("span","g", fmtShort(s.date) + " " + span(s) + " · " + (s.label || "Training") + (s.place ? " · " + s.place : "")));
 
       var edit = el("button","btn quiet", editing === s.id ? "schließen" : "bearbeiten");
       edit.type = "button";
@@ -1019,7 +1048,13 @@
       if (editing === s.id) {
         var box = el("div","edit");
         var d = el("input"); d.type = "date"; d.value = s.date;
+        var lv = el("label", null, "von"); lv.style.alignSelf = "center";
         var ti = el("input"); ti.type = "time"; ti.value = s.time;
+        var lb = el("label", null, "bis"); lb.style.alignSelf = "center";
+        var en = el("input"); en.type = "time"; en.value = s.end || "";
+        ti.addEventListener("change", function(){
+          if (ti.value && (!en.value || en.value <= ti.value)) en.value = plusMinutes(ti.value, 90);
+        });
         var la = el("input"); la.type = "text"; la.value = s.label || ""; la.placeholder = "Bezeichnung"; la.style.flex = "1"; la.style.minWidth = "150px";
         var pl = el("input"); pl.type = "text"; pl.value = s.place || ""; pl.placeholder = "Ort"; pl.style.width = "140px";
         var rs = el("input"); rs.type = "text"; rs.value = s.reason || ""; rs.placeholder = "Grund der Absage, optional"; rs.style.minWidth = "200px"; rs.style.flex = "1";
@@ -1027,10 +1062,10 @@
         ok.type = "button";
         ok.addEventListener("click", function(){
           editing = null;
-          mutate({ t:"updSession", id:s.id, patch:{ date: d.value || s.date, time: ti.value || s.time,
+          mutate({ t:"updSession", id:s.id, patch:{ date: d.value || s.date, time: ti.value || s.time, end: en.value,
             label: la.value.trim() || "Training", place: pl.value.trim(), reason: rs.value.trim() } });
         });
-        [d,ti,la,pl,ok].forEach(function(n){ box.appendChild(n); });
+        [d,lv,ti,lb,en,la,pl,ok].forEach(function(n){ box.appendChild(n); });
         if (s.cancelled) box.insertBefore(rs, ok);
         row.appendChild(box);
       }
@@ -1043,7 +1078,7 @@
   function buildCsv(){
     var held = heldSessions();
     var sep = ";";
-    var head = ["Spieler"].concat(held.map(function(s){ return fmtShort(s.date) + " " + s.time + " " + (s.label || "Training"); })).concat(["Anwesend","Eingetragen","Quote in Prozent"]);
+    var head = ["Spieler"].concat(held.map(function(s){ return fmtShort(s.date) + " " + span(s) + " " + (s.label || "Training"); })).concat(["Anwesend","Eingetragen","Quote in Prozent"]);
     var lines = [head.join(sep)];
     state.players.forEach(function(p){
       var cells = [p.name];
@@ -1112,6 +1147,7 @@
       var msg = $("rhythmMsg");
       if (!rhythmDays.length) { msg.textContent = "Bitte mindestens einen Wochentag wählen."; return; }
       var time = $("rhythmTime").value || "19:30";
+      var end = $("rhythmEnd").value || "";
       var weeks = Math.max(1, Math.min(52, parseInt($("rhythmWeeks").value, 10) || 8));
       var place = $("rhythmPlace").value.trim();
       var start = new Date(); start.setHours(0,0,0,0);
@@ -1122,7 +1158,7 @@
         var iso = isoOf(d);
         var dup = state.sessions.some(function(s){ return s.date === iso && s.time === time; });
         if (dup) continue;
-        mutate({ t:"addSession", s:{ id: uid("s"), date: iso, time: time, label:"Training", place: place, cancelled:false, reason:"" } });
+        mutate({ t:"addSession", s:{ id: uid("s"), date: iso, time: time, end: end, label:"Training", place: place, cancelled:false, reason:"" } });
         added++;
       }
       msg.textContent = added ? added + (added === 1 ? " Termin angelegt." : " Termine angelegt.") : "Diese Termine stehen schon im Plan.";
@@ -1131,10 +1167,13 @@
     $("addOne").addEventListener("click", function(){
       var date = $("oneDate").value;
       if (!date) { $("oneDate").focus(); return; }
-      mutate({ t:"addSession", s:{ id: uid("s"), date: date, time: $("oneTime").value || "19:30",
+      mutate({ t:"addSession", s:{ id: uid("s"), date: date, time: $("oneTime").value || "19:30", end: $("oneEnd").value || "",
         label: $("oneLabel").value.trim() || "Training", place: $("onePlace").value.trim(), cancelled:false, reason:"" } });
       $("oneLabel").value = "";
     });
+
+    linkTimes("rhythmTime","rhythmEnd");
+    linkTimes("oneTime","oneEnd");
 
     $("csvBtn").addEventListener("click", exportCsv);
 
@@ -1165,7 +1204,8 @@
       var d = new Date(base.getTime() + off*86400000);
       var wd = d.getDay();
       if (wd !== 2 && wd !== 4) continue;
-      var s = { id:"demo-s" + (k++), date: isoOf(d), time: wd === 2 ? "19:30" : "20:00", label:"Training", place:"", cancelled:false, reason:"" };
+      var s = { id:"demo-s" + (k++), date: isoOf(d), time: wd === 2 ? "19:30" : "20:00", end: wd === 2 ? "21:00" : "21:30",
+                label:"Training", place:"", cancelled:false, reason:"" };
       sessions.push(s);
       if (off > 0) continue;
       att[s.id] = {};
@@ -1177,7 +1217,7 @@
       });
     }
     var extra = new Date(base.getTime() + 10*86400000);
-    sessions.push({ id:"demo-extra", date: isoOf(extra), time:"10:00", label:"Zusatztraining", place:"", cancelled:false, reason:"" });
+    sessions.push({ id:"demo-extra", date: isoOf(extra), time:"10:00", end:"12:00", label:"Zusatztraining", place:"", cancelled:false, reason:"" });
     return { v:2, demo:true, team:"Beispielteam", trainerPin:null, players:players, sessions:sessions, att:att };
   }
 
@@ -1191,7 +1231,7 @@
       players: Array.isArray(st.players) ? st.players.filter(function(p){ return p && p.id; }).map(function(p){
         return { id:p.id, name:String(p.name || "?"), pin: typeof p.pin === "string" ? p.pin : null }; }) : [],
       sessions: Array.isArray(st.sessions) ? st.sessions.filter(function(s){ return s && s.id && s.date; }).map(function(s){
-        return { id:s.id, date:s.date, time:s.time || "19:30", label:s.label || "Training", place:s.place || "",
+        return { id:s.id, date:s.date, time:s.time || "19:30", end: s.end || "", label:s.label || "Training", place:s.place || "",
                  cancelled: !!s.cancelled, reason: s.reason || "" }; }) : [],
       att: st.att && typeof st.att === "object" ? st.att : {}
     };
