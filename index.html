@@ -618,14 +618,7 @@ window.TB_STANDALONE = true;
         <details class="rules">
           <summary>Wie gezählt wird</summary>
           <div class="rbody">
-            <ul>
-              <li>Anwesend bringt 10 Punkte, entschuldigt 3 Punkte, gefehlt 0 Punkte.</li>
-              <li>Wer sich vor Trainingsbeginn eintragt, bekommt 2 Punkte Bonus. Auch eine Absage zählt, solange sie rechtzeitig kommt.</li>
-              <li>Wer sich gar nicht eintragt, bekommt keine Punkte und die Serie reißt.</li>
-              <li>Die Serie zählt Einheiten in Folge, bei denen du anwesend warst. Eine Entschuldigung pausiert die Serie, sie setzt sie nicht zurück.</li>
-              <li>Die Quote ist anwesend geteilt durch eingetragene Termine. Geplante Termine zählen erst, wenn sie vorbei sind.</li>
-              <li>Die Stufe braucht mindestens fünf gewertete Einheiten: Bronze ab 70 Prozent, Silber ab 80, Gold ab 90.</li>
-            </ul>
+            <ul id="ruleList"></ul>
           </div>
         </details>
       </section>
@@ -648,6 +641,24 @@ window.TB_STANDALONE = true;
             <input type="number" id="goalInput" min="0" max="100" step="5" style="width:96px">
             <span class="hint">Das Ziel steht als Marke im Balken auf der Team-Seite.</span>
           </div>
+        </div>
+
+        <div class="adminblock">
+          <h3>Fristen</h3>
+          <p class="hint">Beide Fristen gibst du in Stunden vor Trainingsbeginn an, damit sie für jeden Termin passen. Den Spielern zeigt die Seite daraus die konkrete Uhrzeit.</p>
+          <div class="row">
+            <label for="excInput">Absage zählt bis</label>
+            <input type="number" id="excInput" min="0" max="336" step="1" style="width:96px">
+            <span class="hint">Stunden vor Trainingsbeginn. 0 heißt: bis zum Trainingsbeginn.</span>
+          </div>
+          <p class="hint" id="excPreview"></p>
+          <div class="row">
+            <label for="bonusInput">Bonuspunkte bis</label>
+            <input type="number" id="bonusInput" min="0" max="336" step="1" style="width:96px">
+            <span class="hint">Stunden vor Trainingsbeginn. Gilt für jede Rückmeldung, auch für eine Zusage.</span>
+          </div>
+          <p class="hint" id="bonusPreview"></p>
+          <p class="hint">Nach der Absagefrist kann sich jeder weiter entschuldigen, die Einheit bringt dann aber keine Punkte und die Serie reißt.</p>
         </div>
 
         <div class="adminblock">
@@ -791,6 +802,9 @@ window.TB_STANDALONE = true;
   var LEVELS = [ { name:"Gold", min:90 }, { name:"Silber", min:80 }, { name:"Bronze", min:70 } ];
   var LEVEL_MIN = 5;
   var DEFAULT_GOAL = 85;
+  var DEFAULT_EXC = 0;      /* Stunden vor Beginn, bis wann eine Absage Punkte gibt */
+  var DEFAULT_BONUS = 24;   /* Stunden vor Beginn, bis wann es Bonuspunkte gibt */
+  var HOUR = 3600000;
 
   var NAV = [
     { k:"heute",   label:"Heute",   icon:"calendar-check" },
@@ -857,8 +871,8 @@ window.TB_STANDALONE = true;
       else st.att[op.sid][op.pid] = { v: op.v, n: op.n || "", by: op.by || "", ts: op.ts || 0 };
     } else if (op.t === "team") {
       st.team = op.name;
-    } else if (op.t === "goal") {
-      st.goal = op.v;
+    } else if (op.t === "cfg") {
+      st[op.k] = op.v;
     } else if (op.t === "pin") {
       if (op.who === "trainer") st.trainerPin = op.h;
       else { var p = null; for (var i=0;i<st.players.length;i++) if (st.players[i].id===op.who) p = st.players[i]; if (p) p.pin = op.h; }
@@ -881,6 +895,8 @@ window.TB_STANDALONE = true;
     } else if (op.t === "restore") {
       st.team = op.st.team;
       st.goal = op.st.goal;
+      st.excHours = op.st.excHours;
+      st.bonusHours = op.st.bonusHours;
       st.trainerPin = op.st.trainerPin;
       st.players = op.st.players;
       st.sessions = op.st.sessions;
@@ -927,8 +943,8 @@ window.TB_STANDALONE = true;
       fbDo(op.v === null ? r.remove() : r.set({ v: op.v, n: op.n || "", by: op.by || "", ts: op.ts || 0 }));
     } else if (op.t === "team") {
       fbDo(FB.child("team").set(op.name));
-    } else if (op.t === "goal") {
-      fbDo(FB.child("goal").set(op.v));
+    } else if (op.t === "cfg") {
+      fbDo(FB.child(op.k).set(op.v));
     } else if (op.t === "pin") {
       fbDo(FB.child(op.who === "trainer" ? "trainerPin" : "players/" + op.who + "/pin").set(op.h));
     } else if (op.t === "addPlayer") {
@@ -946,8 +962,8 @@ window.TB_STANDALONE = true;
       fbDo(FB.child("sessions/" + op.id).remove());
       FB.child("att/" + op.id).remove();
     } else if (op.t === "restore") {
-      var payload = { team: op.st.team, goal: op.st.goal || DEFAULT_GOAL, trainerPin: op.st.trainerPin || null,
-        players: {}, sessions: {}, att: op.st.att || {} };
+      var payload = { team: op.st.team, goal: op.st.goal, excHours: op.st.excHours, bonusHours: op.st.bonusHours,
+        trainerPin: op.st.trainerPin || null, players: {}, sessions: {}, att: op.st.att || {} };
       op.st.players.forEach(function(p){ payload.players[p.id] = { name: p.name, pin: p.pin || null }; });
       op.st.sessions.forEach(function(s){ payload.sessions[s.id] = { date:s.date, time:s.time, end:s.end || "",
         label:s.label || "Training", place:s.place || "", cancelled: !!s.cancelled, reason: s.reason || "" }; });
@@ -967,8 +983,8 @@ window.TB_STANDALONE = true;
       sessions.push({ id: id, date: s.date, time: s.time, end: s.end || "", label: s.label || "Training",
         place: s.place || "", cancelled: !!s.cancelled, reason: s.reason || "" });
     });
-    return normalize({ demo:false, team: v.team, goal: v.goal, trainerPin: v.trainerPin || null,
-      players: players, sessions: sessions, att: v.att || {} });
+    return normalize({ demo:false, team: v.team, goal: v.goal, excHours: v.excHours, bonusHours: v.bonusHours,
+      trainerPin: v.trainerPin || null, players: players, sessions: sessions, att: v.att || {} });
   }
 
   function mutate(op){
@@ -1066,12 +1082,36 @@ window.TB_STANDALONE = true;
     d.setHours(+p[0] || 0, +p[1] || 0, 0, 0);
     return d.getTime();
   }
-  function onTime(e, s){ if (!e || !e.ts) return true; return e.ts < startMs(s); }
+  function excHours(){ return typeof state.excHours === "number" ? state.excHours : DEFAULT_EXC; }
+  function bonusHours(){ return typeof state.bonusHours === "number" ? state.bonusHours : DEFAULT_BONUS; }
+  function deadlineMs(s, hours){ return startMs(s) - (hours || 0) * HOUR; }
+
+  /* Einträge ohne Zeitstempel sind Altbestand oder vom Trainer gesetzt: sie gelten als rechtzeitig. */
+  function beforeDeadline(e, s, hours){
+    if (!e) return false;
+    if (!e.ts) return true;
+    return e.ts <= deadlineMs(s, hours);
+  }
+  function excOnTime(e, s){ return beforeDeadline(e, s, excHours()); }
+  function bonusOnTime(e, s){ return beforeDeadline(e, s, bonusHours()); }
+  function lateExc(e, s){ return !!e && e.v === "exc" && !excOnTime(e, s); }
+
   function pointsFor(e, s){
-    if (!e || PTS[e.v] == null) return 0;
-    var p = PTS[e.v];
-    if (e.v !== "no" && onTime(e, s)) p += BONUS;
-    return p;
+    if (!e) return 0;
+    if (e.v === "yes") return PTS.yes + (bonusOnTime(e, s) ? BONUS : 0);
+    if (e.v === "exc") return excOnTime(e, s) ? PTS.exc + (bonusOnTime(e, s) ? BONUS : 0) : 0;
+    return 0;
+  }
+
+  /* Frist als Uhrzeit, wie die Spieler sie sehen */
+  function fmtDeadline(s, hours){
+    if (!hours) return "Trainingsbeginn";
+    var d = new Date(deadlineMs(s, hours));
+    var clock = pad(d.getHours()) + ":" + pad(d.getMinutes()) + " Uhr";
+    var day = isoOf(d);
+    if (day === s.date) return clock + " am Trainingstag";
+    if (day === isoOf(new Date(parseISO(s.date).getTime() - 86400000))) return clock + " am Vortag";
+    return "am " + fmtShort(day) + " um " + clock;
   }
   function scoreIn(pid, list){
     var sum = 0;
@@ -1090,7 +1130,7 @@ window.TB_STANDALONE = true;
     heldSessions().forEach(function(s){
       var e = entry(s.id, pid);
       if (e && e.v === "yes") { cur++; if (cur > best) best = cur; }
-      else if (e && e.v === "exc") { /* Entschuldigung pausiert die Serie */ }
+      else if (e && e.v === "exc" && excOnTime(e, s)) { /* rechtzeitige Absage pausiert die Serie */ }
       else cur = 0;
     });
     return { cur:cur, best:best };
@@ -1115,7 +1155,7 @@ window.TB_STANDALONE = true;
     held.forEach(function(s){
       var e = entry(s.id, pid);
       if (e && e.v === "yes") yes++;
-      if (e && e.ts && onTime(e, s)) early++;
+      if (e && e.ts && bonusOnTime(e, s)) early++;
     });
     var st = streakOf(pid);
 
@@ -1135,7 +1175,7 @@ window.TB_STANDALONE = true;
       if (m !== 12 && m !== 1 && m !== 2) return;
       win++;
       var e = entry(s.id, pid);
-      if (!e || e.v === "no") winBad++;
+      if (!e || e.v === "no" || lateExc(e, s)) winBad++;
     });
 
     return [
@@ -1146,7 +1186,7 @@ window.TB_STANDALONE = true;
       { name:"Serie von fünf",  desc:"Fünf Einheiten in Folge anwesend.",            cur:Math.min(st.best,5),  target:5,  icon:"chart-column" },
       { name:"Serie von zehn",  desc:"Zehn Einheiten in Folge anwesend.",            cur:Math.min(st.best,10), target:10, icon:"chart-column" },
       { name:"Immer gemeldet",  desc:"Ein ganzer Monat ohne fehlende Rückmeldung.",  cur:Math.min(cleanMonths,1), target:1, icon:"bell" },
-      { name:"Frühmelder",      desc:"Zehnmal vor Trainingsbeginn eingetragen.",     cur:Math.min(early,10), target:10, icon:"clock" },
+      { name:"Frühmelder",      desc:"Zehnmal vor der Bonusfrist eingetragen.",      cur:Math.min(early,10), target:10, icon:"clock" },
       { name:"Wintertraining",  desc:"Alle Einheiten im Winter mitgemacht oder rechtzeitig abgesagt.",
         cur: (win >= 5 && winBad === 0) ? 1 : 0, target:1, icon:"trophy", locked: win < 5 }
     ];
@@ -1567,7 +1607,16 @@ window.TB_STANDALONE = true;
     } else {
       card.appendChild(pickButtons(next.id, me.id, true));
       var mine = entry(next.id, me.id);
-      if (!mine) card.appendChild(el("p","hint warn","Noch nicht eingetragen. Wer sich vor Trainingsbeginn meldet, bekommt " + BONUS + " Punkte Bonus."));
+      var now = Date.now();
+      var excOpen = now <= deadlineMs(next, excHours());
+      var bonusOpen = now <= deadlineMs(next, bonusHours());
+      var line = el("p", excOpen ? "hint" : "hint warn");
+      line.textContent = "Absage zählt bis " + fmtDeadline(next, excHours())
+        + (excOpen ? "" : " (vorbei, eine Absage bringt jetzt keine Punkte mehr und die Serie reißt)")
+        + " · " + BONUS + " Punkte Bonus bis " + fmtDeadline(next, bonusHours())
+        + (bonusOpen ? "" : " (vorbei)");
+      card.appendChild(line);
+      if (!mine && excOpen) card.appendChild(el("p","hint warn","Noch nicht eingetragen."));
       var rr = reasonRow(next.id, me.id);
       if (rr) card.appendChild(rr);
     }
@@ -1589,8 +1638,13 @@ window.TB_STANDALONE = true;
       line.appendChild(el("b", "nl " + kind, pair[1]));
       line.appendChild(document.createTextNode(members.map(function(p){
         var e = entry(sid, p.id);
+        var s = null;
+        state.sessions.forEach(function(x){ if (x.id === sid) s = x; });
         var reason = "";
-        if (e && e.v === "exc" && mayNote(p.id)) reason = e.n ? " (" + e.n + ")" : " (Grund fehlt)";
+        if (e && e.v === "exc" && mayNote(p.id)) {
+          reason = e.n ? " (" + e.n + ")" : " (Grund fehlt)";
+          if (s && lateExc(e, s)) reason += " (zu spät)";
+        }
         return p.name + reason;
       }).join(", ")));
       box.appendChild(line);
@@ -1616,6 +1670,12 @@ window.TB_STANDALONE = true;
       what.appendChild(document.createTextNode(s.label || "Training"));
       if (s.cancelled) what.appendChild(el("em", null, "fällt aus" + (s.reason ? ": " + s.reason : "")));
       else if (s.place) what.appendChild(el("em", null, s.place));
+      if (!s.cancelled && !isTrainer()) {
+        var over = Date.now() > deadlineMs(s, excHours());
+        what.appendChild(el("em", null, over
+          ? "Absagefrist vorbei, eine Absage bringt keine Punkte mehr"
+          : "Absage zählt bis " + fmtDeadline(s, excHours())));
+      }
       row.appendChild(what);
       if (s.cancelled || isTrainer()) row.appendChild(el("div","mine"));
       else row.appendChild(pickButtons(s.id, me.id, false));
@@ -1650,7 +1710,8 @@ window.TB_STANDALONE = true;
       what.appendChild(document.createTextNode(s.label || "Training"));
       if (!isTrainer()) {
         var e = entry(s.id, me.id);
-        what.appendChild(el("em", null, e ? WORD[e.v] + (e.v !== "no" ? " · " + pointsFor(e, s) + " Punkte" : " · 0 Punkte")
+        what.appendChild(el("em", null, e
+          ? WORD[e.v] + (lateExc(e, s) ? " (zu spät)" : "") + " · " + pointsFor(e, s) + " Punkte"
           : "nichts eingetragen · 0 Punkte"));
       } else if (s.place) {
         what.appendChild(el("em", null, s.place));
@@ -1835,6 +1896,24 @@ window.TB_STANDALONE = true;
         : "Mehr geht nicht. Halte die Quote über 90 Prozent."));
     }
 
+    var rl = $("ruleList");
+    rl.innerHTML = "";
+    var ref = upcoming().filter(function(s){ return !s.cancelled; })[0] || heldSessions().slice(-1)[0];
+    var excTxt = ref ? " Beim nächsten Termin ist das " + fmtDeadline(ref, excHours()) + "." : "";
+    var bonusTxt = ref ? " Beim nächsten Termin ist das " + fmtDeadline(ref, bonusHours()) + "." : "";
+    [
+      "Anwesend bringt " + PTS.yes + " Punkte, eine rechtzeitige Absage " + PTS.exc + " Punkte, gefehlt 0 Punkte.",
+      "Eine Absage zählt bis " + (excHours() ? excHours() + " Stunden vor Trainingsbeginn" : "zum Trainingsbeginn") + "." + excTxt
+        + " Danach kannst du dich weiter entschuldigen, es gibt aber keine Punkte und die Serie reißt.",
+      "Wer bis " + (bonusHours() ? bonusHours() + " Stunden vor Trainingsbeginn" : "zum Trainingsbeginn") + " eingetragen ist, bekommt "
+        + BONUS + " Punkte Bonus." + bonusTxt,
+      "Wer sich gar nicht einträgt, bekommt keine Punkte und die Serie reißt.",
+      "Die Serie zählt Einheiten in Folge, bei denen du anwesend warst. Eine rechtzeitige Absage pausiert die Serie, sie setzt sie nicht zurück.",
+      "Die Quote ist anwesend geteilt durch eingetragene Termine. Geplante Termine zählen erst, wenn sie vorbei sind.",
+      "Die Stufe braucht mindestens " + LEVEL_MIN + " gewertete Einheiten: Bronze ab 70 Prozent, Silber ab 80, Gold ab 90.",
+      "Ältere Einträge ohne Zeitstempel und Korrekturen des Trainers gelten als rechtzeitig."
+    ].forEach(function(t){ rl.appendChild(el("li", null, t)); });
+
     var bb = $("badgeBox");
     bb.innerHTML = "";
     badgesOf(me.id).forEach(function(b){
@@ -1857,6 +1936,18 @@ window.TB_STANDALONE = true;
   function renderAdmin(){
     $("teamInput").value = state.team || "";
     $("goalInput").value = goalPct();
+    $("excInput").value = excHours();
+    $("bonusInput").value = bonusHours();
+
+    var ref = upcoming().filter(function(s){ return !s.cancelled; })[0] || heldSessions().slice(-1)[0];
+    var pre = function(id, hours, what){
+      if (!ref) { $(id).textContent = "Sobald ein Termin im Plan steht, steht hier die konkrete Uhrzeit."; return; }
+      $(id).textContent = "Beim Termin am " + fmtShort(ref.date) + ", " + ref.time + " Uhr heißt das: "
+        + what + " bis " + fmtDeadline(ref, hours) + ".";
+    };
+    pre("excPreview", excHours(), "Absage zählt");
+    pre("bonusPreview", bonusHours(), "Bonuspunkte");
+
     renderSessionEditor();
 
     var r = $("rosterList");
@@ -2097,16 +2188,16 @@ window.TB_STANDALONE = true;
 
   /* ---------- Sicherung ---------- */
   function backupJson(){
-    return JSON.stringify({ v:3, team: state.team, goal: goalPct(), trainerPin: state.trainerPin,
-      players: state.players, sessions: state.sessions, att: state.att }, null, 2);
+    return JSON.stringify({ v:4, team: state.team, goal: goalPct(), excHours: excHours(), bonusHours: bonusHours(),
+      trainerPin: state.trainerPin, players: state.players, sessions: state.sessions, att: state.att }, null, 2);
   }
 
   function restoreFrom(text){
     var msg = $("backupMsg");
     var raw;
     try { raw = JSON.parse(text); } catch (e) { msg.className = "msg"; msg.textContent = "Das ist keine gültige Sicherungsdatei."; return; }
-    var st = normalize({ demo:false, team: raw.team, goal: raw.goal, trainerPin: raw.trainerPin,
-      players: raw.players, sessions: raw.sessions, att: raw.att });
+    var st = normalize({ demo:false, team: raw.team, goal: raw.goal, excHours: raw.excHours, bonusHours: raw.bonusHours,
+      trainerPin: raw.trainerPin, players: raw.players, sessions: raw.sessions, att: raw.att });
     if (!st.players.length && !st.sessions.length) { msg.className = "msg"; msg.textContent = "Die Datei enthält weder Kader noch Termine."; return; }
     mutate({ t:"restore", st: st });
     msg.className = "msg ok";
@@ -2123,11 +2214,17 @@ window.TB_STANDALONE = true;
     $("clearDemo").addEventListener("click", function(){ mutate({ t:"clearDemo" }); });
 
     $("teamInput").addEventListener("change", function(){ mutate({ t:"team", name: this.value.trim() || "Team" }); });
-    $("goalInput").addEventListener("change", function(){
-      var v = Math.max(0, Math.min(100, parseInt(this.value, 10)));
-      if (isNaN(v)) { this.value = goalPct(); return; }
-      mutate({ t:"goal", v: v });
-    });
+    var numberCfg = function(id, key, min, max, fallback){
+      $(id).addEventListener("change", function(){
+        var v = parseInt(this.value, 10);
+        if (isNaN(v)) { this.value = fallback(); return; }
+        v = Math.max(min, Math.min(max, v));
+        mutate({ t:"cfg", k: key, v: v });
+      });
+    };
+    numberCfg("goalInput", "goal", 0, 100, goalPct);
+    numberCfg("excInput", "excHours", 0, 336, excHours);
+    numberCfg("bonusInput", "bonusHours", 0, 336, bonusHours);
 
     $("addPlayer").addEventListener("click", function(){
       var inp = $("newPlayer"), name = inp.value.trim();
@@ -2268,17 +2365,22 @@ window.TB_STANDALONE = true;
     }
     var extra = new Date(base.getTime() + 10*86400000);
     sessions.push({ id:"demo-extra", date: isoOf(extra), time:"10:00", end:"12:00", label:"Zusatztraining", place:"", cancelled:false, reason:"" });
-    return { v:3, demo:true, team:"Beispielteam", goal:DEFAULT_GOAL, trainerPin:null, players:players, sessions:sessions, att:att };
+    return { v:4, demo:true, team:"Beispielteam", goal:DEFAULT_GOAL, excHours:DEFAULT_EXC, bonusHours:DEFAULT_BONUS,
+             trainerPin:null, players:players, sessions:sessions, att:att };
   }
 
   function normalize(raw){
     var st = raw && typeof raw === "object" ? raw : {};
     var g = parseInt(st.goal, 10);
+    var eh = parseInt(st.excHours, 10);
+    var bh = parseInt(st.bonusHours, 10);
     var out = {
-      v: 3,
+      v: 4,
       demo: !!st.demo,
       team: typeof st.team === "string" ? st.team : "Team",
       goal: isNaN(g) ? DEFAULT_GOAL : Math.max(0, Math.min(100, g)),
+      excHours: isNaN(eh) ? DEFAULT_EXC : Math.max(0, Math.min(336, eh)),
+      bonusHours: isNaN(bh) ? DEFAULT_BONUS : Math.max(0, Math.min(336, bh)),
       trainerPin: typeof st.trainerPin === "string" ? st.trainerPin : null,
       players: Array.isArray(st.players) ? st.players.filter(function(p){ return p && p.id; }).map(function(p){
         return { id:p.id, name:String(p.name || "?"), pin: typeof p.pin === "string" ? p.pin : null }; }) : [],
@@ -2290,6 +2392,9 @@ window.TB_STANDALONE = true;
     if (!out.players.length && !out.sessions.length && st.demo !== false) {
       var seeded = demoSeed();
       seeded.team = out.team !== "Team" ? out.team : seeded.team;
+      seeded.goal = out.goal;
+      seeded.excHours = out.excHours;
+      seeded.bonusHours = out.bonusHours;
       seeded.trainerPin = out.trainerPin;
       return seeded;
     }
