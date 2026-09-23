@@ -450,9 +450,34 @@ window.TB_ICONS = {
   .calgrid i.late{background:var(--status-present) var(--watch) center/10px 10px no-repeat;}
   .calgrid i.jok{box-shadow:inset 0 0 0 2px var(--sand-500);}
 
+  /* ---------- Erklärungen: i im Kreis mit Blase ---------- */
+  .info{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;flex:none;padding:0;
+    border-radius:999px;border:1.5px solid var(--border-strong);background:transparent;color:var(--text-muted);
+    font:700 11px/1 var(--font-sans);cursor:pointer;vertical-align:middle;margin-left:7px;
+    transition:border-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out);}
+  .info:hover{border-color:var(--text-brand);color:var(--text-brand);}
+  .info:focus-visible{outline:none;box-shadow:var(--ring-focus);}
+  .info[aria-expanded="true"]{background:var(--surface-brand);border-color:var(--surface-brand);color:var(--text-on-brand);}
+  h1 .info,h2 .info,h3 .info{position:relative;top:-1px;}
+  .pop{position:fixed;z-index:80;background:var(--surface-card);border:1px solid var(--border-strong);
+    border-radius:var(--radius-card);box-shadow:var(--shadow-md);padding:14px 16px;
+    font:400 13.5px/1.55 var(--font-sans);color:var(--text-body);}
+  .pop b{display:block;font:700 11px/1.3 var(--font-narrow);letter-spacing:.06em;text-transform:uppercase;
+    color:var(--text-muted);margin:0 0 7px;}
+  .pop p{margin:0 0 9px;}
+  .pop p:last-child{margin-bottom:0;}
   .tile.txt b{font-size:26px;line-height:1.15;overflow-wrap:anywhere;}
   .note-row .btn{padding:0 14px;height:38px;}
   .noterow td{text-align:left;white-space:normal;height:auto;padding:0 18px 12px;}
+  .rules.big{border-color:var(--border-strong);}
+  .rules.big>summary{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:3px;
+    padding:18px;font:700 16px/1.25 var(--font-sans);color:var(--text-strong);}
+  .rules.big>summary .rs{font:400 13px/1.4 var(--font-sans);color:var(--text-muted);}
+  .rules.big>summary::after{position:absolute;right:18px;top:18px;}
+  .rules.big>summary{position:relative;padding-right:46px;}
+  .rules.big[open]>summary{border-bottom:1px solid var(--border-subtle);}
+  .rules.big>.rbody{padding:14px 18px 18px;gap:8px;}
+  .rules .rules{background:var(--surface-sunken);}
   .rules{border:1px solid var(--border-subtle);border-radius:var(--radius-card);background:var(--surface-card);}
   .rules + .rules{margin-top:8px;}
   .rules .rbody h4{margin:10px 0 0;font:700 13px/1.3 var(--font-narrow);letter-spacing:.04em;
@@ -470,6 +495,29 @@ window.TB_ICONS = {
   .block{display:flex;flex-direction:column;gap:10px;}
   .adminblock{background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-card);padding:18px;
     display:flex;flex-direction:column;gap:10px;}
+  .adminblock.fold{padding:0;gap:0;}
+  .adminblock.fold>summary{display:flex;align-items:center;gap:9px;padding:16px 18px;cursor:pointer;list-style:none;
+    font:700 14px/1.25 var(--font-sans);color:var(--text-strong);}
+  .adminblock.fold>summary::-webkit-details-marker{display:none;}
+  .adminblock.fold>summary::after{content:"+";margin-left:auto;font:400 20px/1 var(--font-sans);color:var(--text-muted);}
+  .adminblock.fold[open]>summary::after{content:"\2013";}
+  .adminblock.fold[open]>summary{border-bottom:1px solid var(--border-subtle);}
+  .adminblock.fold>.fbody{display:flex;flex-direction:column;gap:10px;padding:16px 18px 18px;}
+  .sumval{font:400 13px/1.2 var(--font-sans);color:var(--text-muted);margin-left:2px;}
+  .brow{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 14px;padding:11px 0;border-top:1px solid var(--border-subtle);}
+  .brow:first-child{border-top:0;padding-top:0;}
+  .brow .bon{display:flex;align-items:center;gap:8px;min-width:186px;font:600 14px/1.2 var(--font-sans);
+    color:var(--text-strong);cursor:pointer;padding-bottom:6px;}
+  .brow .bon input{width:18px;height:18px;flex:none;}
+  .bfields{display:flex;gap:8px;flex-wrap:wrap;}
+  .bfields label{display:flex;flex-direction:column;gap:4px;font:700 10.5px/1.2 var(--font-narrow);
+    letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);}
+  .bfields input{width:78px;}
+  .bunit{font-size:13px;color:var(--text-muted);padding-bottom:7px;}
+  .brow.off .bfields,.brow.off .bunit{opacity:.45;}
+  .singles{display:flex;flex-wrap:wrap;gap:9px 20px;padding-top:12px;border-top:1px solid var(--border-subtle);}
+  .singles label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-strong);cursor:pointer;}
+  .singles input{width:18px;height:18px;}
   .roster{display:flex;flex-wrap:wrap;gap:6px;}
   .rchip{display:inline-flex;align-items:center;gap:4px;background:var(--surface-sunken);border:1px solid var(--border-subtle);
     border-radius:var(--radius-pill);padding:4px 6px 4px 13px;font-size:14px;color:var(--text-strong);}
@@ -627,7 +675,7 @@ window.TB_ICONS = {
         <div class="tiles" id="heuteTiles"></div>
 
         <section>
-          <h2>Nächster Termin</h2>
+          <h2 id="nextHead">Nächster Termin</h2>
           <div class="card pad" id="nextCard"></div>
         </section>
       </section>
@@ -660,30 +708,26 @@ window.TB_ICONS = {
         <div class="tiles" id="teamTiles"></div>
 
         <section>
-          <h2>Mannschaftsziel</h2>
+          <h2 id="goalHead">Mannschaftsziel</h2>
           <div class="card pad goal" id="goalCard"></div>
         </section>
 
         <section>
-          <h2>Podium des Monats</h2>
+          <h2 id="podiumHead">Podium des Monats</h2>
           <div class="podium" id="podiumBox"></div>
-          <p class="hint" id="podiumHint"></p>
         </section>
 
         <section>
-          <h2>Beteiligung</h2>
+          <h2 id="tableHead">Beteiligung</h2>
           <div class="card scroll"><table id="statsTable"></table></div>
           <div class="legend">
             <span><i class="mark yes"></i> anwesend</span>
+            <span id="legendLate" hidden><i class="mark late"></i> zu spät</span>
             <span><i class="mark exc"></i> entschuldigt</span>
             <span><i class="mark no"></i> gefehlt</span>
             <span><i class="mark"></i> nichts eingetragen</span>
-            <span id="legendLate" hidden><i class="mark late"></i> zu spät</span>
             <span id="legendTrainer" hidden><i class="mark yes byt"></i> vom Trainer korrigiert</span>
-            <span>Grün hinterlegte Spalten sind geplante Termine, sie zählen noch nicht in die Quote</span>
-            <span>Quote = anwesend geteilt durch eingetragene Termine</span>
           </div>
-          <p class="hint" id="tableHint"></p>
         </section>
       </section>
 
@@ -697,28 +741,27 @@ window.TB_ICONS = {
         <div class="tiles" id="ichTiles"></div>
 
         <section>
-          <h2>Stufe</h2>
+          <h2 id="levelHead">Stufe</h2>
           <div class="card pad goal" id="levelCard"></div>
         </section>
 
         <section>
-          <h2>Deine Saison</h2>
+          <h2 id="calHead">Deine Saison</h2>
           <div class="card pad" id="calCard"></div>
         </section>
 
         <section>
-          <h2>Rekorde</h2>
+          <h2 id="recHead">Rekorde</h2>
           <div class="tiles" id="recordBox"></div>
         </section>
 
         <section>
-          <h2>Abzeichen</h2>
+          <h2 id="badgeHead">Abzeichen</h2>
           <div class="badges" id="badgeBox"></div>
         </section>
 
         <section>
-          <h2>Reglement</h2>
-          <p class="hint" style="margin:0 0 12px">Das gilt für alle. Die Zahlen darin sind die, die euer Trainer eingestellt hat.</p>
+          <h2 id="ruleHead">Reglement</h2>
           <div id="ruleBox"></div>
         </section>
       </section>
@@ -730,98 +773,137 @@ window.TB_ICONS = {
           <p>Kader, Termine, Korrekturen und Sicherung.</p>
         </div>
 
-        <div class="adminblock">
-          <h3>Team</h3>
-          <div class="row">
-            <label for="teamInput">Name</label>
-            <input type="text" id="teamInput" style="flex:1;min-width:200px">
+        <details class="adminblock fold">
+          <summary><span data-info="Der Name steht oben in der Kopfzeile und in der Seitenleiste. Das Mannschaftsziel ist die Quote, die ihr euch vornehmt. Sie steht als senkrechte Marke im Balken auf der Team-Seite und zählt für die Team-Serie: jede abgeschlossene Woche über dem Ziel verlängert sie." data-title="Team">Team</span><span class="sumval" id="sumTeam"></span></summary>
+          <div class="fbody">
+            <div class="row">
+              <label for="teamInput">Name</label>
+              <input type="text" id="teamInput" style="flex:1;min-width:200px">
+            </div>
+            <div class="row">
+              <label for="goalInput">Mannschaftsziel in Prozent</label>
+              <input type="number" id="goalInput" min="0" max="100" step="5" style="width:96px">
+            </div>
           </div>
-          <div class="row">
-            <label for="goalInput">Mannschaftsziel in Prozent</label>
-            <input type="number" id="goalInput" min="0" max="100" step="5" style="width:96px">
-            <span class="hint">Das Ziel steht als Marke im Balken auf der Team-Seite.</span>
+        </details>
+
+        <details class="adminblock fold">
+          <summary><span data-info="Beide Fristen gibst du in Stunden vor Trainingsbeginn an, damit sie für jeden Termin passen. Den Spielern zeigt die Seite daraus immer die konkrete Uhrzeit.
+Absagefrist: bis dahin bringt eine Entschuldigung Punkte und die Serie pausiert. Danach kann sich jeder weiter entschuldigen, es gibt aber keine Punkte und die Serie reißt.
+Bonusfrist: wer bis dahin eingetragen ist, bekommt Bonuspunkte, auch für eine Zusage. Wer danach noch einmal umträgt, verliert sie wieder.
+Ab Trainingsbeginn kann ohnehin nur noch der Trainer etwas ändern." data-title="Fristen">Fristen</span><span class="sumval" id="sumFrist"></span></summary>
+          <div class="fbody">
+            <div class="row">
+              <label for="excInput">Absage zählt bis</label>
+              <input type="number" id="excInput" min="0" max="336" step="1" style="width:96px">
+              <span class="hint">Stunden vor Trainingsbeginn</span>
+            </div>
+            <p class="hint" id="excPreview"></p>
+            <div class="row">
+              <label for="bonusInput">Bonuspunkte bis</label>
+              <input type="number" id="bonusInput" min="0" max="336" step="1" style="width:96px">
+              <span class="hint">Stunden vor Trainingsbeginn</span>
+            </div>
+            <p class="hint" id="bonusPreview"></p>
           </div>
-        </div>
+        </details>
+
+        <details class="adminblock fold">
+          <summary><span data-info="Eine zusätzliche Kategorie für alle, die beim Training zu spät kommen. Setzen kannst nur du sie, nach dem Training.
+In der Quote und in der Serie zählt sie wie anwesend, sie bringt nur weniger Punkte. In der Beteiligungstabelle steht dafür eine kleine Stoppuhr im grünen Feld.
+Schaltest du sie wieder aus, bleiben gesetzte Einträge erhalten und zählen so lange wie anwesend." data-title="Zu spät">Zu spät</span><span class="sumval" id="sumLate"></span></summary>
+          <div class="fbody">
+            <div class="row">
+              <label for="lateOnInput" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                <input type="checkbox" id="lateOnInput" style="width:18px;height:18px">
+                Kategorie zu spät verwenden
+              </label>
+            </div>
+            <div class="row">
+              <label for="latePtsInput">Punkte für zu spät</label>
+              <input type="number" id="latePtsInput" min="0" max="20" step="1" style="width:96px">
+              <span class="hint">anwesend 10, rechtzeitige Absage 3</span>
+            </div>
+            <p class="hint" id="latePreview"></p>
+          </div>
+        </details>
+
+        <details class="adminblock fold">
+          <summary><span data-info="Die Stufe hängt an der Quote, nicht an der Zahl der Einheiten. Sie steht erst ab einer Mindestzahl gewerteter Einheiten, damit eine einzelne Einheit niemandem gleich Gold gibt.
+Die Abzeichen haben je Stufe eine eigene Schwelle. Bronze muss kleiner oder gleich Silber sein und Silber kleiner oder gleich Gold, sonst rückt die Seite die Werte selbst zurecht.
+Ein abgeschaltetes Abzeichen verschwindet aus dem Profil und aus dem Reglement. Die Leistung dahinter wird weiter mitgezählt, es taucht also alles wieder auf, wenn du es später zurückschaltest." data-title="Stufen und Abzeichen">Stufen und Abzeichen</span><span class="sumval" id="sumBadge"></span></summary>
+          <div class="fbody">
+            <div class="row">
+              <label for="lvBronzeInput">Bronze ab</label>
+              <input type="number" id="lvBronzeInput" min="0" max="100" step="1" style="width:84px">
+              <label for="lvSilverInput">Silber ab</label>
+              <input type="number" id="lvSilverInput" min="0" max="100" step="1" style="width:84px">
+              <label for="lvGoldInput">Gold ab</label>
+              <input type="number" id="lvGoldInput" min="0" max="100" step="1" style="width:84px">
+              <span class="hint">Prozent Quote</span>
+            </div>
+            <div class="row">
+              <label for="levelMinInput">Stufe erst ab</label>
+              <input type="number" id="levelMinInput" min="1" max="60" step="1" style="width:84px">
+              <span class="hint">gewerteten Einheiten</span>
+            </div>
+            <p class="hint" id="levelPreview"></p>
+            <div id="badgeCfgBox"></div>
+            <div class="row">
+              <button class="btn" id="badgeReset" type="button">Alles auf Standardwerte</button>
+              <span class="msg ok" id="badgeMsg"></span>
+            </div>
+          </div>
+        </details>
+
+        <details class="adminblock fold">
+          <summary><span data-info="Ein Joker rettet die Serie für genau eine vergangene Einheit. Punkte gibt es dadurch nicht zurück. Jeder setzt seine Joker selbst ein, unter Termine beim vergangenen Termin, und kann sie auch zurücknehmen.
+0 schaltet den Joker ganz ab.
+Gezählt ab ist der Stichtag: nur Joker ab diesem Tag zählen gegen das Budget. Alle Joker jetzt zurückgeben setzt den Stichtag auf heute, damit hat jeder wieder alle. Ältere Joker schützen die Serie in der Vergangenheit weiterhin." data-title="Joker">Joker</span><span class="sumval" id="sumJoker"></span></summary>
+          <div class="fbody">
+            <div class="row">
+              <label for="jokerInput">Joker je Spieler</label>
+              <input type="number" id="jokerInput" min="0" max="20" step="1" style="width:96px">
+            </div>
+            <div class="row">
+              <label for="jokerFromInput">Gezählt ab</label>
+              <input type="date" id="jokerFromInput">
+              <button class="btn" id="jokerReset" type="button">Alle Joker jetzt zurückgeben</button>
+              <span class="msg ok" id="jokerMsg"></span>
+            </div>
+            <p class="hint" id="jokerPreview"></p>
+          </div>
+        </details>
+
+        <details class="adminblock fold">
+          <summary><span data-info="Ab diesem Tag wird gewertet. Termine davor bleiben in der Sicherung erhalten, zählen aber nicht mehr in Quote, Punkte, Serie, Kalender, Abzeichen und Export. Ohne Datum zählt alles." data-title="Saison">Saison</span><span class="sumval" id="sumSeason"></span></summary>
+          <div class="fbody">
+            <div class="row">
+              <label for="seasonInput">Wertung ab</label>
+              <input type="date" id="seasonInput">
+              <button class="btn" id="seasonClear" type="button">Stichtag entfernen</button>
+            </div>
+            <p class="hint" id="seasonPreview"></p>
+          </div>
+        </details>
+
+        <details class="adminblock fold">
+          <summary><span data-info="Ein Code vor der Seite, damit nicht jeder mit der Adresse Kader, Quoten und Entschuldigungsgründe sieht. Das Gerät merkt sich den Code danach.
+Das ist eine Hürde, kein echter Schutz: Wer die Adresse der Datenbank kennt, kommt weiterhin an die Daten. Echter Schutz bräuchte Firebase-Regeln mit Anmeldung." data-title="Teamcode">Teamcode</span><span class="sumval" id="sumCode"></span></summary>
+          <div class="fbody">
+            <div class="row">
+              <input type="password" id="newTeamCode" maxlength="40" placeholder="neuer Teamcode" style="width:200px">
+              <button class="btn" id="setTeamCode" type="button">Code setzen</button>
+              <button class="btn danger" id="clearTeamCode" type="button">Code entfernen</button>
+              <span class="msg ok" id="teamCodeMsg"></span>
+            </div>
+            <p class="hint" id="teamCodeState"></p>
+          </div>
+        </details>
 
         <div class="adminblock">
-          <h3>Fristen</h3>
-          <p class="hint">Beide Fristen gibst du in Stunden vor Trainingsbeginn an, damit sie für jeden Termin passen. Den Spielern zeigt die Seite daraus die konkrete Uhrzeit.</p>
-          <div class="row">
-            <label for="excInput">Absage zählt bis</label>
-            <input type="number" id="excInput" min="0" max="336" step="1" style="width:96px">
-            <span class="hint">Stunden vor Trainingsbeginn. 0 heißt: bis zum Trainingsbeginn.</span>
-          </div>
-          <p class="hint" id="excPreview"></p>
-          <div class="row">
-            <label for="bonusInput">Bonuspunkte bis</label>
-            <input type="number" id="bonusInput" min="0" max="336" step="1" style="width:96px">
-            <span class="hint">Stunden vor Trainingsbeginn. Gilt für jede Rückmeldung, auch für eine Zusage.</span>
-          </div>
-          <p class="hint" id="bonusPreview"></p>
-          <p class="hint">Nach der Absagefrist kann sich jeder weiter entschuldigen, die Einheit bringt dann aber keine Punkte und die Serie reißt.</p>
-          <p class="hint">Wer seine Rückmeldung nach der Bonusfrist noch einmal ändert, verliert die Bonuspunkte für diesen Termin. Ab Trainingsbeginn kann nur noch der Trainer etwas ändern.</p>
-        </div>
-
-        <div class="adminblock">
-          <h3>Zu spät</h3>
-          <p class="hint">Eine zusätzliche Kategorie für alle, die beim Training zu spät kommen. Setzen kannst nur du sie. Sie zählt in der Quote und in der Serie wie anwesend, bringt aber weniger Punkte. In der Beteiligungstabelle steht dafür eine kleine Stoppuhr im grünen Feld.</p>
-          <div class="row">
-            <label for="lateOnInput" style="display:flex;align-items:center;gap:8px;cursor:pointer">
-              <input type="checkbox" id="lateOnInput" style="width:18px;height:18px">
-              Kategorie zu spät verwenden
-            </label>
-          </div>
-          <div class="row">
-            <label for="latePtsInput">Punkte für zu spät</label>
-            <input type="number" id="latePtsInput" min="0" max="20" step="1" style="width:96px">
-            <span class="hint">Anwesend bringt 10 Punkte, eine rechtzeitige Absage 3.</span>
-          </div>
-          <p class="hint" id="latePreview"></p>
-        </div>
-
-        <div class="adminblock">
-          <h3>Joker</h3>
-          <p class="hint">Ein Joker rettet die Serie für genau eine Einheit. Punkte gibt es dadurch nicht zurück. Jeder setzt seine Joker selbst ein, unter Termine beim vergangenen Termin.</p>
-          <div class="row">
-            <label for="jokerInput">Joker je Spieler</label>
-            <input type="number" id="jokerInput" min="0" max="20" step="1" style="width:96px">
-            <span class="hint">0 schaltet den Joker ab.</span>
-          </div>
-          <div class="row">
-            <label for="jokerFromInput">Gezählt ab</label>
-            <input type="date" id="jokerFromInput">
-            <button class="btn" id="jokerReset" type="button">Alle Joker jetzt zurückgeben</button>
-            <span class="msg ok" id="jokerMsg"></span>
-          </div>
-          <p class="hint" id="jokerPreview"></p>
-        </div>
-
-        <div class="adminblock">
-          <h3>Saison</h3>
-          <p class="hint">Ab diesem Tag wird gewertet. Termine davor bleiben in der Sicherung erhalten, zählen aber nicht mehr in Quote, Punkte, Serie und Abzeichen. Ohne Datum zählt alles.</p>
-          <div class="row">
-            <label for="seasonInput">Wertung ab</label>
-            <input type="date" id="seasonInput">
-            <button class="btn" id="seasonClear" type="button">Stichtag entfernen</button>
-          </div>
-          <p class="hint" id="seasonPreview"></p>
-        </div>
-
-        <div class="adminblock">
-          <h3>Teamcode</h3>
-          <p class="hint">Ein Code vor der Seite, damit nicht jeder mit der Adresse Kader, Quoten und Entschuldigungsgründe sieht. Das ist eine Hürde, kein echter Schutz: Wer die Adresse der Datenbank kennt, kommt weiterhin an die Daten.</p>
-          <div class="row">
-            <input type="password" id="newTeamCode" maxlength="40" placeholder="neuer Teamcode" style="width:200px">
-            <button class="btn" id="setTeamCode" type="button">Code setzen</button>
-            <button class="btn danger" id="clearTeamCode" type="button">Code entfernen</button>
-            <span class="msg ok" id="teamCodeMsg"></span>
-          </div>
-          <p class="hint" id="teamCodeState"></p>
-        </div>
-
-        <div class="adminblock">
-          <h3>Kader</h3>
-          <p class="hint">Wer hier steht, kann sich anmelden und selbst eintragen. Ohne PIN heißt: hat sich noch nie angemeldet.</p>
+          <h3 data-info="Wer hier steht, kann sich anmelden und sich selbst eintragen. Ohne PIN heißt: hat sich noch nie angemeldet, die PIN legt jeder bei der ersten Anmeldung selbst fest.
+Einen Spieler zu löschen entfernt auch alle seine Einträge. Die Seite fragt vorher nach.">Kader</h3>
           <div class="roster" id="rosterList"></div>
           <div class="row">
             <input type="text" id="newPlayer" placeholder="Name" style="flex:1;min-width:200px">
@@ -830,8 +912,8 @@ window.TB_ICONS = {
         </div>
 
         <div class="adminblock">
-          <h3>Fester Rhythmus</h3>
-          <p class="hint">Wochentage wählen, Uhrzeit setzen, Zeitraum angeben. Termine, die schon im Plan stehen, werden nicht doppelt angelegt.</p>
+          <h3 data-info="Wochentage wählen, Uhrzeit setzen, Zahl der Wochen angeben. Termine, die für einen Tag schon im Plan stehen, werden nicht doppelt angelegt.
+Die Endzeit schlägt die Seite 90 Minuten nach der Startzeit vor, du kannst sie überschreiben.">Fester Rhythmus</h3>
           <div class="days" id="dayPicker"></div>
           <div class="row">
             <label for="rhythmTime">von</label><input type="time" id="rhythmTime" value="19:30">
@@ -844,7 +926,7 @@ window.TB_ICONS = {
         </div>
 
         <div class="adminblock">
-          <h3>Einzeltermin</h3>
+          <h3 data-info="Für alles, was nicht in den festen Rhythmus passt: Zusatztraining, Turnier, Wanderfahrt. Bezeichnung und Ort sind freiwillig, sie stehen den Spielern beim Termin.">Einzeltermin</h3>
           <div class="row">
             <input type="date" id="oneDate">
             <label for="oneTime">von</label><input type="time" id="oneTime" value="19:30">
@@ -856,8 +938,9 @@ window.TB_ICONS = {
         </div>
 
         <div class="adminblock">
-          <h3>Termin abhaken und Gründe pflegen</h3>
-          <p class="hint">Nach dem Training hier durchgehen: Status setzen, Grund ergänzen oder korrigieren. Was du änderst, ist in der Tabelle blau umrandet.</p>
+          <h3 data-info="Nach dem Training hier durchgehen: Status setzen, Grund ergänzen oder korrigieren. Was du änderst, ist in der Beteiligungstabelle blau umrandet.
+Deine Korrekturen behalten den Zeitstempel des Spielers, du nimmst also niemandem aus Versehen den Bonus weg.
+Entschuldigt lässt sich auch hier nur mit Grund speichern.">Termin abhaken und Gründe pflegen</h3>
           <div class="row">
             <label for="sessPick">Termin</label>
             <select id="sessPick" style="flex:1;min-width:220px"></select>
@@ -866,8 +949,8 @@ window.TB_ICONS = {
         </div>
 
         <div class="adminblock">
-          <h3>Zeitraum absagen oder löschen</h3>
-          <p class="hint">Für Ferien, gesperrte Halle oder eine Turnierpause. Absagen behält die Termine samt Einträgen und markiert sie als ausgefallen, löschen entfernt sie ganz.</p>
+          <h3 data-info="Für Ferien, gesperrte Halle oder eine Turnierpause.
+Absagen behält die Termine samt Einträgen und markiert sie als ausgefallen, sie zählen dann nicht mehr in die Quote. Löschen entfernt sie mit allen Einträgen, das fragt vorher nach.">Zeitraum absagen oder löschen</h3>
           <div class="row">
             <label for="rangeFrom">von</label><input type="date" id="rangeFrom">
             <label for="rangeTo">bis</label><input type="date" id="rangeTo">
@@ -879,8 +962,8 @@ window.TB_ICONS = {
         </div>
 
         <div class="adminblock">
-          <h3>Sicherung</h3>
-          <p class="hint">Der komplette Stand als Datei, inklusive Kader, Termine, Einträge und Gründe. Einspielen ersetzt alles, was gerade in der Datenbank steht.</p>
+          <h3 data-info="Der komplette Stand als Datei, inklusive Kader, Termine, Einträge, Gründe und allen Einstellungen. Gut vor größeren Änderungen.
+Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher nach.">Sicherung</h3>
           <div class="row">
             <button class="btn" id="backupSave" type="button">Sicherung herunterladen</button>
             <button class="btn" id="backupPick" type="button">Sicherung einspielen</button>
@@ -891,14 +974,12 @@ window.TB_ICONS = {
         </div>
 
         <div class="adminblock">
-          <h3>Termine bearbeiten und löschen</h3>
-          <p class="hint">„bearbeiten" öffnet Datum, Uhrzeit, Bezeichnung und Ort des Termins. Eine Absage sehen alle sofort auf der Seite, gelöschte Termine verschwinden mit allen Einträgen.</p>
+          <h3 data-info="Bearbeiten öffnet Datum, Uhrzeit, Bezeichnung und Ort eines einzelnen Termins. Eine Absage sehen alle sofort auf der Seite, gelöschte Termine verschwinden mit allen Einträgen.">Termine bearbeiten und löschen</h3>
           <div class="slist" id="adminSessions"></div>
         </div>
 
         <div class="adminblock">
-          <h3>Export</h3>
-          <p class="hint">Komplette Beteiligung als CSV, mit Semikolon getrennt, damit Excel die Spalten direkt erkennt.</p>
+          <h3 data-info="Komplette Beteiligung als CSV, mit Semikolon getrennt, damit Excel die Spalten direkt erkennt. Hinten stehen je Spieler Punkte, Serie, Stufe und übrige Joker.">Export</h3>
           <div class="row">
             <button class="btn" id="csvBtn" type="button">Als CSV exportieren</button>
             <span class="msg ok" id="csvMsg"></span>
@@ -907,8 +988,7 @@ window.TB_ICONS = {
         </div>
 
         <div class="adminblock">
-          <h3>Trainercode</h3>
-          <p class="hint">Der Code schützt diesen Bereich. Ändere ihn, wenn ihn zu viele kennen.</p>
+          <h3 data-info="Der Code schützt diesen Bereich. Ändere ihn, wenn ihn zu viele kennen. Er wird als Hashwert gespeichert, im Klartext steht er nirgends.">Trainercode</h3>
           <div class="row">
             <input type="password" id="newTrainerPin" inputmode="numeric" maxlength="12" placeholder="neuer Code" style="width:180px">
             <button class="btn" id="setTrainerPin" type="button">Code ändern</button>
@@ -917,8 +997,7 @@ window.TB_ICONS = {
         </div>
 
         <div class="adminblock">
-          <h3>Reglement</h3>
-          <p class="hint">Genau das lesen deine Spieler in ihrem Profil. Es passt sich an, was du oben einstellst.</p>
+          <h3 data-info="Genau das lesen deine Spieler in ihrem Profil. Alle Zahlen darin kommen aus deinen Einstellungen, es bleibt also von selbst richtig.">Reglement</h3>
           <div id="ruleBoxT"></div>
         </div>
       </section>
@@ -966,8 +1045,26 @@ window.TB_ICONS = {
   var PTS = { yes:10, exc:3, no:0 };
   var BONUS = 2;
   var DEFAULT_LATE = 5;     /* Punkte für zu spät, wenn der Trainer die Kategorie anschaltet */
-  var LEVELS = [ { name:"Gold", min:90 }, { name:"Silber", min:80 }, { name:"Bronze", min:70 } ];
-  var LEVEL_MIN = 5;
+  var DEF_LEVELS = { gold:90, silver:80, bronze:70 };
+  var DEF_LEVEL_MIN = 5;
+  var BADGE_DEFS = [
+    { k:"units",    name:"Einheiten",          unit:"Einheiten",          def:[10,25,50], max:500,
+      desc:"Wie oft du anwesend warst." },
+    { k:"streak",   name:"Serie",              unit:"Einheiten in Folge", def:[5,10,20],  max:500,
+      desc:"Deine längste Serie in Folge." },
+    { k:"reliable", name:"Zuverlässig",        unit:"Monate",             def:[1,3,6],    max:120,
+      desc:"Monate ohne eine einzige fehlende Rückmeldung." },
+    { k:"early",    name:"Frühmelder",         unit:"Rückmeldungen",      def:[10,25,50], max:500,
+      desc:"Rückmeldungen vor der Bonusfrist." },
+    { k:"punctual", name:"Pünktlich in Folge", unit:"in Folge",           def:[5,12,25],  max:500,
+      desc:"Rückmeldungen in Folge vor der Bonusfrist." }
+  ];
+  var SINGLE_DEFS = [
+    { k:"first",    name:"Erste Einheit" },
+    { k:"comeback", name:"Comeback" },
+    { k:"winter",   name:"Wintertraining" },
+    { k:"newyear",  name:"Jahreswechsel" }
+  ];
   var DEFAULT_GOAL = 85;
   var DEFAULT_EXC = 0;      /* Stunden vor Beginn, bis wann eine Absage Punkte gibt */
   var DEFAULT_BONUS = 24;   /* Stunden vor Beginn, bis wann es Bonuspunkte gibt */
@@ -1014,6 +1111,74 @@ window.TB_ICONS = {
   function entry(sid,pid){ var m = state.att[sid]; return (m && m[pid]) || null; }
   function sessById(id){ for (var i=0;i<state.sessions.length;i++) if (state.sessions[i].id===id) return state.sessions[i]; return null; }
   function isTrainer(){ return !!me && me.role === "trainer"; }
+  /* ---------- Erklärungen ---------- */
+  var openPop = null;
+  function closePop(){
+    if (!openPop) return;
+    safe(function(){ openPop.btn.setAttribute("aria-expanded","false"); });
+    safe(function(){ openPop.el.parentNode.removeChild(openPop.el); });
+    openPop = null;
+  }
+  /* Die Blase hängt an ihrem Knopf und wandert beim Scrollen mit */
+  function placePop(){
+    if (!openPop) return;
+    safe(function(){
+      var r = openPop.btn.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > window.innerHeight) { closePop(); return; }
+      var pop = openPop.el;
+      var w = pop.offsetWidth, h = pop.offsetHeight;
+      pop.style.left = Math.round(Math.min(Math.max(12, r.left + r.width/2 - w/2), window.innerWidth - w - 12)) + "px";
+      var top = r.bottom + 8;
+      if (top + h > window.innerHeight - 12 && r.top - h - 8 > 12) top = r.top - h - 8;
+      pop.style.top = Math.round(Math.max(12, top)) + "px";
+    });
+  }
+  function info(text, title){
+    var b = el("button","info","i");
+    b.type = "button";
+    b.setAttribute("aria-label", "Erklärung" + (title ? ": " + title : ""));
+    b.setAttribute("aria-expanded","false");
+    b.addEventListener("click", function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      var same = openPop && openPop.btn === b;
+      closePop();
+      if (same) return;
+      var pop = el("div","pop");
+      var body = typeof text === "function" ? text() : text;
+      var head = typeof title === "function" ? title() : title;
+      if (head) pop.appendChild(el("b", null, head));
+      String(body || "").split("\n").forEach(function(t){ if (t.trim()) pop.appendChild(el("p", null, t.trim())); });
+      pop.addEventListener("click", function(e){ e.stopPropagation(); });
+      document.body.appendChild(pop);
+      pop.style.width = Math.min(320, window.innerWidth - 24) + "px";
+      b.setAttribute("aria-expanded","true");
+      openPop = { btn:b, el:pop };
+      placePop();
+    });
+    return b;
+  }
+  function setInfo(id, text, title){
+    var node = $(id);
+    if (!node) return;
+    node.setAttribute("data-info", text);
+    if (title) node.setAttribute("data-title", title);
+  }
+  /* Erklärungen, die im festen Seitengerüst als data-info stehen */
+  function paintInfo(){
+    safe(function(){
+      var list = document.querySelectorAll("[data-info]");
+      for (var i=0;i<list.length;i++){
+        var node = list[i];
+        if (node.getAttribute("data-done") === "1") continue;
+        node.setAttribute("data-done","1");
+        var title = node.getAttribute("data-title") || node.textContent.trim();
+        node.appendChild(info(
+          (function(nd){ return function(){ return nd.getAttribute("data-info"); }; })(node), title));
+      }
+    });
+  }
+
   function icon(name){ var i = el("i"); i.setAttribute("data-lucide", name); i.setAttribute("aria-hidden","true"); return i; }
   function paintIcons(){ safe(function(){ if (window.lucide && lucide.createIcons) lucide.createIcons(); }); }
 
@@ -1075,6 +1240,11 @@ window.TB_ICONS = {
       st.bonusHours = op.st.bonusHours;
       st.lateOn = op.st.lateOn;
       st.latePts = op.st.latePts;
+      st.lvGold = op.st.lvGold;
+      st.lvSilver = op.st.lvSilver;
+      st.lvBronze = op.st.lvBronze;
+      st.levelMin = op.st.levelMin;
+      st.badges = op.st.badges;
       st.jokers = op.st.jokers;
       st.jokerFrom = op.st.jokerFrom;
       st.seasonFrom = op.st.seasonFrom;
@@ -1156,6 +1326,8 @@ window.TB_ICONS = {
     } else if (op.t === "restore") {
       var payload = { team: op.st.team, goal: op.st.goal, excHours: op.st.excHours, bonusHours: op.st.bonusHours,
         lateOn: !!op.st.lateOn, latePts: op.st.latePts,
+        lvGold: op.st.lvGold, lvSilver: op.st.lvSilver, lvBronze: op.st.lvBronze,
+        levelMin: op.st.levelMin, badges: op.st.badges || {},
         jokers: op.st.jokers, jokerFrom: op.st.jokerFrom || "", seasonFrom: op.st.seasonFrom || "",
         teamCode: op.st.teamCode || "", trainerPin: op.st.trainerPin || null,
         players: {}, sessions: {}, att: op.st.att || {}, joker: op.st.joker || {} };
@@ -1180,6 +1352,8 @@ window.TB_ICONS = {
     });
     return normalize({ demo:false, team: v.team, goal: v.goal, excHours: v.excHours, bonusHours: v.bonusHours,
       lateOn: v.lateOn, latePts: v.latePts,
+      lvGold: v.lvGold, lvSilver: v.lvSilver, lvBronze: v.lvBronze,
+      levelMin: v.levelMin, badges: v.badges,
       jokers: v.jokers, jokerFrom: v.jokerFrom, seasonFrom: v.seasonFrom, teamCode: v.teamCode,
       trainerPin: v.trainerPin || null,
       players: players, sessions: sessions, att: v.att || {}, joker: v.joker || {} });
@@ -1281,6 +1455,50 @@ window.TB_ICONS = {
     d.setHours(+p[0] || 0, +p[1] || 0, 0, 0);
     return d.getTime();
   }
+  /* ---------- Stufen und Abzeichen, vom Trainer einstellbar ---------- */
+  function levelMin(){
+    var v = parseInt(state.levelMin, 10);
+    return isNaN(v) ? DEF_LEVEL_MIN : Math.max(1, Math.min(60, v));
+  }
+  function levelDefs(){
+    var g = parseInt(state.lvGold, 10),  s = parseInt(state.lvSilver, 10), b = parseInt(state.lvBronze, 10);
+    if (isNaN(g)) g = DEF_LEVELS.gold;
+    if (isNaN(s)) s = DEF_LEVELS.silver;
+    if (isNaN(b)) b = DEF_LEVELS.bronze;
+    g = Math.max(0, Math.min(100, g)); s = Math.max(0, Math.min(100, s)); b = Math.max(0, Math.min(100, b));
+    if (s > g) s = g;                       /* absteigend erzwingen */
+    if (b > s) b = s;
+    return [ { name:"Gold", min:g }, { name:"Silber", min:s }, { name:"Bronze", min:b } ];
+  }
+  function badgeDef(k){ for (var i=0;i<BADGE_DEFS.length;i++) if (BADGE_DEFS[i].k === k) return BADGE_DEFS[i]; return null; }
+  function badgeCfg(){ return state.badges && typeof state.badges === "object" ? state.badges : {}; }
+  function badgeOn(k){ var c = badgeCfg()[k]; return !c || c.on !== false; }
+  function badgeT(k){
+    var d = badgeDef(k);
+    if (!d) return [1,2,3];
+    var c = badgeCfg()[k];
+    var raw = c && c.t && c.t.length ? c.t : d.def;
+    var out = [];
+    for (var i=0;i<3;i++){
+      var v = parseInt(raw[i], 10);
+      out.push(isNaN(v) ? d.def[i] : Math.max(1, Math.min(d.max, v)));
+    }
+    if (out[1] < out[0]) out[1] = out[0];   /* aufsteigend erzwingen */
+    if (out[2] < out[1]) out[2] = out[1];
+    return out;
+  }
+  function setBadge(k, patch){
+    var cur = badgeCfg(), next = {};
+    Object.keys(cur).forEach(function(x){
+      next[x] = { on: cur[x] && cur[x].on !== false, t: cur[x] && cur[x].t ? cur[x].t.slice() : null };
+      if (!next[x].t) delete next[x].t;
+    });
+    if (!next[k]) next[k] = { on:true };
+    if (patch.on != null) next[k].on = !!patch.on;
+    if (patch.t) next[k].t = patch.t.slice(0,3);
+    mutate({ t:"cfg", k:"badges", v: next });
+  }
+
   function lateOn(){ return !!state.lateOn; }
   function latePts(){ return typeof state.latePts === "number" ? state.latePts : DEFAULT_LATE; }
   function cycleVals(){ return lateOn() ? [null,"yes","late","exc","no"] : [null,"yes","exc","no"]; }
@@ -1390,10 +1608,11 @@ window.TB_ICONS = {
 
   function levelOf(pid){
     var q = quota(pid);
-    var out = { name:null, pct:q.pct, tot:q.tot, ready: q.tot >= LEVEL_MIN, next:null, need:null };
-    if (!out.ready || q.pct === null) { out.next = LEVELS[LEVELS.length-1]; return out; }
-    for (var i=0;i<LEVELS.length;i++) if (q.pct >= LEVELS[i].min) { out.name = LEVELS[i].name; break; }
-    for (var j=LEVELS.length-1;j>=0;j--) if (q.pct < LEVELS[j].min) { out.next = LEVELS[j]; break; }
+    var LV = levelDefs();
+    var out = { name:null, pct:q.pct, tot:q.tot, ready: q.tot >= levelMin(), next:null, need:null };
+    if (!out.ready || q.pct === null) { out.next = LV[LV.length-1]; return out; }
+    for (var i=0;i<LV.length;i++) if (q.pct >= LV[i].min) { out.name = LV[i].name; break; }
+    for (var j=LV.length-1;j>=0;j--) if (q.pct < LV[j].min) { out.next = LV[j]; break; }
     if (out.next) {
       var n = Math.ceil((out.next.min * q.tot - 100 * q.y) / (100 - out.next.min));
       out.need = n > 0 ? n : 1;
@@ -1479,18 +1698,101 @@ window.TB_ICONS = {
       return (m === 12 && d >= 27) || (m === 1 && d <= 6);
     });
 
-    return [
-      tiered("Einheiten", "Wie oft du anwesend warst.", "Einheiten", yes, [10,25,50], "waves"),
-      tiered("Serie", "Deine längste Serie in Folge.", "Einheiten in Folge", st.best, [5,10,20], "chart-column"),
-      tiered("Zuverlässig", "Monate ohne eine einzige fehlende Rückmeldung.", "Monate", cleanMonths, [1,3,6], "bell"),
-      tiered("Frühmelder", "Rückmeldungen vor der Bonusfrist.", "Rückmeldungen", early, [10,25,50], "clock"),
-      tiered("Pünktlich in Folge", "Rückmeldungen in Folge vor der Bonusfrist.", "in Folge", pcBest, [5,12,25], "check"),
-      single("Erste Einheit", "Einmal anwesend gewesen.", yes >= 1, "check"),
-      single("Comeback", "Nach vier Wochen Pause wieder dreimal in Folge dabei.", comeback, "chart-column"),
-      single("Wintertraining", "Alle Einheiten im Winter mitgemacht oder rechtzeitig abgesagt.",
-        win >= 5 && winBad === 0, "waves", win < 5, win ? win + " von 5 Wintereinheiten im Plan" : "noch keine Wintereinheit im Plan"),
-      single("Jahreswechsel", "Zwischen dem 27. Dezember und dem 6. Januar auf dem Wasser.", turn, "trophy")
-    ];
+    var cur = { units:yes, streak:st.best, reliable:cleanMonths, early:early, punctual:pcBest };
+    var ICON = { units:"waves", streak:"chart-column", reliable:"bell", early:"clock", punctual:"check" };
+    var out = [];
+    BADGE_DEFS.forEach(function(d){
+      if (!badgeOn(d.k)) return;
+      out.push(tiered(d.name, d.desc, d.unit, cur[d.k], badgeT(d.k), ICON[d.k]));
+    });
+    if (badgeOn("first")) out.push(single("Erste Einheit", "Einmal anwesend gewesen.", yes >= 1, "check"));
+    if (badgeOn("comeback")) out.push(single("Comeback", "Nach vier Wochen Pause wieder dreimal in Folge dabei.", comeback, "chart-column"));
+    if (badgeOn("winter")) out.push(single("Wintertraining", "Alle Einheiten im Winter mitgemacht oder rechtzeitig abgesagt.",
+      win >= 5 && winBad === 0, "waves", win < 5, win ? win + " von 5 Wintereinheiten im Plan" : "noch keine Wintereinheit im Plan"));
+    if (badgeOn("newyear")) out.push(single("Jahreswechsel", "Zwischen dem 27. Dezember und dem 6. Januar auf dem Wasser.", turn, "trophy"));
+    return out;
+  }
+
+  /* Erklärungen an den Überschriften der Ansichten, mit den aktuellen Zahlen */
+  function headInfo(){
+    var LV = levelDefs();
+    setInfo("nextHead", isTrainer()
+      ? "Wer schon zugesagt, abgesagt oder noch nichts eingetragen hat. Eintragen und korrigieren kannst du im Trainerbereich unter Termin abhaken oder in der Beteiligungstabelle.\n"
+        + "Gründe siehst nur du und der Spieler selbst."
+      : "Hier trägst du dich für die nächste Einheit ein: anwesend, entschuldigt oder gefehlt. Entschuldigt braucht einen Grund, sonst wird nichts gespeichert.\n"
+        + "Nach der Absagefrist kannst du dich weiter entschuldigen, es gibt dann aber keine Punkte und die Serie reißt.\n"
+        + "Wer bis zur Bonusfrist eingetragen ist, bekommt " + BONUS + " Punkte Bonus. Wer danach noch einmal umträgt, verliert sie wieder.\n"
+        + "Ab Trainingsbeginn steht deine Rückmeldung fest, ändern kann sie dann nur noch der Trainer.",
+      "Nächster Termin");
+    setInfo("goalHead",
+      "Die Saisonquote der Mannschaft ist anwesend geteilt durch alle eingetragenen Termine, über den ganzen Kader. Die senkrechte Marke im Balken ist euer Ziel von "
+      + goalPct() + " Prozent.\n"
+      + "Darunter die laufende Woche und die abgeschlossenen Wochen: jede Woche über dem Ziel verlängert die Team-Serie, eine darunter setzt sie zurück.",
+      "Mannschaftsziel");
+    setInfo("levelHead",
+      "Die Stufe hängt an deiner Quote, nicht an der Zahl deiner Einheiten: Bronze ab " + LV[2].min
+      + " Prozent, Silber ab " + LV[1].min + ", Gold ab " + LV[0].min + ".\n"
+      + "Sie steht erst ab " + levelMin() + " gewerteten Einheiten, damit eine einzelne Einheit noch nichts entscheidet.",
+      "Stufe");
+    setInfo("calHead",
+      "Ein Quadrat je gewerteter Einheit, nach Monat gruppiert und eingefärbt nach dem Status, mit dem sie gezählt hat. Zeig darauf, dann steht das Datum und die Punktzahl da.\n"
+      + (jokerBudget() ? "Ein heller Rahmen heißt: dort hast du einen Joker eingesetzt." : ""),
+      "Deine Saison");
+    setInfo("recHead",
+      "Deine persönlichen Bestwerte über die ganze Saison: die längste Serie in Folge, der Monat und die Woche mit den meisten Punkten und der Monat, in dem du am häufigsten dabei warst.",
+      "Rekorde");
+    setInfo("badgeHead",
+      "Abzeichen sammelst du nebenbei. Die gestuften gibt es in Bronze, Silber und Gold, die Schwellen legt euer Trainer fest, sie stehen unter jedem Abzeichen.\n"
+      + "Die einzelnen gibt es nur einmal, für besondere Anlässe.\n"
+      + "Was du einmal hast, bleibt dir. Alle Schwellen stehen auch im Reglement.",
+      "Abzeichen");
+    setInfo("ruleHead",
+      "Das vollständige Reglement, aufgeteilt in Abschnitte. Alle Zahlen darin kommen aus den Einstellungen eures Trainers, es bleibt also von selbst aktuell.",
+      "Reglement");
+  }
+
+  /* ---------- Trainer: Stufen und Abzeichen ---------- */
+  function renderBadgeCfg(){
+    var box = $("badgeCfgBox");
+    if (!box) return;
+    box.innerHTML = "";
+    BADGE_DEFS.forEach(function(d){
+      var on = badgeOn(d.k), t = badgeT(d.k);
+      var row = el("div","brow" + (on ? "" : " off"));
+      var lab = el("label","bon");
+      var cb = el("input"); cb.type = "checkbox"; cb.checked = on; cb.disabled = readOnly;
+      cb.addEventListener("change", function(){ setBadge(d.k, { on: cb.checked }); });
+      lab.appendChild(cb);
+      lab.appendChild(document.createTextNode(d.name));
+      row.appendChild(lab);
+      var f = el("div","bfields"), inputs = [];
+      ["Bronze","Silber","Gold"].forEach(function(nm, i){
+        var l = el("label", null, nm);
+        var inp = el("input");
+        inp.type = "number"; inp.min = "1"; inp.max = String(d.max); inp.step = "1";
+        inp.value = t[i];
+        inp.disabled = readOnly || !on;
+        inputs.push(inp);
+        inp.addEventListener("change", function(){
+          setBadge(d.k, { t: inputs.map(function(x){ var v = parseInt(x.value, 10); return isNaN(v) ? 1 : v; }) });
+        });
+        l.appendChild(inp);
+        f.appendChild(l);
+      });
+      row.appendChild(f);
+      row.appendChild(el("span","bunit", d.unit));
+      box.appendChild(row);
+    });
+    var sg = el("div","singles");
+    SINGLE_DEFS.forEach(function(d){
+      var l = el("label");
+      var cb = el("input"); cb.type = "checkbox"; cb.checked = badgeOn(d.k); cb.disabled = readOnly;
+      cb.addEventListener("change", function(){ setBadge(d.k, { on: cb.checked }); });
+      l.appendChild(cb);
+      l.appendChild(document.createTextNode(d.name));
+      sg.appendChild(l);
+    });
+    box.appendChild(sg);
   }
 
   /* ---------- Reglement ---------- */
@@ -1498,8 +1800,8 @@ window.TB_ICONS = {
     var ref = upcoming().filter(function(s){ return !s.cancelled; })[0] || heldSessions().slice(-1)[0];
     var excAt = excHours() ? excHours() + " Stunden vor Trainingsbeginn" : "zum Trainingsbeginn";
     var bonusAt = bonusHours() ? bonusHours() + " Stunden vor Trainingsbeginn" : "zum Trainingsbeginn";
-    var excTxt = ref ? " Beim nächsten Termin ist das " + fmtDeadline(ref, excHours()) + "." : "";
-    var bonusTxt = ref ? " Beim nächsten Termin ist das " + fmtDeadline(ref, bonusHours()) + "." : "";
+    var excTxt = (ref && excHours()) ? " Beim nächsten Termin ist das " + fmtDeadline(ref, excHours()) + "." : "";
+    var bonusTxt = (ref && bonusHours()) ? " Beim nächsten Termin ist das " + fmtDeadline(ref, bonusHours()) + "." : "";
     var lp = latePts();
 
     var rueck = [
@@ -1537,7 +1839,8 @@ window.TB_ICONS = {
     var quote = [
       "Die Quote ist anwesend geteilt durch eingetragene Termine. Geplante Termine zählen erst, wenn sie vorbei sind."
         + (seasonFrom() ? " Gewertet wird ab " + fmtLong(seasonFrom()) + ", alles davor zählt nicht mehr." : ""),
-      "Ab " + LEVEL_MIN + " gewerteten Einheiten gibt es eine Stufe: Bronze ab 70 Prozent, Silber ab 80, Gold ab 90.",
+      "Ab " + levelMin() + " gewerteten Einheiten gibt es eine Stufe: Bronze ab " + levelDefs()[2].min
+        + " Prozent, Silber ab " + levelDefs()[1].min + ", Gold ab " + levelDefs()[0].min + ".",
       "Das Mannschaftsziel liegt bei " + goalPct() + " Prozent. Es steht als Marke im Balken auf der Team-Seite."
     ];
     if (lateOn()) quote.push("Zu spät gekommen zählt in der Quote als anwesend.");
@@ -1549,11 +1852,20 @@ window.TB_ICONS = {
           "Angeboten wird er nur dort, wo die Serie sonst reißen würde. Der Trainer gibt alle Joker irgendwann wieder frei." ]
       : [ "Joker sind bei euch abgeschaltet." ];
 
-    var extra = [
-      "Abzeichen gibt es in Bronze, Silber und Gold für Einheiten, Serie, Zuverlässigkeit und frühe Rückmeldungen. Dazu kommen vier einzelne für besondere Anlässe.",
+    var stufen = [];
+    BADGE_DEFS.forEach(function(d){
+      if (!badgeOn(d.k)) return;
+      var t = badgeT(d.k);
+      stufen.push(d.name + ": Bronze ab " + t[0] + ", Silber ab " + t[1] + ", Gold ab " + t[2] + " " + d.unit + ".");
+    });
+    var einzeln = SINGLE_DEFS.filter(function(d){ return badgeOn(d.k); }).map(function(d){ return d.name; });
+    if (einzeln.length) stufen.push("Ohne Stufen, einmalig: " + einzeln.join(", ") + ".");
+    if (!stufen.length) stufen.push("Abzeichen sind bei euch abgeschaltet.");
+
+    var extra = stufen.concat([
       "Im Podium des Monats zählen die Punkte des laufenden Kalendermonats. Öffentlich stehen die besten drei, deinen eigenen Platz siehst du nur hier.",
       "Bei den Rekorden stehen deine längste Serie, dein bester Monat, deine beste Woche und der Monat mit den meisten Einheiten."
-    ];
+    ]);
 
     var rechte = [
       "Du änderst nur deine eigenen Einträge und setzt deine Joker selbst.",
@@ -1563,8 +1875,8 @@ window.TB_ICONS = {
     ];
 
     return [
-      { t:"Rückmeldung", open:true, li:rueck },
-      { t:"Punkte", open:true, li:punkte },
+      { t:"Rückmeldung", li:rueck },
+      { t:"Punkte", li:punkte },
       { t:"Fristen und Bonus", li:fristen },
       { t:"Serie", li:serie },
       { t:"Quote, Stufen und Ziel", li:quote },
@@ -1577,17 +1889,25 @@ window.TB_ICONS = {
   function buildRules(box){
     if (!box) return;
     box.innerHTML = "";
-    ruleGroups().forEach(function(grp){
+    var groups = ruleGroups();
+    var outer = el("details","rules big");
+    var sum = el("summary");
+    sum.appendChild(el("span","rt","Das komplette Reglement"));
+    sum.appendChild(el("span","rs", groups.length + " Abschnitte, von der Rückmeldung bis zu den Rechten. Alle Zahlen darin hat euer Trainer eingestellt."));
+    outer.appendChild(sum);
+    var inner = el("div","rbody");
+    groups.forEach(function(grp){
       var d = el("details","rules");
-      if (grp.open) d.open = true;
       d.appendChild(el("summary", null, grp.t));
       var body = el("div","rbody");
       var ul = el("ul");
       grp.li.forEach(function(t){ ul.appendChild(el("li", null, t)); });
       body.appendChild(ul);
       d.appendChild(body);
-      box.appendChild(d);
+      inner.appendChild(d);
     });
+    outer.appendChild(inner);
+    box.appendChild(outer);
   }
 
   /* persönliche Rekorde */
@@ -1877,11 +2197,15 @@ window.TB_ICONS = {
     $("whoTag").hidden = !isTrainer();
     $("legendTrainer").hidden = !isTrainer();
     $("legendLate").hidden = !lateOn();
-    $("tableHint").textContent = isTrainer()
-      ? "Auf ein Feld tippen ändert den Eintrag: " + cycleVals().map(function(v){
-          return v ? WORD[v].toLowerCase() : "nichts"; }).join(", ")
-        + ". Für entschuldigt öffnet sich darunter das Feld für den Grund. Korrekturen von dir sind blau umrandet."
-      : "Eintragen kannst du dich unter Termine.";
+    setInfo("tableHead",
+      "Ein Feld je Spieler und Termin, eingefärbt nach dem gewerteten Status. Grün hinterlegte Spalten sind geplante Termine, sie zählen noch nicht in die Quote.\n"
+      + "Die Quote rechts ist anwesend geteilt durch eingetragene Termine.\n"
+      + (isTrainer()
+        ? "Auf ein Feld tippen ändert den Eintrag der Reihe nach: " + cycleVals().map(function(v){
+            return v ? WORD[v].toLowerCase() : "nichts"; }).join(", ")
+          + ". Bei entschuldigt öffnet sich darunter das Feld für den Grund, ohne Grund wird nichts gespeichert. Deine Korrekturen sind blau umrandet."
+        : "Eintragen kannst du dich unter Termine. Der Trainer kann hier korrigieren."),
+      "Beteiligung");
     var footText = mode === "fb"
       ? "Jeder trägt sich selbst ein. Änderungen sind sofort für alle sichtbar."
       : mode === "local"
@@ -1897,11 +2221,15 @@ window.TB_ICONS = {
     renderHeute();
     renderNext();
     renderUpcoming();
+    closePop();
     renderPast();
     renderTeamView();
     renderStats();
     renderIch();
     if (isTrainer()) renderAdmin();
+
+    headInfo();
+    paintInfo();
 
     if (focusNote) {
       var fn = focusNote;
@@ -1989,7 +2317,7 @@ window.TB_ICONS = {
     tile(box, "Quote", q.pct === null ? "–" : q.pct + " %", null, q.y + " von " + q.tot + " anwesend");
     tile(box, "Stufe", lv.name || "–", null, lv.name
       ? (lv.next ? "noch " + lv.need + " bis " + lv.next.name : "höchste Stufe")
-      : (lv.ready ? "ab 70 Prozent Bronze" : "ab " + LEVEL_MIN + " gewerteten Einheiten"));
+      : (lv.ready ? "ab " + levelDefs()[2].min + " Prozent Bronze" : "ab " + levelMin() + " gewerteten Einheiten"));
   }
 
   var BIGWORD = { yes:["Bin da","anwesend"], late:["Zu spät","trotzdem da"],
@@ -2129,7 +2457,7 @@ window.TB_ICONS = {
     card.appendChild(head);
 
     if (isTrainer()) {
-      card.appendChild(el("p","hint","Als Trainer trägst du dich hier nicht selbst ein. Korrekturen für einzelne Spieler machst du im Trainerbereich oder in der Beteiligungstabelle."));
+      card.appendChild(el("p","hint","Als Trainer trägst du dich hier nicht selbst ein."));
     } else {
       card.appendChild(pickButtons(next.id, me.id, true));
       var mine = entry(next.id, me.id);
@@ -2137,18 +2465,15 @@ window.TB_ICONS = {
       var excOpen = now <= deadlineMs(next, excHours());
       var bonusOpen = now <= deadlineMs(next, bonusHours());
       var line = el("p", excOpen ? "hint" : "hint warn");
-      line.textContent = "Absage zählt bis " + fmtDeadline(next, excHours())
-        + (excOpen ? "" : " (vorbei, eine Absage bringt jetzt keine Punkte mehr und die Serie reißt)")
-        + " · " + BONUS + " Punkte Bonus bis " + fmtDeadline(next, bonusHours())
-        + (bonusOpen ? "" : " (vorbei)");
+      line.textContent = "Absage zählt bis " + fmtDeadline(next, excHours()) + (excOpen ? "" : " (vorbei)")
+        + " · Bonus bis " + fmtDeadline(next, bonusHours()) + (bonusOpen ? "" : " (vorbei)");
       card.appendChild(line);
       if (started(next)) card.appendChild(el("p","hint warn",
-        "Das Training hat begonnen. Deine Rückmeldung steht fest, ändern kann sie jetzt nur noch der Trainer."));
+        "Training läuft, ändern kann jetzt nur noch der Trainer."));
       else if (!bonusOpen) card.appendChild(el("p","hint",
-        "Die Bonusfrist ist vorbei. Wenn du deine Rückmeldung jetzt noch änderst, sind die "
-        + BONUS + " Bonuspunkte für diesen Termin weg."));
+        "Eine Änderung kostet jetzt die " + BONUS + " Bonuspunkte."));
       if (mine && bonusLost(mine, next)) card.appendChild(el("p","hint warn",
-        "Für diesen Termin gibt es keine Bonuspunkte, deine Rückmeldung kam oder änderte sich nach der Bonusfrist."));
+        "Für diesen Termin gibt es keine Bonuspunkte."));
       if (!mine && excOpen) card.appendChild(el("p","hint warn","Noch nicht eingetragen."));
       var rr = reasonRow(next.id, me.id);
       if (rr) card.appendChild(rr);
@@ -2344,9 +2669,12 @@ window.TB_ICONS = {
         pb.appendChild(c);
       });
     }
-    $("podiumHint").textContent = "Punkte im " + MONLONG[now.getMonth()] + ". Jeden Monatsanfang beginnt die Wertung neu. "
+    setInfo("podiumHead", "Gezählt werden die Punkte im laufenden Monat, hier " + MONLONG[now.getMonth()]
+      + ". Jeden Monatsanfang beginnt die Wertung neu, damit auch Späteinsteiger eine Chance haben.\n"
+      + "Öffentlich stehen nur die besten drei. "
       + (isTrainer() ? "Die vollständige Reihenfolge sieht niemand, jeder sieht nur seinen eigenen Platz."
-                     : "Deinen eigenen Platz siehst du unter Mein Profil.");
+                     : "Deinen eigenen Platz siehst du unter Mein Profil."),
+      "Podium des Monats");
   }
 
   function renderStats(){
@@ -2483,7 +2811,7 @@ window.TB_ICONS = {
     lc.innerHTML = "";
     if (!lv.ready) {
       lc.appendChild(el("h3", null, "Noch keine Stufe"));
-      lc.appendChild(el("p","hint","Ab " + LEVEL_MIN + " gewerteten Einheiten bekommst du eine Stufe. Bisher sind es " + q.tot + "."));
+      lc.appendChild(el("p","hint","Ab " + levelMin() + " gewerteten Einheiten bekommst du eine Stufe. Bisher sind es " + q.tot + "."));
     } else {
       lc.appendChild(el("h3", null, lv.name ? "Stufe " + lv.name : "Noch keine Stufe"));
       goalRow(lc, lv.next ? "Fortschritt bis " + lv.next.name : "Höchste Stufe erreicht",
@@ -2592,6 +2920,31 @@ window.TB_ICONS = {
       ? "Zu spät ist an und bringt " + latePts() + (latePts() === 1 ? " Punkt" : " Punkte")
         + ". Setzen kannst du es in der Beteiligungstabelle und beim Nachtragen."
       : "Zu spät ist aus. Schon gesetzte Einträge bleiben erhalten und zählen so lange wie anwesend.";
+
+    var LV = levelDefs();
+    $("lvBronzeInput").value = LV[2].min;
+    $("lvSilverInput").value = LV[1].min;
+    $("lvGoldInput").value = LV[0].min;
+    $("levelMinInput").value = levelMin();
+    $("levelPreview").textContent = "Ab " + levelMin() + " gewerteten Einheiten: Bronze ab " + LV[2].min
+      + " Prozent, Silber ab " + LV[1].min + ", Gold ab " + LV[0].min + ".";
+    renderBadgeCfg();
+
+    /* Kurzfassungen in den zugeklappten Überschriften */
+    var onCount = BADGE_DEFS.concat(SINGLE_DEFS).filter(function(d){ return badgeOn(d.k); }).length;
+    var sums = {
+      sumTeam:  state.team + ", Ziel " + goalPct() + " Prozent",
+      sumFrist: "Absage " + (excHours() ? excHours() + " h" : "bis Beginn") + ", Bonus "
+                + (bonusHours() ? bonusHours() + " h" : "bis Beginn"),
+      sumLate:  lateOn() ? "an, " + latePts() + " Punkte" : "aus",
+      sumBadge: "Bronze ab " + LV[2].min + " Prozent, " + onCount + " von "
+                + (BADGE_DEFS.length + SINGLE_DEFS.length) + " Abzeichen an",
+      sumJoker: jokerBudget() ? jokerBudget() + (jokerBudget() === 1 ? " Joker" : " Joker") + " je Spieler" : "abgeschaltet",
+      sumSeason: seasonFrom() ? "ab " + fmtLong(seasonFrom()) : "alles zählt",
+      sumCode:  state.teamCode ? "gesetzt" : "keiner gesetzt"
+    };
+    Object.keys(sums).forEach(function(id){ if ($(id)) $(id).textContent = sums[id]; });
+
     buildRules($("ruleBoxT"));
 
     var ref = upcoming().filter(function(s){ return !s.cancelled; })[0] || heldSessions().slice(-1)[0];
@@ -2870,8 +3223,10 @@ window.TB_ICONS = {
 
   /* ---------- Sicherung ---------- */
   function backupJson(){
-    return JSON.stringify({ v:6, team: state.team, goal: goalPct(), excHours: excHours(), bonusHours: bonusHours(),
+    return JSON.stringify({ v:7, team: state.team, goal: goalPct(), excHours: excHours(), bonusHours: bonusHours(),
       lateOn: lateOn(), latePts: latePts(),
+      lvGold: levelDefs()[0].min, lvSilver: levelDefs()[1].min, lvBronze: levelDefs()[2].min,
+      levelMin: levelMin(), badges: badgeCfg(),
       jokers: jokerBudget(), jokerFrom: jokerFrom(), seasonFrom: seasonFrom(), teamCode: state.teamCode || "",
       trainerPin: state.trainerPin,
       players: state.players, sessions: state.sessions, att: state.att, joker: state.joker }, null, 2);
@@ -2883,6 +3238,8 @@ window.TB_ICONS = {
     try { raw = JSON.parse(text); } catch (e) { msg.className = "msg"; msg.textContent = "Das ist keine gültige Sicherungsdatei."; return; }
     var st = normalize({ demo:false, team: raw.team, goal: raw.goal, excHours: raw.excHours, bonusHours: raw.bonusHours,
       lateOn: raw.lateOn, latePts: raw.latePts,
+      lvGold: raw.lvGold, lvSilver: raw.lvSilver, lvBronze: raw.lvBronze,
+      levelMin: raw.levelMin, badges: raw.badges,
       jokers: raw.jokers, jokerFrom: raw.jokerFrom, seasonFrom: raw.seasonFrom, teamCode: raw.teamCode,
       trainerPin: raw.trainerPin,
       players: raw.players, sessions: raw.sessions, att: raw.att, joker: raw.joker });
@@ -2915,7 +3272,21 @@ window.TB_ICONS = {
     numberCfg("bonusInput", "bonusHours", 0, 336, bonusHours);
     numberCfg("jokerInput", "jokers", 0, 20, jokerBudget);
     numberCfg("latePtsInput", "latePts", 0, LATE_MAX, latePts);
+    numberCfg("lvBronzeInput", "lvBronze", 0, 100, function(){ return levelDefs()[2].min; });
+    numberCfg("lvSilverInput", "lvSilver", 0, 100, function(){ return levelDefs()[1].min; });
+    numberCfg("lvGoldInput", "lvGold", 0, 100, function(){ return levelDefs()[0].min; });
+    numberCfg("levelMinInput", "levelMin", 1, 60, levelMin);
     $("lateOnInput").addEventListener("change", function(){ mutate({ t:"cfg", k:"lateOn", v: !!this.checked }); });
+    $("badgeReset").addEventListener("click", function(){
+      mutate({ t:"cfg", k:"badges", v: {} });
+      mutate({ t:"cfg", k:"lvBronze", v: DEF_LEVELS.bronze });
+      mutate({ t:"cfg", k:"lvSilver", v: DEF_LEVELS.silver });
+      mutate({ t:"cfg", k:"lvGold", v: DEF_LEVELS.gold });
+      mutate({ t:"cfg", k:"levelMin", v: DEF_LEVEL_MIN });
+      var m = $("badgeMsg");
+      m.className = "msg ok";
+      m.textContent = "Stufen und Abzeichen stehen wieder auf den Standardwerten.";
+    });
 
     $("jokerFromInput").addEventListener("change", function(){
       jokerArmed = false;
@@ -3077,6 +3448,12 @@ window.TB_ICONS = {
       var k = String(location.hash || "").replace(/^#\/?/, "");
       if (k && k !== route) go(k);
     });
+
+    /* Erklärblase schließt bei Klick daneben, Escape, Scrollen und Größenwechsel */
+    document.addEventListener("click", closePop);
+    document.addEventListener("keydown", function(e){ if (e.key === "Escape") closePop(); });
+    window.addEventListener("resize", placePop);
+    window.addEventListener("scroll", placePop, true);
   }
 
   /* ---------- Start ---------- */
@@ -3104,10 +3481,32 @@ window.TB_ICONS = {
     }
     var extra = new Date(base.getTime() + 10*86400000);
     sessions.push({ id:"demo-extra", date: isoOf(extra), time:"10:00", end:"12:00", label:"Zusatztraining", place:"", cancelled:false, reason:"" });
-    return { v:6, demo:true, team:"Beispielteam", goal:DEFAULT_GOAL, excHours:DEFAULT_EXC, bonusHours:DEFAULT_BONUS,
+    return { v:7, demo:true, team:"Beispielteam", goal:DEFAULT_GOAL, excHours:DEFAULT_EXC, bonusHours:DEFAULT_BONUS,
              lateOn:false, latePts:DEFAULT_LATE,
+             lvGold:DEF_LEVELS.gold, lvSilver:DEF_LEVELS.silver, lvBronze:DEF_LEVELS.bronze,
+             levelMin:DEF_LEVEL_MIN, badges:{},
              jokers:DEFAULT_JOKERS, jokerFrom:"", seasonFrom:"", teamCode:"", trainerPin:null,
              players:players, sessions:sessions, att:att, joker:{} };
+  }
+
+  function num(v, d, lo, hi){
+    var x = parseInt(v, 10);
+    return isNaN(x) ? d : Math.max(lo, Math.min(hi, x));
+  }
+  function cleanBadges(raw){
+    var out = {};
+    if (!raw || typeof raw !== "object") return out;
+    BADGE_DEFS.concat(SINGLE_DEFS).forEach(function(d){
+      var c = raw[d.k];
+      if (!c || typeof c !== "object") return;
+      var e = { on: c.on !== false };
+      if (d.def && c.t && c.t.length) {
+        e.t = [];
+        for (var i=0;i<3;i++) e.t.push(num(c.t[i], d.def[i], 1, d.max));
+      }
+      out[d.k] = e;
+    });
+    return out;
   }
 
   function normalize(raw){
@@ -3126,6 +3525,11 @@ window.TB_ICONS = {
       bonusHours: isNaN(bh) ? DEFAULT_BONUS : Math.max(0, Math.min(336, bh)),
       lateOn: !!st.lateOn,
       latePts: isNaN(lp) ? DEFAULT_LATE : Math.max(0, Math.min(LATE_MAX, lp)),
+      lvGold: num(st.lvGold, DEF_LEVELS.gold, 0, 100),
+      lvSilver: num(st.lvSilver, DEF_LEVELS.silver, 0, 100),
+      lvBronze: num(st.lvBronze, DEF_LEVELS.bronze, 0, 100),
+      levelMin: num(st.levelMin, DEF_LEVEL_MIN, 1, 60),
+      badges: cleanBadges(st.badges),
       jokers: isNaN(jk) ? DEFAULT_JOKERS : Math.max(0, Math.min(20, jk)),
       jokerFrom: typeof st.jokerFrom === "string" ? st.jokerFrom : "",
       seasonFrom: typeof st.seasonFrom === "string" ? st.seasonFrom : "",
@@ -3147,6 +3551,11 @@ window.TB_ICONS = {
       seeded.bonusHours = out.bonusHours;
       seeded.lateOn = out.lateOn;
       seeded.latePts = out.latePts;
+      seeded.lvGold = out.lvGold;
+      seeded.lvSilver = out.lvSilver;
+      seeded.lvBronze = out.lvBronze;
+      seeded.levelMin = out.levelMin;
+      seeded.badges = out.badges;
       seeded.jokers = out.jokers;
       seeded.jokerFrom = out.jokerFrom;
       seeded.seasonFrom = out.seasonFrom;
