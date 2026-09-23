@@ -398,6 +398,11 @@ window.TB_ICONS = {
   .prank.p3 .pos{background:var(--sand-300,#E9D3A3);color:var(--ink-900);}
   .prank .pinfo{min-width:0;display:flex;flex-direction:column;gap:1px;}
   .prank .pinfo b{font:700 15.5px/1.2 var(--font-sans);color:var(--text-strong);overflow-wrap:anywhere;}
+  /* Platz 1 hat immer einen hellen Sand-Hintergrund, unabhängig vom Farbmodus.
+     Darum feste dunkle Schrift statt --text-strong/--text-muted, die im Dunkelmodus hell werden
+     und sonst auf dem hellen Hintergrund verschwinden würden. */
+  .prank.p1 .pinfo b{color:var(--ink-950);}
+  .prank.p1 .pinfo em{color:var(--sand-700);}
   .prank .pinfo em{font-style:normal;font-size:12.5px;color:var(--text-muted);font-variant-numeric:tabular-nums;}
 
   .badges{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));}
@@ -466,6 +471,8 @@ window.TB_ICONS = {
     color:var(--text-muted);margin:0 0 7px;}
   .pop p{margin:0 0 9px;}
   .pop p:last-child{margin-bottom:0;}
+  .pop.pickpop .prow{display:flex;gap:6px;margin-bottom:10px;}
+  .pop.pickpop .clr{width:100%;}
   .tile.txt b{font-size:26px;line-height:1.15;overflow-wrap:anywhere;}
   .note-row .btn{padding:0 14px;height:38px;}
   .noterow td{text-align:left;white-space:normal;height:auto;padding:0 18px 12px;}
@@ -584,6 +591,7 @@ window.TB_ICONS = {
         <button class="btn primary" id="codeBtn" type="button">Weiter</button>
         <span class="msg" id="codeMsg"></span>
       </div>
+      <p class="hint" style="text-align:center;margin:10px 0 0"><button class="btn quiet" id="gotoTrainerBtn0" type="button">Ich bin Trainer</button></p>
     </div>
   </div>
 </div>
@@ -616,6 +624,7 @@ window.TB_ICONS = {
           <button class="btn primary" id="loginBtn" type="button">Anmelden</button>
           <span class="msg" id="loginMsg"></span>
         </div>
+        <p class="hint" style="text-align:center;margin:10px 0 0"><button class="btn quiet" id="gotoTrainerBtn2" type="button">Ich bin Trainer</button></p>
       </div>
       <div class="aside">
         <p class="eyebrow">So läuft es</p>
@@ -627,6 +636,100 @@ window.TB_ICONS = {
           <li>PIN vergessen? Der Trainer setzt sie zurück, dann vergibst du beim nächsten Login eine neue.</li>
         </ul>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TEAMAUSWAHL (mehrere Teams im Verein) ================= -->
+<div class="gatewrap" id="teamGateWrap" hidden>
+  <div class="inner" style="max-width:460px">
+    <header class="card gatemast">
+      <p class="eyebrow">Trainingsbeteiligung</p>
+      <h1>Welches Team?</h1>
+    </header>
+    <div class="card pad form" style="display:flex;flex-direction:column;gap:12px">
+      <h3>Team wählen</h3>
+      <p class="hint">Spieler wählen hier ihr Team. Trainer melden sich separat an.</p>
+      <div class="field" style="display:flex;flex-direction:column;gap:5px">
+        <label for="teamPickSelect">Team</label>
+        <select id="teamPickSelect"></select>
+      </div>
+      <div class="row">
+        <button class="btn primary" id="teamPickBtn" type="button">Weiter</button>
+      </div>
+      <p class="hint" style="text-align:center;margin:4px 0 0"><button class="btn quiet" id="gotoTrainerBtn1" type="button">Ich bin Trainer</button></p>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TRAINER-ANMELDUNG (Name + eigene PIN, teamübergreifend) ================= -->
+<div class="gatewrap" id="trainerGateWrap" hidden>
+  <div class="inner" style="max-width:460px">
+    <header class="card gatemast">
+      <p class="eyebrow">Trainingsbeteiligung</p>
+      <h1>Trainer</h1>
+    </header>
+    <div class="card pad form" id="trainerLoginWrap" style="display:flex;flex-direction:column;gap:12px" hidden>
+      <h3>Trainer-Anmeldung</h3>
+      <p class="hint" id="trainerPinHint">Einmal anmelden reicht. Dieses Gerät merkt sich dich danach.</p>
+      <div class="field">
+        <label for="trainerWho">Name</label>
+        <select id="trainerWho"></select>
+      </div>
+      <div class="field">
+        <label for="trainerPin" id="trainerPinLabel">PIN</label>
+        <input type="password" id="trainerPin" inputmode="numeric" autocomplete="off" maxlength="12">
+      </div>
+      <div class="row">
+        <button class="btn primary" id="trainerLoginBtn" type="button">Anmelden</button>
+        <span class="msg" id="trainerMsg"></span>
+      </div>
+    </div>
+    <div class="card pad form" id="trainerSetupWrap" style="display:flex;flex-direction:column;gap:12px" hidden>
+      <h3>Ersten Admin einrichten</h3>
+      <p class="hint">Noch ist kein Trainer-Konto vorhanden. Wer sich hier zuerst einrichtet, wird Admin und kann danach weitere Teams und Trainer anlegen.</p>
+      <div class="field">
+        <label for="trainerNewName">Name</label>
+        <input type="text" id="trainerNewName" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="trainerSetupPin">PIN festlegen</label>
+        <input type="password" id="trainerSetupPin" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="frei wählbar">
+      </div>
+      <div class="row">
+        <button class="btn primary" id="trainerSetupBtn" type="button">Als Admin einrichten</button>
+        <span class="msg" id="trainerSetupMsg"></span>
+      </div>
+    </div>
+    <p class="hint" style="text-align:center;margin:12px 0 0"><button class="btn quiet" id="trainerBackBtn" type="button">Zurück</button></p>
+  </div>
+</div>
+
+<!-- ================= TEAMWECHSEL (Trainer mit Zugriff auf mehrere Teams) ================= -->
+<div class="gatewrap" id="teamSwitchWrap" hidden>
+  <div class="inner" style="max-width:460px">
+    <header class="card gatemast">
+      <p class="eyebrow">Trainingsbeteiligung</p>
+      <h1>Team wählen</h1>
+    </header>
+    <div class="card pad form" style="display:flex;flex-direction:column;gap:10px">
+      <h3>Bei welchem Team willst du arbeiten?</h3>
+      <div id="teamSwitchList" style="display:flex;flex-direction:column;gap:8px"></div>
+      <button class="btn quiet" id="teamSwitchLogout" type="button">Abmelden</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= KEIN TEAM ZUGETEILT ================= -->
+<div class="gatewrap" id="noTeamWrap" hidden>
+  <div class="inner" style="max-width:460px">
+    <header class="card gatemast">
+      <p class="eyebrow">Trainingsbeteiligung</p>
+      <h1>Noch kein Team</h1>
+    </header>
+    <div class="card pad form" style="display:flex;flex-direction:column;gap:12px">
+      <p class="hint">Du bist als Trainer angemeldet, aber noch keinem Team zugeteilt. Bitte einen Admin, dich für ein Team freizuschalten.</p>
+      <button class="btn quiet" id="noTeamLogout" type="button">Abmelden</button>
     </div>
   </div>
 </div>
@@ -649,6 +752,7 @@ window.TB_ICONS = {
       <span class="spacer"></span>
       <span class="who">Angemeldet als <b id="whoName">&nbsp;</b><span class="tag" id="whoTag" hidden>Trainer</span></span>
       <span class="save" id="saveStatus"><i class="led"></i><span id="saveText">bereit</span></span>
+      <button class="btn quiet" id="switchTeamBtn" type="button" hidden>Team wechseln</button>
       <button class="btn quiet" id="logoutBtn" type="button">Abmelden</button>
     </header>
 
@@ -715,6 +819,11 @@ window.TB_ICONS = {
         <section>
           <h2 id="podiumHead">Podium des Monats</h2>
           <div class="podium" id="podiumBox"></div>
+        </section>
+
+        <section id="duelSection" hidden>
+          <h2 id="duelHead">Vergleich mit anderen Teams</h2>
+          <div class="card pad goal" id="duelCard"></div>
         </section>
 
         <section>
@@ -784,6 +893,14 @@ window.TB_ICONS = {
               <label for="goalInput">Mannschaftsziel in Prozent</label>
               <input type="number" id="goalInput" min="0" max="100" step="5" style="width:96px">
             </div>
+          </div>
+        </details>
+
+        <details class="adminblock fold">
+          <summary><span data-info="Wähle aus, mit welchen anderen Teams eure Saisonquote auf der Team-Seite verglichen wird. Nur du als Trainer dieses Teams legst das fest, die anderen Teams werden nicht gefragt und sehen nur, dass ihr sie zum Vergleich gewählt habt." data-title="Vergleich">Vergleich</span><span class="sumval" id="sumCompare"></span></summary>
+          <div class="fbody">
+            <p class="hint">Mit welchen Teams soll eure Quote auf der Team-Seite verglichen werden?</p>
+            <div id="compareList"></div>
           </div>
         </details>
 
@@ -987,13 +1104,22 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
           <textarea class="csvbox" id="csvBox" hidden readonly aria-label="CSV zum Kopieren"></textarea>
         </div>
 
-        <div class="adminblock">
-          <h3 data-info="Der Code schützt diesen Bereich. Ändere ihn, wenn ihn zu viele kennen. Er wird als Hashwert gespeichert, im Klartext steht er nirgends.">Trainercode</h3>
+        <div class="adminblock" id="adminCatalogBlock" hidden>
+          <h3 data-info="Nur Admins sehen diesen Bereich. Hier legst du weitere Teams des Vereins an und bestimmst, welcher Trainer bei welchem Team etwas ändern darf. Ein Admin darf immer bei jedem Team mitändern, unabhängig von den Häkchen unten.">Verwaltung: Teams und Trainer</h3>
+          <p class="hint">Teams</p>
+          <div class="roster" id="adminTeamList"></div>
           <div class="row">
-            <input type="password" id="newTrainerPin" inputmode="numeric" maxlength="12" placeholder="neuer Code" style="width:180px">
-            <button class="btn" id="setTrainerPin" type="button">Code ändern</button>
-            <span class="msg ok" id="trainerPinMsg"></span>
+            <input type="text" id="newTeamName" placeholder="Name des neuen Teams" style="flex:1;min-width:200px">
+            <button class="btn primary" id="addTeam" type="button">Team hinzufügen</button>
+            <span class="msg ok" id="teamAddMsg"></span>
           </div>
+          <p class="hint" style="margin-top:16px">Trainer</p>
+          <div id="adminTrainerList"></div>
+          <div class="row">
+            <input type="text" id="newTrainerName" placeholder="Name" style="flex:1;min-width:200px">
+            <button class="btn primary" id="addTrainer" type="button">Trainer hinzufügen</button>
+          </div>
+          <p class="hint">Neue Trainer legen ihre PIN selbst bei der ersten Anmeldung fest, unter „Ich bin Trainer" auf der Anmeldeseite.</p>
         </div>
 
         <div class="adminblock">
@@ -1040,6 +1166,20 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   var route = "heute";
   var codeOk = null;
   var CODEKEY = "tb:code:v1";
+
+  /* ---------- Mehrere Teams, Trainer-Katalog ----------
+     catalog steht neben den einzelnen Teams unter dem Pfad "catalog" in derselben
+     Firebase-Datenbank: catalog/teams/<teamKey> = true, catalog/trainers/<id> =
+     { name, pin, admin, teams:{<teamKey>:true,...} }. Trainer sind damit teamübergreifende
+     Konten, Spieler bleiben wie bisher pro Team in dessen eigenem Kader. */
+  var catalog = { teams:{}, trainers:{} };
+  var catalogLoaded = false;
+  var CATALOG_REF = null;
+  var activeTeamKey = null;
+  var gateStep = null;   /* null | "team" | "trainer" | "teamswitch" | "noteam" */
+  var TRAINERAUTHKEY = "tb:trainerauth:v1";
+  var LASTTEAMKEY = "tb:lastteam:v1";
+  var teamNames = {};    /* Anzeigenamen anderer Teams, per einmaligem Lesezugriff geladen */
 
   /* Wertung */
   var PTS = { yes:10, exc:3, no:0 };
@@ -1111,6 +1251,50 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function entry(sid,pid){ var m = state.att[sid]; return (m && m[pid]) || null; }
   function sessById(id){ for (var i=0;i<state.sessions.length;i++) if (state.sessions[i].id===id) return state.sessions[i]; return null; }
   function isTrainer(){ return !!me && me.role === "trainer"; }
+  function trainerAcct(id){ return (catalog.trainers && catalog.trainers[id]) || null; }
+  function isAdmin(){ var a = isTrainer() && trainerAcct(me.id); return !!a && !!a.admin; }
+  function allowedTeamsFor(trainerId){
+    var acct = trainerAcct(trainerId);
+    if (!acct) return [];
+    var all = Object.keys(catalog.teams || {});
+    if (acct.admin) return all;
+    return all.filter(function(k){ return acct.teams && acct.teams[k]; });
+  }
+  function playerAuthKey(){ return AUTHKEY + ":" + activeTeamKey; }
+  function codeKeyFor(){ return CODEKEY + ":" + activeTeamKey; }
+  function teamDisplayName(k){
+    if (k === activeTeamKey && state && state.team) return state.team;
+    if (teamNames[k]) return teamNames[k];
+    fetchTeamName(k);
+    return k;
+  }
+  function fetchTeamName(k){
+    if (mode !== "fb" || teamNames["_pending_" + k]) return;
+    teamNames["_pending_" + k] = true;
+    safe(function(){
+      firebase.database().ref("teams/" + k + "/team").once("value").then(function(snap){
+        teamNames[k] = snap.val() || k;
+        delete teamNames["_pending_" + k];
+        render();
+      }, function(){ delete teamNames["_pending_" + k]; });
+    });
+  }
+  /* Schreibt direkt in den Katalog, außerhalb der queue/mutate-Mechanik der Teamdaten,
+     mit sofortigem lokalem Echo, damit die Oberfläche nicht auf die Firebase-Antwort warten muss. */
+  function catalogApplyLocal(path, val){
+    var parts = path.split("/");
+    var obj = catalog;
+    for (var i = 0; i < parts.length - 1; i++){
+      if (!obj[parts[i]] || typeof obj[parts[i]] !== "object") obj[parts[i]] = {};
+      obj = obj[parts[i]];
+    }
+    var last = parts[parts.length - 1];
+    if (val === null) delete obj[last]; else obj[last] = val;
+  }
+  function catalogSet(path, val){
+    catalogApplyLocal(path, val);
+    if (CATALOG_REF) CATALOG_REF.child(path).set(val);
+  }
   /* ---------- Erklärungen ---------- */
   var openPop = null;
   function closePop(){
@@ -1157,6 +1341,47 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       placePop();
     });
     return b;
+  }
+  /* Auswahl-Blase für den Trainer in der Beteiligungstabelle: statt Durchklicken
+     zeigt sie beim Antippen eines Feldes alle Status direkt zur Auswahl an. */
+  function statusPop(btn, s, p, e, pend){
+    var same = openPop && openPop.btn === btn;
+    closePop();
+    if (same) return;
+    var cur = pend ? "exc" : (e ? e.v : null);
+    function choose(v){
+      closePop();
+      if (v === "exc") { pendingExc = { sid:s.id, pid:p.id }; focusNote = s.id + "-" + p.id; render(); return; }
+      pendingExc = null;
+      if (v === null) mutate({ t:"att", sid:s.id, pid:p.id, v:null });
+      else mutate({ t:"att", sid:s.id, pid:p.id, v:v, n:(e ? e.n : ""), by:"t", ts:(e && e.ts) || 0 });
+    }
+    var pop = el("div","pop pickpop");
+    pop.appendChild(el("b", null, p.name + " · " + fmtShort(s.date)));
+    var row = el("div","prow");
+    cycleVals().forEach(function(v){
+      if (!v) return;
+      var mb = el("button","mini " + v);
+      mb.type = "button";
+      mb.setAttribute("aria-pressed", cur === v ? "true" : "false");
+      mb.title = WORD[v];
+      mb.setAttribute("aria-label", WORD[v]);
+      mb.textContent = SIGN[v];
+      mb.addEventListener("click", function(){ choose(v); });
+      row.appendChild(mb);
+    });
+    pop.appendChild(row);
+    var clr = el("button","btn quiet clr", "Eintrag löschen");
+    clr.type = "button";
+    clr.disabled = cur === null && !pend;
+    clr.addEventListener("click", function(){ choose(null); });
+    pop.appendChild(clr);
+    pop.addEventListener("click", function(ev){ ev.stopPropagation(); });
+    document.body.appendChild(pop);
+    pop.style.width = Math.min(280, window.innerWidth - 24) + "px";
+    btn.setAttribute("aria-expanded","true");
+    openPop = { btn:btn, el:pop };
+    placePop();
   }
   function setInfo(id, text, title){
     var node = $(id);
@@ -1212,6 +1437,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       if (!st.joker[op.sid]) st.joker[op.sid] = {};
       if (op.v === null) delete st.joker[op.sid][op.pid];
       else st.joker[op.sid][op.pid] = 1;
+    } else if (op.t === "compare") {
+      if (!st.compareWith) st.compareWith = {};
+      if (op.v) st.compareWith[op.key] = true; else delete st.compareWith[op.key];
     } else if (op.t === "pin") {
       if (op.who === "trainer") st.trainerPin = op.h;
       else { var p = null; for (var i=0;i<st.players.length;i++) if (st.players[i].id===op.who) p = st.players[i]; if (p) p.pin = op.h; }
@@ -1272,12 +1500,52 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   /* ---------- Firebase ---------- */
   function fbStart(){
     var cfg = window.TB_FIREBASE;
-    if (!cfg || !cfg.databaseURL || !cfg.apiKey) return null;
-    if (typeof firebase === "undefined" || !firebase.initializeApp) return null;
-    try {
-      firebase.initializeApp(cfg);
-      return firebase.database().ref("teams/" + (cfg.teamKey || "standard"));
-    } catch (e) { return null; }
+    if (!cfg || !cfg.databaseURL || !cfg.apiKey) return false;
+    if (typeof firebase === "undefined" || !firebase.initializeApp) return false;
+    try { firebase.initializeApp(cfg); return true; } catch (e) { return false; }
+  }
+
+  /* Bindet die aktive Team-Referenz neu. Löst die alte Verbindung, setzt den
+     Stand zurück und merkt sich das Team geräteweit für den nächsten Besuch. */
+  function bindTeamRef(key){
+    if (FB) { safe(function(){ FB.off(); }); }
+    activeTeamKey = key;
+    safe(function(){ localStorage.setItem(LASTTEAMKEY, key); });
+    state = fromDb(null);
+    setSave("busy","verbindet");
+    var first = true;
+    FB = firebase.database().ref("teams/" + key);
+    FB.on("value", function(snap){
+      state = fromDb(snap.val());
+      if (first) { first = false; restoreCode(); if (!me) restoreLogin(); }
+      if (!fbPending) setSave("ok","gespeichert");
+      render();
+      installManifest();
+    }, function(){ setSave("bad","keine Verbindung zur Datenbank"); });
+    render();
+  }
+
+  /* Einmalig nach dem ersten Katalog-Snapshot: stellt eine gespeicherte
+     Trainer-Anmeldung wieder her oder bestimmt, welches Team ein Spieler sieht. */
+  function afterCatalogReady(){
+    var savedT = safe(function(){ return JSON.parse(localStorage.getItem(TRAINERAUTHKEY) || "null"); }, null);
+    if (savedT && savedT.id) {
+      var acct = trainerAcct(savedT.id);
+      if (acct && acct.pin && acct.pin === savedT.tok) {
+        me = { role:"trainer", id: savedT.id, tok: savedT.tok };
+        pickActiveTeamForTrainer();
+        return;
+      }
+    }
+    var keys = Object.keys(catalog.teams || {});
+    if (keys.length <= 1) {
+      bindTeamRef(keys[0] || ((window.TB_FIREBASE && window.TB_FIREBASE.teamKey) || "standard"));
+      gateStep = null;
+      return;
+    }
+    var last = safe(function(){ return localStorage.getItem(LASTTEAMKEY); }, null);
+    if (last && keys.indexOf(last) !== -1) { bindTeamRef(last); gateStep = null; return; }
+    gateStep = "team";
   }
 
   function fbDo(promise){
@@ -1303,6 +1571,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     } else if (op.t === "joker") {
       var jr = FB.child("joker/" + op.sid + "/" + op.pid);
       fbDo(op.v === null ? jr.remove() : jr.set(1));
+    } else if (op.t === "compare") {
+      var cr = FB.child("compareWith/" + op.key);
+      fbDo(op.v ? cr.set(true) : cr.remove());
     } else if (op.t === "pin") {
       fbDo(FB.child(op.who === "trainer" ? "trainerPin" : "players/" + op.who + "/pin").set(op.h));
     } else if (op.t === "addPlayer") {
@@ -1355,7 +1626,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       lvGold: v.lvGold, lvSilver: v.lvSilver, lvBronze: v.lvBronze,
       levelMin: v.levelMin, badges: v.badges,
       jokers: v.jokers, jokerFrom: v.jokerFrom, seasonFrom: v.seasonFrom, teamCode: v.teamCode,
-      trainerPin: v.trainerPin || null,
+      trainerPin: v.trainerPin || null, compareWith: v.compareWith || {},
       players: players, sessions: sessions, att: v.att || {}, joker: v.joker || {} });
   }
 
@@ -1447,6 +1718,32 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     return { y:y, tot:tot, pct: tot ? Math.round(y/tot*100) : null };
   }
   function mayNote(pid){ return isTrainer() || (me && me.id === pid); }
+
+  /* Saisonquote eines FREMDEN Teams für den Vergleich, unabhängig vom globalen state.
+     Spiegelt effV()/heldSessions()/teamQuota() für einen fremden, bereits normalisierten
+     Datensatz, ohne die eigenen globalen Funktionen umzubauen. */
+  function foreignEffV(e, st){
+    if (!e) return null;
+    if (e.v === "exc" && !String(e.n || "").trim()) return "no";
+    if (e.v === "late" && !st.lateOn) return "yes";
+    return e.v;
+  }
+  function foreignQuota(st){
+    if (st.demo) return { pct:null, name: st.team, tot:0 };
+    var t = todayISO(), from = typeof st.seasonFrom === "string" ? st.seasonFrom : "";
+    var held = st.sessions.filter(function(s){ return !s.cancelled && s.date <= t && s.date >= from; });
+    var y = 0, tot = 0;
+    st.players.forEach(function(p){
+      held.forEach(function(s){
+        var e = (st.att[s.id] || {})[p.id];
+        if (!e) return;
+        tot++;
+        var v = foreignEffV(e, st);
+        if (v === "yes" || v === "late") y++;
+      });
+    });
+    return { pct: tot ? Math.round(y/tot*100) : null, name: st.team, tot: tot };
+  }
 
   /* ---------- Punkte, Serie, Stufe, Abzeichen ---------- */
   function startMs(s){
@@ -2078,9 +2375,6 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       o.value = p.id;
       sel.appendChild(o);
     });
-    var ot = el("option", null, "Trainer");
-    ot.value = "trainer";
-    sel.appendChild(ot);
     sel.value = keep || "";
     syncPinLabel();
   }
@@ -2088,18 +2382,6 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function syncPinLabel(){
     var v = $("loginWho").value;
     var lbl = $("loginPinLabel"), inp = $("loginPin"), hint = $("gateHint");
-    if (v === "trainer") {
-      if (!state.trainerPin) {
-        lbl.textContent = "Trainercode festlegen";
-        inp.placeholder = "frei wählbar";
-        hint.textContent = "Für den Trainerbereich ist noch kein Code vergeben. Der erste Code, der hier gesetzt wird, gilt.";
-      } else {
-        lbl.textContent = "Trainercode";
-        inp.placeholder = "";
-        hint.textContent = "Einmal anmelden reicht. Dieses Gerät merkt sich dich danach.";
-      }
-      return;
-    }
     var p = v ? player(v) : null;
     if (p && !p.pin) {
       lbl.textContent = "PIN festlegen";
@@ -2119,33 +2401,30 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     msg.className = "msg";
     if (!who) { msg.textContent = "Bitte deinen Namen auswählen."; return; }
     if (pin.length < 3) { msg.textContent = "Bitte eine PIN mit mindestens drei Zeichen eingeben."; return; }
-    var known = who === "trainer" ? state.trainerPin : (player(who) ? player(who).pin : null);
+    var known = player(who) ? player(who).pin : null;
     hashPin(pin).then(function(h){
       if (!known) {
         if (readOnly) { msg.textContent = "Diese Ansicht darf nichts speichern, deshalb geht das Festlegen einer PIN hier nicht."; return; }
         mutate({ t:"pin", who: who, h: h });
       } else if (known !== h) {
-        msg.textContent = who === "trainer" ? "Der Code stimmt nicht." : "Die PIN stimmt nicht. Der Trainer kann sie zurücksetzen.";
+        msg.textContent = "Die PIN stimmt nicht. Der Trainer kann sie zurücksetzen.";
         return;
       }
       msg.textContent = "";
       $("loginPin").value = "";
-      me = { role: who === "trainer" ? "trainer" : "player", id: who === "trainer" ? "trainer" : who, tok: h };
-      safe(function(){ localStorage.setItem(AUTHKEY, JSON.stringify(me)); });
+      me = { role:"player", id: who, tok: h };
+      safe(function(){ localStorage.setItem(playerAuthKey(), JSON.stringify(me)); });
       route = "heute";
       render();
     });
   }
 
   function restoreLogin(){
-    var saved = safe(function(){ return JSON.parse(localStorage.getItem(AUTHKEY) || "null"); }, null);
+    if (me) return;
+    var saved = safe(function(){ return JSON.parse(localStorage.getItem(playerAuthKey()) || "null"); }, null);
     if (!saved || !saved.id) return;
-    if (saved.role === "trainer") {
-      if (state.trainerPin && state.trainerPin === saved.tok) me = saved;
-    } else {
-      var p = player(saved.id);
-      if (p && p.pin && p.pin === saved.tok) me = saved;
-    }
+    var p = player(saved.id);
+    if (p && p.pin && p.pin === saved.tok) me = saved;
   }
 
   function checkCode(){
@@ -2155,7 +2434,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     hashPin(v).then(function(h){
       if (h !== state.teamCode) { msg.textContent = "Der Code stimmt nicht."; return; }
       codeOk = h;
-      safe(function(){ localStorage.setItem(CODEKEY, h); });
+      safe(function(){ localStorage.setItem(codeKeyFor(), h); });
       $("codeInput").value = "";
       msg.textContent = "";
       render();
@@ -2163,20 +2442,146 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   }
 
   function logout(){
+    var wasTrainer = me && me.role === "trainer";
     me = null;
     pendingExc = null;
-    safe(function(){ localStorage.removeItem(AUTHKEY); });
+    if (wasTrainer) {
+      safe(function(){ localStorage.removeItem(TRAINERAUTHKEY); });
+      gateStep = Object.keys(catalog.teams || {}).length > 1 ? "team" : null;
+    } else {
+      safe(function(){ localStorage.removeItem(playerAuthKey()); });
+    }
     $("loginPin").value = "";
     $("loginMsg").textContent = "";
     render();
+  }
+
+  /* ---------- Team-Auswahl, Trainer-Anmeldung, Team-Wechsel ---------- */
+  function renderTeamPick(){
+    var sel = $("teamPickSelect");
+    var keep = sel.value;
+    sel.innerHTML = "";
+    Object.keys(catalog.teams || {}).forEach(function(k){
+      var o = el("option", null, teamDisplayName(k));
+      o.value = k;
+      sel.appendChild(o);
+    });
+    if (keep && catalog.teams[keep]) sel.value = keep;
+  }
+
+  function pickTeamAndContinue(){
+    var key = $("teamPickSelect").value;
+    if (!key) return;
+    bindTeamRef(key);
+    gateStep = null;
+    render();
+  }
+
+  function renderTrainerGate(){
+    var ids = Object.keys(catalog.trainers || {});
+    var noTrainers = !ids.length;
+    $("trainerSetupWrap").hidden = !noTrainers;
+    $("trainerLoginWrap").hidden = noTrainers;
+    if (noTrainers) return;
+    var sel = $("trainerWho");
+    var keep = sel.value;
+    sel.innerHTML = "";
+    var o0 = el("option", null, "bitte auswählen");
+    o0.value = "";
+    sel.appendChild(o0);
+    ids.forEach(function(id){
+      var t = catalog.trainers[id];
+      var o = el("option", null, t.name + (t.pin ? "" : " (noch keine PIN)"));
+      o.value = id;
+      sel.appendChild(o);
+    });
+    sel.value = keep || "";
+    var acct = sel.value ? trainerAcct(sel.value) : null;
+    $("trainerPinLabel").textContent = acct && !acct.pin ? "PIN festlegen" : "PIN";
+    $("trainerPinHint").textContent = acct && !acct.pin
+      ? "Erste Anmeldung: du legst deine PIN jetzt selbst fest."
+      : "Einmal anmelden reicht. Dieses Gerät merkt sich dich danach.";
+  }
+
+  function setTrainerMe(idTok){
+    me = { role:"trainer", id: idTok.id, tok: idTok.tok };
+    safe(function(){ localStorage.setItem(TRAINERAUTHKEY, JSON.stringify(me)); });
+    $("trainerPin").value = "";
+    $("trainerSetupPin").value = "";
+    $("trainerNewName").value = "";
+    route = "heute";
+    pickActiveTeamForTrainer();
+    render();
+  }
+
+  function pickActiveTeamForTrainer(){
+    if (mode !== "fb") { gateStep = null; return; } /* lokal/Artefakt: nur ein Team, keine Auswahl nötig */
+    var allowed = allowedTeamsFor(me.id);
+    if (!allowed.length) { gateStep = "noteam"; return; }
+    if (allowed.length === 1) { bindTeamRef(allowed[0]); gateStep = null; return; }
+    var last = safe(function(){ return localStorage.getItem(LASTTEAMKEY); }, null);
+    if (last && allowed.indexOf(last) !== -1) { bindTeamRef(last); gateStep = null; return; }
+    gateStep = "teamswitch";
+  }
+
+  function doTrainerLogin(){
+    var noTrainers = !Object.keys(catalog.trainers || {}).length;
+    if (noTrainers) {
+      var name = $("trainerNewName").value.trim();
+      var pin0 = $("trainerSetupPin").value.trim();
+      var msg0 = $("trainerSetupMsg");
+      msg0.className = "msg";
+      if (!name) { msg0.textContent = "Bitte deinen Namen eingeben."; return; }
+      if (pin0.length < 3) { msg0.textContent = "Bitte eine PIN mit mindestens drei Zeichen eingeben."; return; }
+      hashPin(pin0).then(function(h){
+        var id = uid("t");
+        catalogSet("trainers/" + id, { name: name, pin: h, admin: true, teams: {} });
+        setTrainerMe({ id: id, tok: h });
+      });
+      return;
+    }
+    var id2 = $("trainerWho").value;
+    var pin = $("trainerPin").value.trim();
+    var msg = $("trainerMsg");
+    msg.className = "msg";
+    if (!id2) { msg.textContent = "Bitte deinen Namen auswählen."; return; }
+    if (pin.length < 3) { msg.textContent = "Bitte eine PIN mit mindestens drei Zeichen eingeben."; return; }
+    var acct = trainerAcct(id2);
+    hashPin(pin).then(function(h){
+      if (!acct.pin) {
+        catalogSet("trainers/" + id2 + "/pin", h);
+        setTrainerMe({ id: id2, tok: h });
+      } else if (acct.pin !== h) {
+        msg.textContent = "Die PIN stimmt nicht. Ein Admin kann sie zurücksetzen.";
+      } else {
+        setTrainerMe({ id: id2, tok: h });
+      }
+    });
+  }
+
+  function renderTeamSwitch(){
+    var box = $("teamSwitchList");
+    box.innerHTML = "";
+    allowedTeamsFor(me.id).forEach(function(k){
+      var b = el("button","btn primary", teamDisplayName(k));
+      b.type = "button";
+      b.addEventListener("click", function(){ bindTeamRef(k); gateStep = null; render(); });
+      box.appendChild(b);
+    });
   }
 
   /* ---------- Hauptrender ---------- */
   function render(){
     if (me && me.role === "player" && !player(me.id)) {
       me = null;
-      safe(function(){ localStorage.removeItem(AUTHKEY); });
+      safe(function(){ localStorage.removeItem(playerAuthKey()); });
     }
+    if (me && me.role === "trainer" && catalogLoaded && !trainerAcct(me.id)) {
+      me = null;
+      safe(function(){ localStorage.removeItem(TRAINERAUTHKEY); });
+      gateStep = Object.keys(catalog.teams || {}).length > 1 ? "team" : null;
+    }
+
     var name = state.team || "Team";
     $("gateTeamName").textContent = name;
     $("codeTeamName").textContent = name;
@@ -2184,16 +2589,26 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     $("topTeam").textContent = name;
     $("demoBanner").hidden = !state.demo;
 
+    var WRAPS = ["codeWrap","gateWrap","teamGateWrap","trainerGateWrap","teamSwitchWrap","noTeamWrap","shell"];
+    function showOnly(id){ WRAPS.forEach(function(w){ $(w).hidden = (w !== id); }); }
+
+    if (!me && gateStep === "team") { renderTeamPick(); showOnly("teamGateWrap"); return; }
+    if (!me && gateStep === "trainer") { renderTrainerGate(); showOnly("trainerGateWrap"); return; }
+    if (me && gateStep === "teamswitch") { renderTeamSwitch(); showOnly("teamSwitchWrap"); return; }
+    if (me && gateStep === "noteam") { showOnly("noTeamWrap"); return; }
+
     var locked = !!state.teamCode && codeOk !== state.teamCode && !me;
-    $("codeWrap").hidden = !locked;
-    if (locked) { $("gateWrap").hidden = true; $("shell").hidden = true; return; }
+    if (locked) { showOnly("codeWrap"); return; }
 
     var loggedIn = !!me;
-    $("gateWrap").hidden = loggedIn;
-    $("shell").hidden = !loggedIn;
-    if (!loggedIn) { renderGate(); return; }
+    if (!loggedIn) { renderGate(); showOnly("gateWrap"); return; }
 
-    $("whoName").textContent = isTrainer() ? "Trainer" : ((player(me.id) || {}).name || "unbekannt");
+    showOnly("shell");
+
+    var switchAllowed = isTrainer() ? allowedTeamsFor(me.id) : [];
+    $("switchTeamBtn").hidden = switchAllowed.length < 2;
+
+    $("whoName").textContent = isTrainer() ? ((trainerAcct(me.id) || {}).name || "Trainer") : ((player(me.id) || {}).name || "unbekannt");
     $("whoTag").hidden = !isTrainer();
     $("legendTrainer").hidden = !isTrainer();
     $("legendLate").hidden = !lateOn();
@@ -2201,9 +2616,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       "Ein Feld je Spieler und Termin, eingefärbt nach dem gewerteten Status. Grün hinterlegte Spalten sind geplante Termine, sie zählen noch nicht in die Quote.\n"
       + "Die Quote rechts ist anwesend geteilt durch eingetragene Termine.\n"
       + (isTrainer()
-        ? "Auf ein Feld tippen ändert den Eintrag der Reihe nach: " + cycleVals().map(function(v){
-            return v ? WORD[v].toLowerCase() : "nichts"; }).join(", ")
-          + ". Bei entschuldigt öffnet sich darunter das Feld für den Grund, ohne Grund wird nichts gespeichert. Deine Korrekturen sind blau umrandet."
+        ? "Auf ein Feld tippen öffnet die Auswahl: " + cycleVals().filter(function(v){ return v; })
+            .map(function(v){ return WORD[v].toLowerCase(); }).join(", ") + " oder Eintrag löschen."
+          + " Bei entschuldigt öffnet sich darunter das Feld für den Grund, ohne Grund wird nichts gespeichert. Deine Korrekturen sind blau umrandet."
         : "Eintragen kannst du dich unter Termine. Der Trainer kann hier korrigieren."),
       "Beteiligung");
     var footText = mode === "fb"
@@ -2675,6 +3090,39 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       + (isTrainer() ? "Die vollständige Reihenfolge sieht niemand, jeder sieht nur seinen eigenen Platz."
                      : "Deinen eigenen Platz siehst du unter Mein Profil."),
       "Podium des Monats");
+
+    renderDuel();
+  }
+
+  var duelCache = {};
+  function duelFetch(key){
+    if (mode !== "fb" || duelCache[key]) return;
+    duelCache[key] = "pending";
+    firebase.database().ref("teams/" + key).once("value").then(function(snap){
+      duelCache[key] = foreignQuota(fromDb(snap.val()));
+      render();
+    }, function(){ duelCache[key] = { pct:null, name:key, tot:0 }; render(); });
+  }
+  function renderDuel(){
+    var keys = Object.keys(state.compareWith || {}).filter(function(k){ return k !== activeTeamKey; });
+    var sec = $("duelSection");
+    sec.hidden = !keys.length;
+    if (!keys.length) return;
+    var box = $("duelCard");
+    box.innerHTML = "";
+    var own = teamQuota();
+    goalRow(box, state.team || "Team", own.pct === null ? "–" : own.pct + " %", own.pct || 0, null, false);
+    keys.forEach(function(k){
+      duelFetch(k);
+      var d = duelCache[k];
+      var pending = !d || d === "pending";
+      var valText = pending ? "lädt…" : (d.pct === null ? "keine Daten" : d.pct + " %");
+      goalRow(box, teamDisplayName(k), valText, pending ? 0 : (d.pct || 0), null, false);
+    });
+    var refresh = el("button","btn quiet","Aktualisieren");
+    refresh.type = "button";
+    refresh.addEventListener("click", function(){ keys.forEach(function(k){ delete duelCache[k]; }); render(); });
+    box.appendChild(refresh);
   }
 
   function renderStats(){
@@ -2735,15 +3183,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
           b.type = "button";
           b.title = title + " · zum Ändern tippen";
           b.setAttribute("aria-label", title);
+          b.setAttribute("aria-expanded","false");
           b.appendChild(mark);
-          b.addEventListener("click", function(){
-            var vals = cycleVals();
-            var idx = vals.indexOf(pend ? "exc" : (e ? e.v : null));
-            var nextVal = vals[(idx + 1) % vals.length];
-            if (nextVal === "exc") { pendingExc = { sid:s.id, pid:p.id }; focusNote = s.id + "-" + p.id; render(); return; }
-            pendingExc = null;
-            if (nextVal === null) mutate({ t:"att", sid:s.id, pid:p.id, v:null });
-            else mutate({ t:"att", sid:s.id, pid:p.id, v:nextVal, n:(e ? e.n : ""), by:"t", ts:(e && e.ts) || 0 });
+          b.addEventListener("click", function(ev){
+            ev.stopPropagation();
+            statusPop(b, s, p, e, pend);
           });
           td.appendChild(b);
         } else {
@@ -2908,6 +3352,100 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   }
 
   /* ---------- Trainerbereich ---------- */
+  /* Checkboxen: mit welchen anderen Teams die Quote verglichen wird. Das legt allein der
+     Trainer des aktiven Teams fest, unabhängig davon ob er Admin ist. */
+  function renderCompareSettings(){
+    var box = $("compareList");
+    box.innerHTML = "";
+    var others = Object.keys(catalog.teams || {}).filter(function(k){ return k !== activeTeamKey; });
+    if (!others.length) { box.appendChild(el("p","hint","Noch keine weiteren Teams im Verein angelegt.")); return; }
+    others.forEach(function(k){
+      var row = el("label", null);
+      row.style.display = "flex"; row.style.alignItems = "center"; row.style.gap = "8px"; row.style.cursor = "pointer";
+      var cb = el("input"); cb.type = "checkbox";
+      cb.style.width = "18px"; cb.style.height = "18px";
+      cb.checked = !!(state.compareWith && state.compareWith[k]);
+      cb.addEventListener("change", function(){ mutate({ t:"compare", key:k, v: this.checked }); });
+      row.appendChild(cb);
+      row.appendChild(document.createTextNode(teamDisplayName(k)));
+      box.appendChild(row);
+    });
+  }
+
+  /* Nur für Admins: Teams anlegen, Trainer anlegen, Admin-Rechte und
+     Team-Zugriff je Trainer vergeben. Schreibt direkt in den Katalog. */
+  function renderCatalogAdmin(){
+    var tl = $("adminTeamList");
+    tl.innerHTML = "";
+    Object.keys(catalog.teams || {}).forEach(function(k){
+      var chip = el("span","rchip");
+      chip.appendChild(document.createTextNode(teamDisplayName(k) + (k === activeTeamKey ? " (aktiv)" : "")));
+      if (k !== activeTeamKey) {
+        var go = el("button", null, "wechseln");
+        go.type = "button";
+        go.addEventListener("click", function(){ bindTeamRef(k); render(); });
+        chip.appendChild(go);
+      }
+      tl.appendChild(chip);
+    });
+    if (!Object.keys(catalog.teams || {}).length) tl.appendChild(el("span","hint","Noch keine Teams."));
+
+    var box = $("adminTrainerList");
+    box.innerHTML = "";
+    var teamKeys = Object.keys(catalog.teams || {});
+    Object.keys(catalog.trainers || {}).forEach(function(id){
+      var t = catalog.trainers[id];
+      var card = el("div","card pad");
+      card.style.marginBottom = "10px";
+      var top = el("div","row");
+      top.appendChild(el("b", null, t.name + (t.pin ? "" : " (noch keine PIN)")));
+      var adminLbl = el("label", null);
+      adminLbl.style.display = "flex"; adminLbl.style.alignItems = "center"; adminLbl.style.gap = "6px";
+      var adminCb = el("input"); adminCb.type = "checkbox";
+      adminCb.checked = !!t.admin;
+      adminCb.addEventListener("change", function(){ catalogSet("trainers/" + id + "/admin", this.checked); render(); });
+      adminLbl.appendChild(adminCb);
+      adminLbl.appendChild(document.createTextNode("Admin"));
+      top.appendChild(adminLbl);
+      if (t.pin) {
+        var rp = el("button", null, "PIN zurücksetzen");
+        rp.type = "button";
+        rp.addEventListener("click", function(){ catalogSet("trainers/" + id + "/pin", null); render(); });
+        top.appendChild(rp);
+      }
+      var isArmed = !!armed && armed.k === "tr" && armed.id === id;
+      var x = el("button", isArmed ? "confirm" : null, isArmed ? "wirklich löschen?" : "×");
+      x.type = "button";
+      x.addEventListener("click", function(){
+        if (isArmed) { armed = null; catalogSet("trainers/" + id, null); }
+        else { armed = { k:"tr", id:id }; }
+        render();
+      });
+      top.appendChild(x);
+      card.appendChild(top);
+
+      if (!t.admin) {
+        var teamsRow = el("div","row");
+        teamsRow.appendChild(el("span","hint","darf einstellen bei:"));
+        teamKeys.forEach(function(k){
+          var lbl = el("label", null);
+          lbl.style.display = "flex"; lbl.style.alignItems = "center"; lbl.style.gap = "6px";
+          var cb = el("input"); cb.type = "checkbox";
+          cb.checked = !!(t.teams && t.teams[k]);
+          cb.addEventListener("change", function(){ catalogSet("trainers/" + id + "/teams/" + k, this.checked || null); render(); });
+          lbl.appendChild(cb);
+          lbl.appendChild(document.createTextNode(teamDisplayName(k)));
+          teamsRow.appendChild(lbl);
+        });
+        card.appendChild(teamsRow);
+      } else {
+        card.appendChild(el("p","hint","Admin: darf bei jedem Team mitändern."));
+      }
+      box.appendChild(card);
+    });
+    if (!Object.keys(catalog.trainers || {}).length) box.appendChild(el("p","hint","Noch keine Trainer angelegt."));
+  }
+
   function renderAdmin(){
     $("teamInput").value = state.team || "";
     $("goalInput").value = goalPct();
@@ -2941,9 +3479,16 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
                 + (BADGE_DEFS.length + SINGLE_DEFS.length) + " Abzeichen an",
       sumJoker: jokerBudget() ? jokerBudget() + (jokerBudget() === 1 ? " Joker" : " Joker") + " je Spieler" : "abgeschaltet",
       sumSeason: seasonFrom() ? "ab " + fmtLong(seasonFrom()) : "alles zählt",
-      sumCode:  state.teamCode ? "gesetzt" : "keiner gesetzt"
+      sumCode:  state.teamCode ? "gesetzt" : "keiner gesetzt",
+      sumCompare: Object.keys(state.compareWith || {}).length
+        ? Object.keys(state.compareWith).length + (Object.keys(state.compareWith).length === 1 ? " Team" : " Teams")
+        : "keiner gewählt"
     };
     Object.keys(sums).forEach(function(id){ if ($(id)) $(id).textContent = sums[id]; });
+
+    renderCompareSettings();
+    $("adminCatalogBlock").hidden = !isAdmin() || mode !== "fb";
+    if (isAdmin() && mode === "fb") renderCatalogAdmin();
 
     buildRules($("ruleBoxT"));
 
@@ -3258,6 +3803,50 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     $("logoutBtn").addEventListener("click", logout);
     $("clearDemo").addEventListener("click", function(){ mutate({ t:"clearDemo" }); });
 
+    /* ---- Team-Auswahl, Trainer-Anmeldung, Team-Wechsel ---- */
+    var gotoTrainer = function(){ gateStep = "trainer"; render(); };
+    ["gotoTrainerBtn0","gotoTrainerBtn1","gotoTrainerBtn2"].forEach(function(id){
+      $(id).addEventListener("click", gotoTrainer);
+    });
+    $("trainerBackBtn").addEventListener("click", function(){
+      gateStep = Object.keys(catalog.teams || {}).length > 1 ? "team" : null;
+      render();
+    });
+    $("teamPickBtn").addEventListener("click", pickTeamAndContinue);
+    $("teamPickSelect").addEventListener("change", function(){});
+    $("trainerWho").addEventListener("change", function(){ $("trainerMsg").textContent = ""; renderTrainerGate(); });
+    $("trainerLoginBtn").addEventListener("click", doTrainerLogin);
+    $("trainerPin").addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); doTrainerLogin(); } });
+    $("trainerSetupBtn").addEventListener("click", doTrainerLogin);
+    $("trainerSetupPin").addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); doTrainerLogin(); } });
+    $("teamSwitchLogout").addEventListener("click", logout);
+    $("noTeamLogout").addEventListener("click", logout);
+    $("switchTeamBtn").addEventListener("click", function(){ gateStep = "teamswitch"; render(); });
+
+    $("addTeam").addEventListener("click", function(){
+      var name = $("newTeamName").value.trim();
+      var msg = $("teamAddMsg");
+      if (!name) { msg.textContent = "Bitte einen Namen eingeben."; return; }
+      var key = uid("team");
+      catalogSet("teams/" + key, true);
+      teamNames[key] = name;
+      safe(function(){ firebase.database().ref("teams/" + key).set({ team: name, demo: false }); });
+      $("newTeamName").value = "";
+      msg.textContent = "Team „" + name + "“ angelegt. Du kannst jetzt dorthin wechseln.";
+      render();
+    });
+    $("newTeamName").addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); $("addTeam").click(); } });
+
+    $("addTrainer").addEventListener("click", function(){
+      var name = $("newTrainerName").value.trim();
+      if (!name) return;
+      var id = uid("t");
+      catalogSet("trainers/" + id, { name: name, pin: null, admin: false, teams: {} });
+      $("newTrainerName").value = "";
+      render();
+    });
+    $("newTrainerName").addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); $("addTrainer").click(); } });
+
     $("teamInput").addEventListener("change", function(){ mutate({ t:"team", name: this.value.trim() || "Team" }); });
     var numberCfg = function(id, key, min, max, fallback){
       $(id).addEventListener("change", function(){
@@ -3401,21 +3990,6 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       r.readAsText(f);
     });
 
-    $("setTrainerPin").addEventListener("click", function(){
-      var v = $("newTrainerPin").value.trim();
-      var msg = $("trainerPinMsg");
-      if (v.length < 3) { msg.textContent = "Bitte mindestens drei Zeichen."; return; }
-      hashPin(v).then(function(h){
-        mutate({ t:"pin", who:"trainer", h: h });
-        if (me && me.role === "trainer") {
-          me.tok = h;
-          safe(function(){ localStorage.setItem(AUTHKEY, JSON.stringify(me)); });
-        }
-        $("newTrainerPin").value = "";
-        msg.textContent = "Code geändert.";
-      });
-    });
-
     $("codeBtn").addEventListener("click", checkCode);
     $("codeInput").addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); checkCode(); } });
 
@@ -3430,7 +4004,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       hashPin(v).then(function(h){
         mutate({ t:"cfg", k:"teamCode", v: h });
         codeOk = h;
-        safe(function(){ localStorage.setItem(CODEKEY, h); });
+        safe(function(){ localStorage.setItem(codeKeyFor(), h); });
         $("newTeamCode").value = "";
         msg.className = "msg ok";
         msg.textContent = "Teamcode gesetzt. Gib ihn an die Mannschaft weiter.";
@@ -3439,7 +4013,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     $("clearTeamCode").addEventListener("click", function(){
       mutate({ t:"cfg", k:"teamCode", v:"" });
       codeOk = null;
-      safe(function(){ localStorage.removeItem(CODEKEY); });
+      safe(function(){ localStorage.removeItem(codeKeyFor()); });
       $("teamCodeMsg").className = "msg ok";
       $("teamCodeMsg").textContent = "Teamcode entfernt.";
     });
@@ -3535,6 +4109,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       seasonFrom: typeof st.seasonFrom === "string" ? st.seasonFrom : "",
       teamCode: typeof st.teamCode === "string" ? st.teamCode : "",
       trainerPin: typeof st.trainerPin === "string" ? st.trainerPin : null,
+      compareWith: st.compareWith && typeof st.compareWith === "object" ? st.compareWith : {},
       players: Array.isArray(st.players) ? st.players.filter(function(p){ return p && p.id; }).map(function(p){
         return { id:p.id, name:String(p.name || "?"), pin: typeof p.pin === "string" ? p.pin : null }; }) : [],
       sessions: Array.isArray(st.sessions) ? st.sessions.filter(function(s){ return s && s.id && s.date; }).map(function(s){
@@ -3561,13 +4136,14 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       seeded.seasonFrom = out.seasonFrom;
       seeded.teamCode = out.teamCode;
       seeded.trainerPin = out.trainerPin;
+      seeded.compareWith = out.compareWith;
       return seeded;
     }
     return out;
   }
 
   function restoreCode(){
-    codeOk = safe(function(){ return localStorage.getItem(CODEKEY); }, null);
+    codeOk = safe(function(){ return localStorage.getItem(codeKeyFor()); }, null);
   }
 
   /* Manifest zur Laufzeit, damit die Seite eine einzelne Datei bleibt */
@@ -3644,22 +4220,33 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     wire();
     render();
     setSave("busy","verbindet");
-    var first = true;
-    FB.on("value", function(snap){
-      state = fromDb(snap.val());
-      if (first) { first = false; restoreLogin(); restoreCode(); }
-      if (!fbPending) setSave("ok","gespeichert");
+    CATALOG_REF = firebase.database().ref("catalog");
+    CATALOG_REF.on("value", function(snap){
+      var v = snap.val() || {};
+      catalog = { teams: v.teams || {}, trainers: v.trainers || {} };
+      var firstCatalog = !catalogLoaded;
+      catalogLoaded = true;
+      if (firstCatalog) {
+        var keys = Object.keys(catalog.teams);
+        if (!keys.length) {
+          var tk = (window.TB_FIREBASE && window.TB_FIREBASE.teamKey) || "standard";
+          catalog.teams[tk] = true;
+          CATALOG_REF.child("teams/" + tk).set(true);
+        }
+        afterCatalogReady();
+      }
       render();
-      installManifest();
     }, function(){
+      catalogLoaded = true;
+      if (!activeTeamKey) afterCatalogReady();
       setSave("bad","keine Verbindung zur Datenbank");
+      render();
     });
   }
 
   var seed = safe(function(){ return JSON.parse($("tb-seed").textContent); }, {});
   if (standalone) {
-    FB = fbStart();
-    if (FB) { bootFirebase(); return; }
+    if (fbStart()) { bootFirebase(); return; }
     mode = "local";
     boot(safe(function(){ return JSON.parse(localStorage.getItem(LOCALKEY) || "null"); }, null) || seed);
     return;
