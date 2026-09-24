@@ -1,0 +1,31 @@
+name: Push-Erinnerungen
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: remind
+  cancel-in-progress: false
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: remind.mjs
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-save --no-package-lock web-push@3
+      - run: node remind.mjs
+        env:
+          TZ: Europe/Berlin
+          VAPID_PUBLIC: BNJUWg0HNBYiNiwZP4dy50fiFtAQY-GvbWXxrkyq64QgjFWk41I5rgvbHmwcovTJy3Xnf1cG3CffvNehfhc-nfQ
+          VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
+          DB_URL: https://kcw-trainingstagebuch-default-rtdb.europe-west1.firebasedatabase.app
+          PAGE_URL: https://kcw-1.github.io/kcw_trainingstagebuch/
