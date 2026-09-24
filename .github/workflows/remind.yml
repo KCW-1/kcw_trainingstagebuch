@@ -3,6 +3,8 @@ name: Push-Erinnerungen
 on:
   schedule:
     - cron: "*/15 * * * *"
+    # Einmal pro Woche: Workflow aktiv halten, damit GitHub ihn nach 60 Tagen nicht abschaltet
+    - cron: "17 3 * * 1"
   workflow_dispatch:
 
 concurrency:
@@ -29,3 +31,16 @@ jobs:
           VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
           DB_URL: https://kcw-trainingstagebuch-default-rtdb.europe-west1.firebasedatabase.app
           PAGE_URL: https://kcw-1.github.io/kcw_trainingstagebuch/
+
+  # Schaltet den Workflow über die GitHub-API erneut ein. Das setzt die 60-Tage-Frist
+  # zurück, ganz ohne Commit und ohne neuen Aufbau von GitHub Pages.
+  keepalive:
+    if: github.event.schedule == '17 3 * * 1' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions:
+      actions: write
+    steps:
+      - run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/remind.yml/enable"
+        env:
+          GH_TOKEN: ${{ github.token }}
