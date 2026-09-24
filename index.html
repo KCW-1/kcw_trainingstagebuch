@@ -24,7 +24,14 @@ window.TB_FIREBASE = {
   teamKey:           "standard"
 };
 window.TB_STANDALONE = true;
+/* Push-Erinnerungen: öffentlicher VAPID-Schlüssel. Den privaten Gegenpart kennt nur
+   der GitHub-Workflow (Secret VAPID_PRIVATE). sw.js muss neben dieser Datei liegen. */
+window.TB_PUSH = {
+  publicKey: "BNJUWg0HNBYiNiwZP4dy50fiFtAQY-GvbWXxrkyq64QgjFWk41I5rgvbHmwcovTJy3Xnf1cG3CffvNehfhc-nfQ",
+  sw: "sw.js"
+};
 </script>
+<link rel="manifest" href="manifest.webmanifest" id="tb-manifest">
 
 <meta name="theme-color" content="#3C814A">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -779,6 +786,8 @@ window.TB_ICONS = {
         </div>
 
         <div id="nudge" hidden class="banner note"><span id="nudgeText"></span></div>
+        <div id="pushNudge" hidden class="banner note"><span>Soll dein Handy dich erinnern, wenn du dich noch nicht eingetragen hast?</span>
+          <span class="row"><button class="btn" id="pushNudgeOn" type="button">Einschalten</button><button class="btn" id="pushNudgeHide" type="button">Nicht jetzt</button></span></div>
 
         <div class="tiles" id="heuteTiles"></div>
 
@@ -873,6 +882,13 @@ window.TB_ICONS = {
           <div class="badges" id="badgeBox"></div>
         </section>
 
+        <section id="pushSection">
+          <h2 id="pushHead" data-info="Dein Handy meldet sich vor dem Training, falls du dich noch nicht eingetragen hast. Die Erinnerung kommt nur, wenn noch keine Rückmeldung von dir da ist, und höchstens einmal pro Termin.
+Eingeschaltet wird je Gerät. Hast du die Seite auf Handy und Laptop, entscheidest du auf beiden getrennt.
+Auf dem iPhone geht das nur, wenn die Seite als App auf dem Home-Bildschirm liegt und du sie von dort öffnest." data-title="Erinnerungen">Erinnerungen</h2>
+          <div class="card pad" id="pushCard"></div>
+        </section>
+
         <section>
           <h2 id="ruleHead">Reglement</h2>
           <div id="ruleBox"></div>
@@ -926,6 +942,21 @@ Ab Trainingsbeginn kann ohnehin nur noch der Trainer etwas ändern." data-title=
               <span class="hint">Stunden vor Trainingsbeginn</span>
             </div>
             <p class="hint" id="bonusPreview"></p>
+            <div class="row" style="margin-top:14px">
+              <label for="remindOnInput" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                <input type="checkbox" id="remindOnInput" style="width:18px;height:18px">
+                <span data-info="Wer bis dahin noch keine Rückmeldung gegeben hat, bekommt eine Push-Nachricht aufs Handy. Das gilt nur für Spieler, die unter Mein Profil Erinnerungen auf ihrem Gerät eingeschaltet haben.
+Verschickt wird automatisch über GitHub, etwa alle 15 Minuten. Die Nachricht kann deshalb ein paar Minuten später ankommen als eingestellt.
+Jeder bekommt pro Termin höchstens eine Erinnerung." data-title="Erinnerung">Push-Erinnerung an Spieler ohne Rückmeldung</span>
+              </label>
+            </div>
+            <div class="row">
+              <label for="remindInput">Erinnern</label>
+              <input type="number" id="remindInput" min="1" max="168" step="1" style="width:96px">
+              <span class="hint">Stunden vor der Absagefrist</span>
+            </div>
+            <p class="hint" id="remindPreview"></p>
+            <p class="hint" id="remindCount"></p>
           </div>
         </details>
 
@@ -1213,6 +1244,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   var DEFAULT_EXC = 0;      /* Stunden vor Beginn, bis wann eine Absage Punkte gibt */
   var DEFAULT_BONUS = 24;   /* Stunden vor Beginn, bis wann es Bonuspunkte gibt */
   var DEFAULT_JOKERS = 1;   /* Joker je Spieler */
+  var DEFAULT_REMIND = 3;   /* Push-Erinnerung so viele Stunden vor der Absagefrist */
+  var PUSHKEY = "tb:push:v1";       /* + ":" + Team + ":" + Spieler, Wert: Schlüssel des Abos */
+  var PUSHHIDE = "tb:pushhide:v1";  /* Hinweis auf Heute weggeklickt */
   var LATE_MAX = 20;
   var HOUR = 3600000;
 
@@ -1470,6 +1504,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       st.goal = op.st.goal;
       st.excHours = op.st.excHours;
       st.bonusHours = op.st.bonusHours;
+      st.remindOn = op.st.remindOn;
+      st.remindHours = op.st.remindHours;
       st.lateOn = op.st.lateOn;
       st.latePts = op.st.latePts;
       st.lvGold = op.st.lvGold;
@@ -1584,6 +1620,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       fbDo(FB.child("players/" + op.id).set({ name: op.name, pin: null }));
     } else if (op.t === "delPlayer") {
       fbDo(FB.child("players/" + op.id).remove());
+      safe(function(){ firebase.database().ref("push/" + activeTeamKey + "/" + op.id).remove(); });
       state.sessions.forEach(function(s){
         FB.child("att/" + s.id + "/" + op.id).remove();
         FB.child("joker/" + s.id + "/" + op.id).remove();
@@ -1600,6 +1637,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       FB.child("joker/" + op.id).remove();
     } else if (op.t === "restore") {
       var payload = { team: op.st.team, goal: op.st.goal, excHours: op.st.excHours, bonusHours: op.st.bonusHours,
+        remindOn: op.st.remindOn !== false, remindHours: op.st.remindHours,
         lateOn: !!op.st.lateOn, latePts: op.st.latePts,
         lvGold: op.st.lvGold, lvSilver: op.st.lvSilver, lvBronze: op.st.lvBronze,
         levelMin: op.st.levelMin, badges: op.st.badges || {},
@@ -1626,6 +1664,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         place: s.place || "", cancelled: !!s.cancelled, reason: s.reason || "" });
     });
     return normalize({ demo:false, team: v.team, goal: v.goal, excHours: v.excHours, bonusHours: v.bonusHours,
+      remindOn: v.remindOn, remindHours: v.remindHours,
       lateOn: v.lateOn, latePts: v.latePts,
       lvGold: v.lvGold, lvSilver: v.lvSilver, lvBronze: v.lvBronze,
       levelMin: v.levelMin, badges: v.badges,
@@ -1807,6 +1846,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function excHours(){ return typeof state.excHours === "number" ? state.excHours : DEFAULT_EXC; }
   function bonusHours(){ return typeof state.bonusHours === "number" ? state.bonusHours : DEFAULT_BONUS; }
   function deadlineMs(s, hours){ return startMs(s) - (hours || 0) * HOUR; }
+  function remindOn(){ return state.remindOn !== false; }
+  function remindHours(){ return typeof state.remindHours === "number" ? state.remindHours : DEFAULT_REMIND; }
+  function remindLead(){ return excHours() + remindHours(); }
 
   /* Einträge ohne Zeitstempel sind Altbestand oder vom Trainer gesetzt: sie gelten als rechtzeitig. */
   function beforeDeadline(e, s, hours){
@@ -2129,6 +2171,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       "Einen Grund nachzutragen oder zu berichtigen kostet den Bonus nicht.",
       "Ältere Einträge ohne Zeitstempel und Korrekturen des Trainers gelten als rechtzeitig."
     ];
+    if (remindOn()) fristen.push("Erinnerung: " + remindHours() + (remindHours() === 1 ? " Stunde" : " Stunden")
+      + " vor der Absagefrist bekommt jeder ohne Rückmeldung eine Push-Nachricht, sofern er Erinnerungen unter Mein Profil eingeschaltet hat."
+      + ((ref && !ref.cancelled) ? " Beim nächsten Termin ist das " + fmtDeadline(ref, remindLead()) + "." : ""));
 
     var serie = [
       "Die Serie zählt Einheiten in Folge, bei denen du dabei warst.",
@@ -2447,6 +2492,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   function logout(){
     var wasTrainer = me && me.role === "trainer";
+    if (me && !wasTrainer) pushForget(me.id);
     me = null;
     pendingExc = null;
     if (wasTrainer) {
@@ -2645,6 +2691,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     renderTeamView();
     renderStats();
     renderIch();
+    renderPush();
     if (isTrainer()) renderAdmin();
 
     headInfo();
@@ -3480,7 +3527,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var sums = {
       sumTeam:  state.team + ", Ziel " + goalPct() + " Prozent",
       sumFrist: "Absage " + (excHours() ? excHours() + " h" : "bis Beginn") + ", Bonus "
-                + (bonusHours() ? bonusHours() + " h" : "bis Beginn"),
+                + (bonusHours() ? bonusHours() + " h" : "bis Beginn")
+                + (remindOn() ? ", Erinnerung " + remindHours() + " h davor" : ""),
       sumLate:  lateOn() ? "an, " + latePts() + " Punkte" : "aus",
       sumBadge: "Bronze ab " + LV[2].min + " Prozent, " + onCount + " von "
                 + (BADGE_DEFS.length + SINGLE_DEFS.length) + " Abzeichen an",
@@ -3507,6 +3555,14 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     };
     pre("excPreview", excHours(), "Absage zählt");
     pre("bonusPreview", bonusHours(), "Bonuspunkte");
+    $("remindOnInput").checked = remindOn();
+    $("remindInput").value = remindHours();
+    $("remindInput").disabled = !remindOn();
+    if (!remindOn()) $("remindPreview").textContent = "Push-Erinnerungen sind für dieses Team aus.";
+    else if (!ref) $("remindPreview").textContent = "Sobald ein Termin im Plan steht, steht hier die konkrete Uhrzeit.";
+    else $("remindPreview").textContent = "Beim Termin am " + fmtShort(ref.date) + ", " + ref.time
+      + " Uhr kommt die Erinnerung um " + fmtDeadline(ref, remindLead()) + ".";
+    renderRemindCount();
 
     $("jokerInput").value = jokerBudget();
     $("jokerFromInput").value = jokerFrom();
@@ -3627,6 +3683,204 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       list.appendChild(row);
     });
     if (!state.sessions.length) list.appendChild(el("div","empty","Noch keine Termine."));
+  }
+
+  /* ---------- Push-Erinnerungen ---------- */
+  /* Die Seite meldet nur das Abo an. Verschickt wird von einem GitHub-Workflow, der alle
+     15 Minuten Firebase liest (push/<team>/<spieler>/<abo>, pushSent/<team>/<termin>/<spieler>). */
+  var pushInfo = { checked:false, supported:false, on:false, sub:null, busy:false, msg:"", err:false };
+  var swPromise = null;
+  var remindCountCache = { key:null, at:0, data:null, loading:false };
+
+  function pushCfg(){ return window.TB_PUSH || {}; }
+  function isIOS(){
+    return /iPad|iPhone|iPod/.test(navigator.userAgent || "")
+      || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  }
+  function isStandalone(){
+    return safe(function(){ return window.matchMedia("(display-mode: standalone)").matches; }, false) || navigator.standalone === true;
+  }
+  function pushPossible(){
+    return mode === "fb" && !!pushCfg().publicKey && (location.protocol === "https:" || location.hostname === "localhost")
+      && "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+  }
+  function pushLocalKey(pid){ return PUSHKEY + ":" + activeTeamKey + ":" + pid; }
+  function swReg(){
+    if (!swPromise) {
+      swPromise = navigator.serviceWorker.register(pushCfg().sw || "sw.js").then(function(){
+        return navigator.serviceWorker.ready;
+      });
+      swPromise.catch(function(){ swPromise = null; });
+    }
+    return swPromise;
+  }
+  function b64u(s){
+    var pad = "=".repeat((4 - s.length % 4) % 4);
+    var raw = atob((s + pad).replace(/-/g, "+").replace(/_/g, "/"));
+    var out = new Uint8Array(raw.length);
+    for (var i=0;i<raw.length;i++) out[i] = raw.charCodeAt(i);
+    return out;
+  }
+  function subKeyOf(endpoint){ return hashPin("push|" + endpoint).then(function(h){ return h.slice(0, 24); }); }
+  function pushRef(pid){ return firebase.database().ref("push/" + activeTeamKey + "/" + pid); }
+  function subRecord(sub){
+    var j = sub.toJSON();
+    return { endpoint: j.endpoint, keys: j.keys || {}, ts: Date.now(),
+             dev: isIOS() ? "iPhone/iPad" : (/Android/.test(navigator.userAgent) ? "Android" : "Browser") };
+  }
+
+  /* Liest den Stand des Geräts. Läuft beim Anmelden und nach jedem Teamwechsel einmal. */
+  var pushCheckedFor = null;
+  function pushCheck(){
+    if (!me || isTrainer()) return;
+    var tag = activeTeamKey + ":" + me.id;
+    if (pushCheckedFor === tag) return;
+    pushCheckedFor = tag;
+    pushInfo = { checked:false, supported: pushPossible(), on:false, sub:null, busy:false, msg:"", err:false };
+    if (!pushInfo.supported) { pushInfo.checked = true; return; }
+    var pid = me.id;
+    swReg().then(function(reg){ return reg.pushManager.getSubscription(); }).then(function(sub){
+      if (!me || me.id !== pid) return;
+      var k = safe(function(){ return localStorage.getItem(pushLocalKey(pid)); }, null);
+      pushInfo.sub = sub;
+      pushInfo.on = !!sub && !!k && Notification.permission === "granted";
+      pushInfo.checked = true;
+      /* Abo in der Datenbank auffrischen, falls es dort fehlt oder sich geändert hat */
+      if (pushInfo.on) subKeyOf(sub.endpoint).then(function(nk){
+        if (nk !== k) { safe(function(){ localStorage.setItem(pushLocalKey(pid), nk); }); pushRef(pid).child(k).remove(); }
+        pushRef(pid).child(nk).set(subRecord(sub));
+      });
+      renderPush();
+    }).catch(function(){ pushInfo.checked = true; renderPush(); });
+  }
+
+  function pushEnable(){
+    if (!me || isTrainer() || pushInfo.busy) return;
+    var pid = me.id;
+    if (!pushPossible()) { renderPush(); return; }
+    pushInfo.busy = true; pushInfo.msg = ""; pushInfo.err = false;
+    renderPush();
+    var perm = Notification.requestPermission();
+    if (!perm || !perm.then) perm = new Promise(function(res){ Notification.requestPermission(res); });
+    perm.then(function(p){
+      if (p !== "granted") throw new Error("denied");
+      return swReg();
+    }).then(function(reg){
+      return reg.pushManager.getSubscription().then(function(old){
+        if (old) return old;
+        return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(pushCfg().publicKey) });
+      }).then(function(sub){
+        return subKeyOf(sub.endpoint).then(function(k){
+          return pushRef(pid).child(k).set(subRecord(sub)).then(function(){
+            safe(function(){ localStorage.setItem(pushLocalKey(pid), k); });
+            pushInfo.sub = sub; pushInfo.on = true;
+            pushInfo.msg = "Erinnerungen sind auf diesem Gerät an.";
+            safe(function(){ var n = reg.showNotification("Erinnerungen sind an", {
+              body: "So sieht es aus, wenn dich die Seite an eine fehlende Rückmeldung erinnert.",
+              icon: "icon-192.png", badge: "icon-192.png", tag: "tb-test" });
+              if (n && n.catch) n.catch(function(){}); });
+          });
+        });
+      });
+    }).catch(function(e){
+      pushInfo.err = true;
+      pushInfo.msg = (e && e.message === "denied") || Notification.permission === "denied"
+        ? "Mitteilungen sind für diese Seite blockiert. Erlaube sie in den Einstellungen des Browsers oder Handys und versuche es dann noch einmal."
+        : "Das hat nicht geklappt. Bitte später noch einmal versuchen.";
+    }).then(function(){ pushInfo.busy = false; renderPush(); });
+  }
+
+  function pushDisable(){
+    if (!me || isTrainer() || pushInfo.busy) return;
+    var pid = me.id;
+    pushInfo.busy = true;
+    renderPush();
+    pushForget(pid);
+    var sub = pushInfo.sub;
+    (sub ? sub.unsubscribe().catch(function(){}) : Promise.resolve()).then(function(){
+      pushInfo.busy = false; pushInfo.on = false; pushInfo.sub = null; pushInfo.err = false;
+      pushInfo.msg = "Erinnerungen sind auf diesem Gerät aus.";
+      renderPush();
+    });
+  }
+
+  /* Beim Abmelden und Ausschalten: Abo dieses Geräts für den Spieler aus der Datenbank nehmen */
+  function pushForget(pid){
+    var k = safe(function(){ return localStorage.getItem(pushLocalKey(pid)); }, null);
+    if (!k) return;
+    safe(function(){ localStorage.removeItem(pushLocalKey(pid)); });
+    if (mode === "fb") safe(function(){ pushRef(pid).child(k).remove(); });
+    pushCheckedFor = null;
+    pushInfo.on = false;
+  }
+
+  function renderPush(){
+    var sec = $("pushSection"), card = $("pushCard"), nudge = $("pushNudge");
+    if (!sec || !card) return;
+    if (!me || isTrainer() || mode !== "fb") { sec.hidden = true; nudge.hidden = true; return; }
+    pushCheck();
+    sec.hidden = false;
+    card.innerHTML = "";
+    var h = el("h3", null, !remindOn() ? "Vom Trainer ausgeschaltet" : pushInfo.on ? "An auf diesem Gerät" : "Aus auf diesem Gerät");
+    card.appendChild(h);
+
+    var next = upcoming().filter(function(s){ return !s.cancelled; })[0];
+    var hideNudge = safe(function(){ return localStorage.getItem(PUSHHIDE) === "1"; }, false);
+    var showNudge = false;
+
+    if (!remindOn()) {
+      card.appendChild(el("p","hint","Euer Trainer verschickt gerade keine Erinnerungen."));
+    } else if (!pushInfo.supported && isIOS() && !isStandalone()) {
+      card.appendChild(el("p","hint warn","Auf dem iPhone geht das nur mit der Seite auf dem Home-Bildschirm."));
+      card.appendChild(el("p","hint","Tippe unten in Safari auf Teilen, dann auf Zum Home-Bildschirm. Öffne die Seite danach über das neue Symbol und schalte die Erinnerungen hier ein."));
+    } else if (!pushInfo.supported) {
+      card.appendChild(el("p","hint warn","Dieser Browser kann keine Push-Nachrichten empfangen."));
+    } else if (!pushInfo.checked) {
+      card.appendChild(el("p","hint","Wird geprüft."));
+    } else {
+      card.appendChild(el("p","hint", pushInfo.on
+        ? (next ? "Für " + fmtShort(next.date) + " kommt eine Erinnerung um " + fmtDeadline(next, remindLead())
+            + ", falls du dich bis dahin nicht eingetragen hast." : "Du bekommst eine Nachricht, wenn für einen Termin deine Rückmeldung fehlt.")
+        : "Dein Handy meldet sich " + remindHours() + (remindHours() === 1 ? " Stunde" : " Stunden")
+          + " vor der Absagefrist, falls du dich noch nicht eingetragen hast."));
+      if (Notification.permission === "denied" && !pushInfo.on) {
+        card.appendChild(el("p","hint warn","Mitteilungen sind für diese Seite blockiert. Erlaube sie in den Einstellungen des Browsers oder Handys."));
+      }
+      var b = el("button", "btn" + (pushInfo.on ? "" : " primary"),
+        pushInfo.busy ? "Einen Moment" : pushInfo.on ? "Erinnerungen ausschalten" : "Erinnerungen einschalten");
+      b.type = "button";
+      b.disabled = pushInfo.busy;
+      b.addEventListener("click", function(){ if (pushInfo.on) pushDisable(); else pushEnable(); });
+      var row = el("div","row");
+      row.style.marginTop = "10px";
+      row.appendChild(b);
+      card.appendChild(row);
+      showNudge = !pushInfo.on && !hideNudge && Notification.permission !== "denied";
+    }
+    if (pushInfo.msg) card.appendChild(el("p", pushInfo.err ? "msg" : "msg ok", pushInfo.msg));
+    nudge.hidden = !(showNudge && route === "heute");
+  }
+
+  /* Trainer: wie viele Spieler Erinnerungen eingeschaltet haben */
+  function renderRemindCount(){
+    var box = $("remindCount");
+    if (!box) return;
+    if (mode !== "fb" || !remindOn()) { box.textContent = ""; return; }
+    var c = remindCountCache;
+    var fresh = c.key === activeTeamKey && Date.now() - c.at < 60000;
+    if (!fresh && !c.loading) {
+      c.loading = true;
+      var key = activeTeamKey;
+      firebase.database().ref("push/" + key).once("value").then(function(snap){
+        remindCountCache = { key:key, at:Date.now(), data: snap.val() || {}, loading:false };
+        renderRemindCount();
+      }, function(){ c.loading = false; });
+    }
+    if (c.key !== activeTeamKey || !c.data) { box.textContent = ""; return; }
+    var withPush = state.players.filter(function(p){ return c.data[p.id] && Object.keys(c.data[p.id]).length; });
+    var without = state.players.filter(function(p){ return withPush.indexOf(p) === -1; });
+    box.textContent = withPush.length + " von " + state.players.length + " Spielern haben Erinnerungen eingeschaltet."
+      + (without.length && without.length <= 12 ? " Noch ohne: " + without.map(function(p){ return p.name; }).join(", ") + "." : "");
   }
 
   /* ---------- Hinweis oben ---------- */
@@ -3775,7 +4029,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   /* ---------- Sicherung ---------- */
   function backupJson(){
-    return JSON.stringify({ v:7, team: state.team, goal: goalPct(), excHours: excHours(), bonusHours: bonusHours(),
+    return JSON.stringify({ v:8, team: state.team, goal: goalPct(), excHours: excHours(), bonusHours: bonusHours(),
+      remindOn: remindOn(), remindHours: remindHours(),
       lateOn: lateOn(), latePts: latePts(),
       lvGold: levelDefs()[0].min, lvSilver: levelDefs()[1].min, lvBronze: levelDefs()[2].min,
       levelMin: levelMin(), badges: badgeCfg(),
@@ -3789,6 +4044,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var raw;
     try { raw = JSON.parse(text); } catch (e) { msg.className = "msg"; msg.textContent = "Das ist keine gültige Sicherungsdatei."; return; }
     var st = normalize({ demo:false, team: raw.team, goal: raw.goal, excHours: raw.excHours, bonusHours: raw.bonusHours,
+      remindOn: raw.remindOn, remindHours: raw.remindHours,
       lateOn: raw.lateOn, latePts: raw.latePts,
       lvGold: raw.lvGold, lvSilver: raw.lvSilver, lvBronze: raw.lvBronze,
       levelMin: raw.levelMin, badges: raw.badges,
@@ -3866,6 +4122,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     numberCfg("goalInput", "goal", 0, 100, goalPct);
     numberCfg("excInput", "excHours", 0, 336, excHours);
     numberCfg("bonusInput", "bonusHours", 0, 336, bonusHours);
+    numberCfg("remindInput", "remindHours", 1, 168, remindHours);
+    $("remindOnInput").addEventListener("change", function(){ mutate({ t:"cfg", k:"remindOn", v: !!this.checked }); });
+    $("pushNudgeOn").addEventListener("click", function(){ pushEnable(); });
+    $("pushNudgeHide").addEventListener("click", function(){
+      safe(function(){ localStorage.setItem(PUSHHIDE, "1"); });
+      $("pushNudge").hidden = true;
+    });
     numberCfg("jokerInput", "jokers", 0, 20, jokerBudget);
     numberCfg("latePtsInput", "latePts", 0, LATE_MAX, latePts);
     numberCfg("lvBronzeInput", "lvBronze", 0, 100, function(){ return levelDefs()[2].min; });
@@ -4104,6 +4367,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       goal: isNaN(g) ? DEFAULT_GOAL : Math.max(0, Math.min(100, g)),
       excHours: isNaN(eh) ? DEFAULT_EXC : Math.max(0, Math.min(336, eh)),
       bonusHours: isNaN(bh) ? DEFAULT_BONUS : Math.max(0, Math.min(336, bh)),
+      remindOn: st.remindOn !== false,
+      remindHours: num(st.remindHours, DEFAULT_REMIND, 1, 168),
       lateOn: !!st.lateOn,
       latePts: isNaN(lp) ? DEFAULT_LATE : Math.max(0, Math.min(LATE_MAX, lp)),
       lvGold: num(st.lvGold, DEF_LEVELS.gold, 0, 100),
@@ -4131,6 +4396,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       seeded.goal = out.goal;
       seeded.excHours = out.excHours;
       seeded.bonusHours = out.bonusHours;
+      seeded.remindOn = out.remindOn;
+      seeded.remindHours = out.remindHours;
       seeded.lateOn = out.lateOn;
       seeded.latePts = out.latePts;
       seeded.lvGold = out.lvGold;
@@ -4156,8 +4423,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   /* Manifest zur Laufzeit, damit die Seite eine einzelne Datei bleibt */
   function installManifest(){
     safe(function(){
-      if (!window.TB_ICONS || !window.Blob || !window.URL || !URL.createObjectURL) return;
       var name = state.team || "Trainingsbeteiligung";
+      document.title = name + " · Trainingsbeteiligung";
+      /* Online liegt manifest.webmanifest neben der Seite, das braucht das iPhone für Push */
+      if (location.protocol === "https:") return;
+      if (!window.TB_ICONS || !window.Blob || !window.URL || !URL.createObjectURL) return;
       var mf = {
         name: name + " Trainingsbeteiligung",
         short_name: "Training",
