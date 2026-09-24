@@ -547,7 +547,11 @@ window.TB_ICONS = {
   .banner{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
     background:var(--status-excused-soft);color:var(--sand-700);border-radius:var(--radius-card);padding:12px 16px;font-size:14px;font-weight:600;}
   .banner .btn{background:transparent;border-color:currentColor;color:inherit;}
-  .banner.info{background:var(--info-soft);color:var(--info);}
+  /* Heißt bewusst "note" und nicht "info": eine gleichnamige Klasse .info gibt es schon für den
+     kleinen runden i-Knopf (19x19px) weiter unten. Mit demselben Klassennamen quetschte dessen
+     feste Größe das Hinweisbanner auf 19px zusammen, der Text lief in einer schmalen Spalte
+     ineinander und wirkte wie ein winziger Fleck statt eines lesbaren Satzes. */
+  .banner.note{background:var(--info-soft);color:var(--info);}
   .plist{display:flex;flex-direction:column;border:1px solid var(--border-subtle);border-radius:var(--radius-control);}
   .prow{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;padding:10px 12px;border-top:1px solid var(--border-subtle);}
   .prow:first-child{border-top:0;}
@@ -774,7 +778,7 @@ window.TB_ICONS = {
           <p id="heuteSub"></p>
         </div>
 
-        <div id="nudge" hidden class="banner info"><span id="nudgeText"></span></div>
+        <div id="nudge" hidden class="banner note"><span id="nudgeText"></span></div>
 
         <div class="tiles" id="heuteTiles"></div>
 
@@ -2748,7 +2752,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var pend = !!pendingExc && pendingExc.sid === sid && pendingExc.pid === pid && v === "exc";
       var b = el("button", (big ? "pick " : "mini ") + v + (pend ? " pend" : ""));
       b.type = "button";
-      b.setAttribute("aria-pressed", (cur && cur.v === v) || pend ? "true" : "false");
+      /* aria-pressed nur beim tatsächlich gespeicherten Wert, nicht beim wartenden "pend"-Zustand:
+         sonst überlagert die volle Füllfarbe von [aria-pressed="true"] die gestrichelte
+         Warte-Darstellung, und Text und Hintergrund landen in derselben Farbe (unsichtbar). */
+      b.setAttribute("aria-pressed", (cur && cur.v === v) ? "true" : "false");
       b.setAttribute("aria-label", WORD[v]);
       b.title = v === "late" ? "Zu spät gekommen, setzt nur der Trainer" : WORD[v];
       if (big) {
