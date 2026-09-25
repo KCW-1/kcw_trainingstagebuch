@@ -29,6 +29,7 @@ jobs:
           TZ: Europe/Berlin
           VAPID_PUBLIC: BNJUWg0HNBYiNiwZP4dy50fiFtAQY-GvbWXxrkyq64QgjFWk41I5rgvbHmwcovTJy3Xnf1cG3CffvNehfhc-nfQ
           VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           DB_URL: https://kcw-trainingstagebuch-default-rtdb.europe-west1.firebasedatabase.app
           PAGE_URL: https://kcw-1.github.io/kcw_trainingstagebuch/
 
