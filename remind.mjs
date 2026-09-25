@@ -1,6 +1,6 @@
 // Push-Erinnerungen der Trainingsbeteiligung.
 // Läuft als GitHub-Workflow etwa alle 15 Minuten (.github/workflows/remind.yml).
-// Liest die offene Firebase-Datenbank über REST, sucht Spieler ohne Rückmeldung,
+// Liest die Firebase-Datenbank über REST, sucht Spieler ohne Rückmeldung,
 // deren Erinnerungszeitpunkt erreicht ist, und schickt ihnen eine Web-Push-Nachricht.
 //
 // Umgebung:
@@ -9,8 +9,12 @@
 //   PAGE_URL                     Adresse der Seite, für den Link in der Nachricht
 //   TZ=Europe/Berlin             Termine sind in deutscher Ortszeit gespeichert
 //   DRY_RUN=1                    nur anzeigen, nichts verschicken oder schreiben
+//   FIREBASE_SERVICE_ACCOUNT     Dienstkonto-Schlüssel (JSON, GitHub-Secret). Seit Version 9
+//                                ist die Datenbank durch Regeln geschützt, das Skript meldet
+//                                sich deshalb mit diesem Dienstkonto an.
 
 import webpush from "web-push";
+import { createSign } from "node:crypto";
 
 const DB = (process.env.DB_URL || "https://kcw-trainingstagebuch-default-rtdb.europe-west1.firebasedatabase.app").replace(/\/$/, "");
 const PAGE = process.env.PAGE_URL || "https://kcw-1.github.io/kcw_trainingstagebuch/";
@@ -29,19 +33,39 @@ if (!DRY) {
   webpush.setVapidDetails(PAGE, process.env.VAPID_PUBLIC, process.env.VAPID_PRIVATE);
 }
 
+// OAuth-Zugangstoken aus dem Dienstkonto (JWT, RS256), ohne zusätzliche Pakete
+let TOKEN = null;
+async function login() {
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (!raw) { console.warn("FIREBASE_SERVICE_ACCOUNT fehlt, lese ohne Anmeldung."); return; }
+  const sa = JSON.parse(raw);
+  const b64 = (o) => Buffer.from(typeof o === "string" ? o : JSON.stringify(o)).toString("base64url");
+  const iat = Math.floor(Date.now() / 1000);
+  const head = b64({ alg: "RS256", typ: "JWT" });
+  const claim = b64({ iss: sa.client_email, aud: "https://oauth2.googleapis.com/token", iat, exp: iat + 3600,
+    scope: "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/firebase.database" });
+  const sig = createSign("RSA-SHA256").update(head + "." + claim).sign(sa.private_key).toString("base64url");
+  const r = await fetch("https://oauth2.googleapis.com/token", { method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion: head + "." + claim + "." + sig }) });
+  if (!r.ok) throw new Error("Anmeldung Dienstkonto: " + r.status + " " + (await r.text()));
+  TOKEN = (await r.json()).access_token;
+}
+const q = () => (TOKEN ? "?access_token=" + encodeURIComponent(TOKEN) : "");
+
 async function get(path) {
-  const r = await fetch(`${DB}/${path}.json`);
+  const r = await fetch(`${DB}/${path}.json${q()}`);
   if (!r.ok) throw new Error(`GET ${path}: ${r.status}`);
   return (await r.json()) || null;
 }
 async function put(path, v) {
   if (DRY) return;
-  const r = await fetch(`${DB}/${path}.json`, { method: "PUT", body: JSON.stringify(v) });
+  const r = await fetch(`${DB}/${path}.json${q()}`, { method: "PUT", body: JSON.stringify(v) });
   if (!r.ok) throw new Error(`PUT ${path}: ${r.status}`);
 }
 async function del(path) {
   if (DRY) return;
-  const r = await fetch(`${DB}/${path}.json`, { method: "DELETE" });
+  const r = await fetch(`${DB}/${path}.json${q()}`, { method: "DELETE" });
   if (!r.ok) throw new Error(`DELETE ${path}: ${r.status}`);
 }
 
@@ -138,7 +162,16 @@ async function runTeam(key, stats) {
 }
 
 const stats = { sent: 0, removed: 0, failed: 0 };
-const catalog = await get("catalog/teams");
+await login();
+let catalog;
+try { catalog = await get("catalog/teams"); }
+catch (e) {
+  if (!TOKEN && /: 40[13]/.test(e.message)) {
+    console.warn("Kein Zugriff auf die Datenbank. Bitte das GitHub-Secret FIREBASE_SERVICE_ACCOUNT anlegen.");
+    process.exit(0);
+  }
+  throw e;
+}
 const keys = catalog ? Object.keys(catalog) : ["standard"];
 for (const key of keys) {
   try { await runTeam(key, stats); }

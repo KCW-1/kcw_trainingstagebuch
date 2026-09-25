@@ -2,6 +2,8 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-QPevyUpG4Hn+Xo2f9UBwsOMYuoPABTIySfkxg8oKOjA=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Trainingsbeteiligung</title>
 <style>:root{color-scheme:light dark;}*{box-sizing:border-box}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
@@ -47,8 +49,9 @@ window.TB_ICONS = {
 };
 </script>
 
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" integrity="sha384-ZaR6mWzmJtrRibZ1Vm7SoHFr8OXjyAuGAXalGDKqbxFT18oi/z+oZLIRFkpeNor1" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js" integrity="sha384-g5H2aNdtgRBYOBLsuOAuHvUXWnw4bswmU+tYjmGc1G3JfKxl79uWwV4sQarJsLwu" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" integrity="sha384-I1LYojsZ5RM1cOda44Z2h42Qa6YfsQ1XkXxREnhp4ueYBR/4d1pG1K+NZM537Vsj" crossorigin="anonymous"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Narrow:wght@400;500;600;700&display=swap">
@@ -593,7 +596,7 @@ window.TB_ICONS = {
     </header>
     <div class="card pad form" style="display:flex;flex-direction:column;gap:12px">
       <h3>Teamcode</h3>
-      <p class="hint">Diese Seite ist dem Team vorbehalten. Den Code bekommst du vom Trainer, danach merkt sich dieses Gerät ihn.</p>
+      <p class="hint" id="codeHint">Diese Seite ist dem Team vorbehalten. Den Code bekommst du vom Trainer, danach merkt sich dieses Gerät ihn.</p>
       <div class="gate"><div class="field" style="display:flex;flex-direction:column;gap:5px">
         <label for="codeInput">Code</label>
         <input type="password" id="codeInput" autocomplete="off" maxlength="40" style="width:100%">
@@ -635,7 +638,8 @@ window.TB_ICONS = {
           <button class="btn primary" id="loginBtn" type="button">Anmelden</button>
           <span class="msg" id="loginMsg"></span>
         </div>
-        <p class="hint" style="text-align:center;margin:10px 0 0"><button class="btn quiet" id="gotoTrainerBtn2" type="button">Ich bin Trainer</button></p>
+        <p class="hint" style="text-align:center;margin:10px 0 0"><button class="btn quiet" id="gotoTrainerBtn2" type="button">Ich bin Trainer</button>
+          <button class="btn quiet" id="otherTeamBtn" type="button" hidden>Anderes Team</button></p>
       </div>
       <div class="aside">
         <p class="eyebrow">So läuft es</p>
@@ -645,6 +649,7 @@ window.TB_ICONS = {
           <li>Jede Rückmeldung bringt Punkte, jede Anwesenheit verlängert deine Serie.</li>
           <li>Der Trainer pflegt Kader und Termine und kann Einträge nachträglich korrigieren.</li>
           <li>PIN vergessen? Der Trainer setzt sie zurück, dann vergibst du beim nächsten Login eine neue.</li>
+          <li id="gateAsideFb" hidden>Deine PIN wird nie im Klartext gespeichert. Nach zu vielen falschen Versuchen sperrt die Anmeldung für eine Weile.</li>
         </ul>
       </div>
     </div>
@@ -694,6 +699,30 @@ window.TB_ICONS = {
       <div class="row">
         <button class="btn primary" id="trainerLoginBtn" type="button">Anmelden</button>
         <span class="msg" id="trainerMsg"></span>
+      </div>
+    </div>
+    <div class="card pad form" id="trainerFbWrap" style="display:flex;flex-direction:column;gap:12px" hidden>
+      <h3>Trainer-Anmeldung</h3>
+      <p class="hint">Einmal anmelden reicht. Dieses Gerät merkt sich dich danach.</p>
+      <div class="field">
+        <label for="trainerFbName">Name</label>
+        <input type="text" id="trainerFbName" autocomplete="username" maxlength="60">
+      </div>
+      <div class="field">
+        <label for="trainerFbPin">PIN</label>
+        <input type="password" id="trainerFbPin" inputmode="numeric" autocomplete="current-password" maxlength="12">
+      </div>
+      <details id="trainerFbSetup">
+        <summary>Erste Anmeldung mit Einrichtungscode</summary>
+        <div class="field" style="margin-top:8px">
+          <label for="trainerFbCode">Einrichtungscode vom Admin</label>
+          <input type="text" id="trainerFbCode" autocomplete="off" maxlength="20" style="text-transform:uppercase">
+        </div>
+        <p class="hint">Bei der ersten Anmeldung legst du mit dem Code deine PIN fest, mindestens vier Ziffern.</p>
+      </details>
+      <div class="row">
+        <button class="btn primary" id="trainerFbBtn" type="button">Anmelden</button>
+        <span class="msg" id="trainerFbMsg"></span>
       </div>
     </div>
     <div class="card pad form" id="trainerSetupWrap" style="display:flex;flex-direction:column;gap:12px" hidden>
@@ -1172,7 +1201,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
 <script id="tb-seed" type="application/json">{"v":2,"demo":true}</script>
 
-<script src="https://unpkg.com/lucide@0.544.0/dist/umd/lucide.js"></script>
+<script src="https://unpkg.com/lucide@0.544.0/dist/umd/lucide.js" integrity="sha384-gYH+krreiYS66hNL8Tjjis9fmOhUYyqhUHwHZ+Tx9saIWRzy4xeZUpLQJmVmEUMM" crossorigin="anonymous"></script>
 <style>
   .navitem svg,.tabitem svg{width:18px;height:18px;flex:none;stroke-width:1.9;}
   .tabitem svg{width:20px;height:20px;}
@@ -1215,6 +1244,24 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   var TRAINERAUTHKEY = "tb:trainerauth:v1";
   var LASTTEAMKEY = "tb:lastteam:v1";
   var teamNames = {};    /* Anzeigenamen anderer Teams, per einmaligem Lesezugriff geladen */
+
+  /* ---------- Sichere Anmeldung (seit Version 9) ----------
+     Firebase Authentication: Besucher sind zunächst anonym angemeldet. Der Teamcode wird
+     als Hash unter gate/<hash> nachgeschlagen und unter pending/<uid> hinterlegt, erst dann
+     geben die Datenbankregeln Teamname und Kader frei. Spieler und Trainer haben eigene
+     Konten (E-Mail aus einer Zufallskennung, Passwort aus der PIN). Wer was lesen und
+     schreiben darf, entscheiden allein die Regeln in der Datenbank (database.rules.json). */
+  var AUTH = null, authUser = null, authStep = "wait", claiming = false;
+  var fbCode = null;            /* Hash des Teamcodes dieses Geräts */
+  var CODEKEY2 = "tb:code:v2";
+  var ACCT_DOMAIN = "@nutzer.kcw-trainingstagebuch.firebaseapp.com";
+  var rawTeam = null;           /* letzter Datenbankstand des aktiven Teams (roh) */
+  var rawPlayers = {};          /* Kader roh, auch schon vor der Anmeldung (für Konto-Kennungen) */
+  var notesVal = {};            /* Gründe: { pid: { sid: text } } */
+  var NOTES_REF = null, PRE_REFS = [];
+  var pendingMe = null;
+  var migrated = {};
+  var shownInv = {};            /* frisch erzeugte Einrichtungscodes je Trainer, nur für die Anzeige */
 
   /* Wertung */
   var PTS = { yes:10, exc:3, no:0 };
@@ -1299,6 +1346,33 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     return all.filter(function(k){ return acct.teams && acct.teams[k]; });
   }
   function playerAuthKey(){ return AUTHKEY + ":" + activeTeamKey; }
+  function db(){ return firebase.database(); }
+  function acctEmail(acct){ return acct + ACCT_DOMAIN; }
+  function pinPw(pin){ return "kcw-pin:" + pin; }
+  function randStr(n, abc){
+    var a = new Uint8Array(n), out = "";
+    crypto.getRandomValues(a);
+    for (var i=0;i<n;i++) out += abc.charAt(a[i] % abc.length);
+    return out;
+  }
+  function randAcct(){ return randStr(20, "abcdefghijklmnopqrstuvwxyz0123456789"); }
+  function randInvite(){ return randStr(10, "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"); }
+  function slugName(n){
+    return String(n || "").trim().toLowerCase()
+      .replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss")
+      .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60);
+  }
+  function validNewPin(pin){ return /^[0-9]{4,12}$/.test(pin); }
+  function authErr(e){
+    var c = (e && e.code) || "";
+    if (/wrong-password|invalid-credential|invalid-login-credentials|user-not-found|invalid-password/.test(c)) return "Die PIN stimmt nicht.";
+    if (/too-many-requests/.test(c)) return "Zu viele Versuche. Bitte in ein paar Minuten noch einmal.";
+    if (/network/.test(c)) return "Keine Verbindung. Bitte noch einmal versuchen.";
+    if (/PERMISSION_DENIED|permission/i.test(String((e && (e.code || e.message)) || ""))) return "Das ist nicht erlaubt oder schon vergeben.";
+    if (/operation-not-allowed|admin-restricted/.test(c)) return "Die Anmeldung ist in Firebase noch nicht eingeschaltet.";
+    return "Das hat nicht geklappt. Bitte noch einmal versuchen.";
+  }
+  function hasReason(e){ return !!e && (e.r === true || !!String(e.n || "").trim()); }
   function codeKeyFor(){ return CODEKEY + ":" + activeTeamKey; }
   function teamDisplayName(k){
     if (k === activeTeamKey && state && state.team) return state.team;
@@ -1466,7 +1540,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     if (op.t === "att") {
       if (!st.att[op.sid]) st.att[op.sid] = {};
       if (op.v === null) delete st.att[op.sid][op.pid];
-      else st.att[op.sid][op.pid] = { v: op.v, n: op.n || "", by: op.by || "", ts: op.ts || 0 };
+      else st.att[op.sid][op.pid] = { v: op.v, n: op.n || "", by: op.by || "", ts: op.ts || 0,
+                                      r: op.v === "exc" && !!String(op.n || "").trim() };
     } else if (op.t === "team") {
       st.team = op.name;
     } else if (op.t === "cfg") {
@@ -1542,7 +1617,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var cfg = window.TB_FIREBASE;
     if (!cfg || !cfg.databaseURL || !cfg.apiKey) return false;
     if (typeof firebase === "undefined" || !firebase.initializeApp) return false;
-    try { firebase.initializeApp(cfg); return true; } catch (e) { return false; }
+    try {
+      firebase.initializeApp(cfg);
+      AUTH = firebase.auth ? firebase.auth() : null;
+      return true;
+    } catch (e) { return false; }
   }
 
   /* Bindet die aktive Team-Referenz neu. Löst die alte Verbindung, setzt den
@@ -1554,14 +1633,42 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     state = fromDb(null);
     setSave("busy","verbindet");
     var first = true;
+    rawTeam = null;
+    notesVal = {};
+    if (NOTES_REF) { safe(function(){ NOTES_REF.off(); }); NOTES_REF = null; }
     FB = firebase.database().ref("teams/" + key);
+    var asPlayer = pendingMe && pendingMe.role === "player" ? pendingMe.id : (me && me.role === "player" ? me.id : null);
+    NOTES_REF = firebase.database().ref("notes/" + key + (asPlayer ? "/" + asPlayer : ""));
+    NOTES_REF.on("value", function(snap){
+      var v = snap.val() || {};
+      if (asPlayer) { notesVal = {}; notesVal[asPlayer] = v; } else notesVal = v;
+      if (rawTeam) { state = fromDb(rawTeam, notesVal); render(); }
+    }, function(){ notesVal = {}; });
     FB.on("value", function(snap){
-      state = fromDb(snap.val());
-      if (first) { first = false; restoreCode(); if (!me) restoreLogin(); }
+      rawTeam = snap.val() || {};
+      rawPlayers = rawTeam.players || {};
+      state = fromDb(rawTeam, notesVal);
+      if (first) {
+        first = false;
+        if (pendingMe) {
+          var pp = rawPlayers[pendingMe.id];
+          if (pp && pp.login && authUser && pp.login.uid === authUser.uid) { me = pendingMe; route = route || "heute"; }
+          else { pendingMe = null; AUTH.signOut(); return; }
+          pendingMe = null;
+        }
+      }
+      if (me && me.role === "player") {
+        var p2 = rawPlayers[me.id];
+        if (!p2 || !p2.login || !authUser || p2.login.uid !== authUser.uid) { AUTH.signOut(); return; }
+      }
+      if (isTrainer()) migrateTeam(key);
       if (!fbPending) setSave("ok","gespeichert");
       render();
       installManifest();
-    }, function(){ setSave("bad","keine Verbindung zur Datenbank"); });
+    }, function(){
+      setSave("bad","kein Zugriff auf dieses Team");
+      if (authUser && !authUser.isAnonymous) AUTH.signOut();
+    });
     render();
   }
 
@@ -1601,9 +1708,21 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   }
 
   function fbApply(op){
+    var TK = "teams/" + activeTeamKey + "/";
     if (op.t === "att") {
-      var r = FB.child("att/" + op.sid + "/" + op.pid);
-      fbDo(op.v === null ? r.remove() : r.set({ v: op.v, n: op.n || "", by: op.by || "", ts: op.ts || 0 }));
+      var upd = {};
+      var base = TK + "att/" + op.sid + "/" + op.pid;
+      var npath = "notes/" + activeTeamKey + "/" + op.pid + "/" + op.sid;
+      if (op.v === null) { upd[base] = null; upd[npath] = null; }
+      else {
+        var nt = String(op.n || "").trim().slice(0, 300);
+        var rec = { v: op.v, by: op.by || "",
+                    ts: op.newTs ? firebase.database.ServerValue.TIMESTAMP : (op.ts || 0) };
+        if (op.v === "exc" && nt) rec.r = true;
+        upd[base] = rec;
+        upd[npath] = (op.v === "exc" && nt) ? nt : null;
+      }
+      fbDo(db().ref().update(upd));
     } else if (op.t === "team") {
       fbDo(FB.child("team").set(op.name));
     } else if (op.t === "cfg") {
@@ -1615,12 +1734,19 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var cr = FB.child("compareWith/" + op.key);
       fbDo(op.v ? cr.set(true) : cr.remove());
     } else if (op.t === "pin") {
-      fbDo(FB.child(op.who === "trainer" ? "trainerPin" : "players/" + op.who + "/pin").set(op.h));
+      /* In der Datenbank gibt es keine PINs mehr. Zurücksetzen heißt: Konto-Verknüpfung lösen,
+         danach legt der Spieler beim nächsten Anmelden eine neue PIN fest. */
+      if (op.who === "trainer" || op.h) return;
+      var up = {};
+      up[TK + "players/" + op.who + "/login"] = null;
+      up[TK + "players/" + op.who + "/pin"] = null;
+      fbDo(db().ref().update(up));
     } else if (op.t === "addPlayer") {
-      fbDo(FB.child("players/" + op.id).set({ name: op.name, pin: null }));
+      fbDo(FB.child("players/" + op.id).set({ name: String(op.name).slice(0, 60) }));
     } else if (op.t === "delPlayer") {
       fbDo(FB.child("players/" + op.id).remove());
       safe(function(){ firebase.database().ref("push/" + activeTeamKey + "/" + op.id).remove(); });
+      safe(function(){ firebase.database().ref("notes/" + activeTeamKey + "/" + op.id).remove(); });
       state.sessions.forEach(function(s){
         FB.child("att/" + s.id + "/" + op.id).remove();
         FB.child("joker/" + s.id + "/" + op.id).remove();
@@ -1628,13 +1754,18 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     } else if (op.t === "addSession") {
       var s2 = op.s;
       fbDo(FB.child("sessions/" + s2.id).set({ date:s2.date, time:s2.time, end:s2.end || "", label:s2.label || "Training",
-        place:s2.place || "", cancelled: !!s2.cancelled, reason: s2.reason || "" }));
+        place:s2.place || "", cancelled: !!s2.cancelled, reason: s2.reason || "", at: startMs(s2) }));
     } else if (op.t === "updSession") {
-      fbDo(FB.child("sessions/" + op.id).update(op.patch));
+      var patch = {};
+      for (var pk in op.patch) patch[pk] = op.patch[pk];
+      var cur = sessById(op.id);
+      if (cur) patch.at = startMs(cur);
+      fbDo(FB.child("sessions/" + op.id).update(patch));
     } else if (op.t === "delSession") {
       fbDo(FB.child("sessions/" + op.id).remove());
       FB.child("att/" + op.id).remove();
       FB.child("joker/" + op.id).remove();
+      state.players.forEach(function(p){ safe(function(){ db().ref("notes/" + activeTeamKey + "/" + p.id + "/" + op.id).remove(); }); });
     } else if (op.t === "restore") {
       var payload = { team: op.st.team, goal: op.st.goal, excHours: op.st.excHours, bonusHours: op.st.bonusHours,
         remindOn: op.st.remindOn !== false, remindHours: op.st.remindHours,
@@ -1642,21 +1773,53 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         lvGold: op.st.lvGold, lvSilver: op.st.lvSilver, lvBronze: op.st.lvBronze,
         levelMin: op.st.levelMin, badges: op.st.badges || {},
         jokers: op.st.jokers, jokerFrom: op.st.jokerFrom || "", seasonFrom: op.st.seasonFrom || "",
-        teamCode: op.st.teamCode || "", trainerPin: op.st.trainerPin || null,
-        players: {}, sessions: {}, att: op.st.att || {}, joker: op.st.joker || {} };
-      op.st.players.forEach(function(p){ payload.players[p.id] = { name: p.name, pin: p.pin || null }; });
+        teamCode: (rawTeam && rawTeam.teamCode) || "",
+        compareWith: (rawTeam && rawTeam.compareWith) || {},
+        players: {}, sessions: {}, att: {}, joker: op.st.joker || {} };
+      var notes = {};
+      op.st.players.forEach(function(p){
+        var rec = { name: String(p.name).slice(0, 60) };
+        var old = rawPlayers[p.id];
+        if (old && old.login) rec.login = old.login;   /* bestehende Konten bleiben verknüpft */
+        payload.players[p.id] = rec;
+      });
       op.st.sessions.forEach(function(s){ payload.sessions[s.id] = { date:s.date, time:s.time, end:s.end || "",
-        label:s.label || "Training", place:s.place || "", cancelled: !!s.cancelled, reason: s.reason || "" }; });
+        label:s.label || "Training", place:s.place || "", cancelled: !!s.cancelled, reason: s.reason || "", at: startMs(s) }; });
+      Object.keys(op.st.att || {}).forEach(function(sid){
+        Object.keys(op.st.att[sid] || {}).forEach(function(pid){
+          var e = op.st.att[sid][pid];
+          if (!e || !e.v) return;
+          var nt = String(e.n || "").trim().slice(0, 300);
+          if (!payload.att[sid]) payload.att[sid] = {};
+          payload.att[sid][pid] = { v: e.v, by: e.by || "", ts: e.ts || 0 };
+          if (e.v === "exc" && (nt || e.r === true)) payload.att[sid][pid].r = true;
+          if (e.v === "exc" && nt) { if (!notes[pid]) notes[pid] = {}; notes[pid][sid] = nt; }
+        });
+      });
       fbDo(FB.set(payload));
+      fbDo(db().ref("notes/" + activeTeamKey).set(notes));
     }
   }
 
-  function fromDb(v){
+  function fromDb(v, notes){
     v = v || {};
+    notes = notes || {};
     var players = [], sessions = [];
     Object.keys(v.players || {}).forEach(function(id){
       var p = v.players[id] || {};
-      players.push({ id: id, name: p.name || "?", pin: p.pin || null });
+      /* pin steht hier nur noch als Merker "hat ein Konto" für die Oberfläche */
+      players.push({ id: id, name: p.name || "?", pin: p.login ? "konto" : null });
+    });
+    var att = {};
+    Object.keys(v.att || {}).forEach(function(sid){
+      att[sid] = {};
+      Object.keys(v.att[sid] || {}).forEach(function(pid){
+        var e = v.att[sid][pid];
+        if (!e) return;
+        var c = { v: e.v, by: e.by || "", ts: e.ts || 0, r: e.r === true, n: typeof e.n === "string" ? e.n : "" };
+        if (notes[pid] && typeof notes[pid][sid] === "string") c.n = notes[pid][sid];
+        att[sid][pid] = c;
+      });
     });
     Object.keys(v.sessions || {}).forEach(function(id){
       var s = v.sessions[id] || {};
@@ -1670,13 +1833,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       levelMin: v.levelMin, badges: v.badges,
       jokers: v.jokers, jokerFrom: v.jokerFrom, seasonFrom: v.seasonFrom, teamCode: v.teamCode,
       trainerPin: v.trainerPin || null, compareWith: v.compareWith || {},
-      players: players, sessions: sessions, att: v.att || {}, joker: v.joker || {} });
+      players: players, sessions: sessions, att: att, joker: JSON.parse(JSON.stringify(v.joker || {})) });
   }
 
   function mutate(op){
     if (readOnly) return;
     armed = null;
-    if (op.t === "att" && op.v !== null && op.ts === undefined) op.ts = Date.now();
+    if (op.t === "att" && op.v !== null && op.ts === undefined) { op.ts = Date.now(); op.newTs = true; }
     applyOp(state, op);
     if (mode === "fb") { render(); fbApply(op); return; }
     queue.push(op);
@@ -1767,7 +1930,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
      Datensatz, ohne die eigenen globalen Funktionen umzubauen. */
   function foreignEffV(e, st){
     if (!e) return null;
-    if (e.v === "exc" && !String(e.n || "").trim()) return "no";
+    if (e.v === "exc" && !hasReason(e)) return "no";
     if (e.v === "late" && !st.lateOn) return "yes";
     return e.v;
   }
@@ -1874,12 +2037,12 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
      anwesend, solange die Kategorie ausgeschaltet ist. */
   function effV(e){
     if (!e) return null;
-    if (e.v === "exc" && !String(e.n || "").trim()) return "no";
+    if (e.v === "exc" && !hasReason(e)) return "no";
     if (e.v === "late" && !lateOn()) return "yes";
     return e.v;
   }
   function present(e){ var v = effV(e); return v === "yes" || v === "late"; }
-  function noReason(e){ return !!e && e.v === "exc" && !String(e.n || "").trim(); }
+  function noReason(e){ return !!e && e.v === "exc" && !hasReason(e); }
   function lateExc(e, s){ return effV(e) === "exc" && !excOnTime(e, s); }
   /* Rückmeldung nach der Bonusfrist eingegangen oder geändert: der Bonus ist weg */
   function bonusLost(e, s){ return !!e && !!e.ts && bonusHours() > 0 && !bonusOnTime(e, s); }
@@ -2429,6 +2592,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   }
 
   function syncPinLabel(){
+    if (mode === "fb") { syncPinLabelFb(); return; }
     var v = $("loginWho").value;
     var lbl = $("loginPinLabel"), inp = $("loginPin"), hint = $("gateHint");
     var p = v ? player(v) : null;
@@ -2443,7 +2607,68 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     }
   }
 
+  function syncPinLabelFb(){
+    var v = $("loginWho").value;
+    var lbl = $("loginPinLabel"), inp = $("loginPin"), hint = $("gateHint");
+    var raw = v ? rawPlayers[v] : null;
+    $("loginBtn").disabled = authStep !== "gate";
+    if (authStep !== "gate") { hint.textContent = "Verbindung wird aufgebaut …"; return; }
+    if (v && !(raw && raw.login)) {
+      lbl.textContent = "PIN festlegen";
+      inp.placeholder = "mindestens vier Ziffern";
+      hint.textContent = "Erste Anmeldung: Du legst deine PIN jetzt selbst fest und brauchst sie nur, wenn du das Gerät wechselst.";
+    } else {
+      lbl.textContent = "PIN";
+      inp.placeholder = "deine PIN";
+      hint.textContent = "Einmal anmelden reicht. Dieses Gerät merkt sich dich danach.";
+    }
+  }
+
+  function doLoginFb(){
+    var who = $("loginWho").value;
+    var pin = $("loginPin").value.trim();
+    var msg = $("loginMsg");
+    msg.className = "msg";
+    if (authStep !== "gate") return;
+    if (!who) { msg.textContent = "Bitte deinen Namen auswählen."; return; }
+    var raw = rawPlayers[who] || {};
+    if (raw.login && raw.login.acct) {
+      if (!pin) { msg.textContent = "Bitte deine PIN eingeben."; return; }
+      msg.textContent = "meldet an …";
+      AUTH.signInWithEmailAndPassword(acctEmail(raw.login.acct), pinPw(pin)).then(function(){
+        msg.textContent = ""; $("loginPin").value = "";
+      }, function(e){ msg.textContent = authErr(e); });
+      return;
+    }
+    if (!validNewPin(pin)) { msg.textContent = "Bitte eine PIN aus mindestens vier Ziffern festlegen."; return; }
+    var k = activeTeamKey, code = fbCode, acct = randAcct();
+    msg.textContent = "legt dein Konto an …";
+    claiming = true;
+    var user = null;
+    AUTH.createUserWithEmailAndPassword(acctEmail(acct), pinPw(pin)).then(function(cred){
+      user = cred.user;
+      return db().ref("pending/" + user.uid).set({ c: code });
+    }).then(function(){
+      var up = {};
+      up["teams/" + k + "/players/" + who + "/login"] = { uid: user.uid, acct: acct };
+      up["users/" + user.uid] = { k: k, p: who };
+      return db().ref().update(up);
+    }).then(function(){
+      claiming = false;
+      msg.textContent = ""; $("loginPin").value = "";
+      onAuth(AUTH.currentUser);
+    }, function(e){
+      claiming = false;
+      msg.textContent = /email-already|PERMISSION|permission/i.test(String(e && (e.code || e.message)))
+        ? "Für diesen Namen gibt es schon ein Konto. Frag den Trainer, falls das nicht du warst."
+        : authErr(e);
+      var keepMsg = msg.textContent;
+      (user ? user.delete().catch(function(){ return AUTH.signOut(); }) : Promise.resolve()).then(function(){ msg.textContent = keepMsg; });
+    });
+  }
+
   function doLogin(){
+    if (mode === "fb") { doLoginFb(); return; }
     var who = $("loginWho").value;
     var pin = $("loginPin").value.trim();
     var msg = $("loginMsg");
@@ -2480,6 +2705,19 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var v = $("codeInput").value.trim();
     var msg = $("codeMsg");
     if (!v) { msg.textContent = "Bitte den Code eingeben."; return; }
+    if (mode === "fb") {
+      msg.textContent = "prüft …";
+      hashPin(v).then(function(h){
+        return resolveCode(h).then(function(k){
+          if (!k) { msg.textContent = "Der Code stimmt nicht."; return; }
+          safe(function(){ localStorage.setItem(CODEKEY2, h); });
+          $("codeInput").value = "";
+          msg.textContent = "";
+          enterGate();
+        });
+      }).catch(function(){ msg.textContent = "Keine Verbindung. Bitte noch einmal versuchen."; });
+      return;
+    }
     hashPin(v).then(function(h){
       if (h !== state.teamCode) { msg.textContent = "Der Code stimmt nicht."; return; }
       codeOk = h;
@@ -2491,6 +2729,14 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   }
 
   function logout(){
+    if (mode === "fb") {
+      var pid = me && me.role === "player" ? me.id : null;
+      pendingExc = null;
+      $("loginPin").value = "";
+      $("loginMsg").textContent = "";
+      (pid ? pushForget(pid) : Promise.resolve()).then(function(){ AUTH.signOut(); }, function(){ AUTH.signOut(); });
+      return;
+    }
     var wasTrainer = me && me.role === "trainer";
     if (me && !wasTrainer) pushForget(me.id);
     me = null;
@@ -2528,6 +2774,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   }
 
   function renderTrainerGate(){
+    if (mode === "fb") {
+      $("trainerFbWrap").hidden = false;
+      $("trainerSetupWrap").hidden = true;
+      $("trainerLoginWrap").hidden = true;
+      return;
+    }
+    $("trainerFbWrap").hidden = true;
     var ids = Object.keys(catalog.trainers || {});
     var noTrainers = !ids.length;
     $("trainerSetupWrap").hidden = !noTrainers;
@@ -2609,6 +2862,97 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     });
   }
 
+  function doTrainerLoginFb(){
+    var name = $("trainerFbName").value.trim();
+    var pin = $("trainerFbPin").value.trim();
+    var code = $("trainerFbCode").value.trim().toUpperCase();
+    var msg = $("trainerFbMsg");
+    msg.className = "msg";
+    var slug = slugName(name);
+    if (!slug) { msg.textContent = "Bitte deinen Namen eingeben."; return; }
+    if (!pin) { msg.textContent = "Bitte die PIN eingeben."; return; }
+    msg.textContent = "meldet an …";
+    db().ref("tname/" + slug).once("value").then(function(snap){
+      var v = snap.val();
+      if (v && v.acct) {
+        return AUTH.signInWithEmailAndPassword(acctEmail(v.acct), pinPw(pin)).then(function(){
+          msg.textContent = ""; $("trainerFbPin").value = ""; gateStep = null;
+        }, function(e){ msg.textContent = authErr(e); });
+      }
+      if (v && v.t) {
+        if (!code) { msg.textContent = "Erste Anmeldung: bitte den Einrichtungscode vom Admin eingeben."; $("trainerFbSetup").open = true; return; }
+        if (!validNewPin(pin)) { msg.textContent = "Bitte eine PIN aus mindestens vier Ziffern festlegen."; return; }
+        return claimTrainer(v.t, slug, code, pin, msg);
+      }
+      return legacyTrainerClaim(slug, pin, msg);
+    }).catch(function(e){ msg.textContent = authErr(e); });
+  }
+
+  /* Erste Anmeldung eines Trainers mit Einrichtungscode */
+  function claimTrainer(tid, slug, code, pin, msg){
+    return db().ref("tinv/" + code).once("value").then(function(snap){
+      var inv = snap.val();
+      if (!inv || inv.t !== tid || !(inv.exp > Date.now())) { msg.textContent = "Der Einrichtungscode passt nicht zu diesem Namen oder ist abgelaufen."; return; }
+      var acct = randAcct(), user = null;
+      claiming = true;
+      return AUTH.createUserWithEmailAndPassword(acctEmail(acct), pinPw(pin)).then(function(cred){
+        user = cred.user;
+        return db().ref("pending/" + user.uid).set({ inv: code });
+      }).then(function(){
+        var up = {};
+        up["catalog/trainers/" + tid + "/login"] = { uid: user.uid, acct: acct };
+        up["users/" + user.uid] = { t: tid };
+        up["tname/" + slug + "/acct"] = acct;
+        up["tinv/" + code] = null;
+        return db().ref().update(up);
+      }).then(function(){
+        claiming = false;
+        msg.textContent = ""; $("trainerFbPin").value = ""; $("trainerFbCode").value = "";
+        gateStep = null;
+        onAuth(AUTH.currentUser);
+      }, function(e){
+        claiming = false;
+        var t = authErr(e);
+        msg.textContent = t;
+        (user ? user.delete().catch(function(){ return AUTH.signOut(); }) : Promise.resolve()).then(function(){ msg.textContent = t; });
+      });
+    });
+  }
+
+  /* Übergang von Version 8: Trainerkonto mit alter PIN übernehmen. Klappt nur, solange
+     die Datenbank noch offen ist, danach braucht es einen Einrichtungscode. */
+  function legacyTrainerClaim(slug, pin, msg){
+    return db().ref("catalog/trainers").once("value").then(function(snap){
+      var all = snap.val() || {}, tid = null;
+      Object.keys(all).forEach(function(id){ if (slugName(all[id] && all[id].name) === slug) tid = id; });
+      if (!tid || !all[tid].pin || all[tid].login) { msg.textContent = "Diesen Namen kennt die Seite nicht."; return; }
+      return hashPin(pin).then(function(h){
+        if (h !== all[tid].pin) { msg.textContent = "Die PIN stimmt nicht."; return; }
+        var acct = randAcct(), user = null;
+        claiming = true;
+        return AUTH.createUserWithEmailAndPassword(acctEmail(acct), pinPw(pin)).then(function(cred){
+          user = cred.user;
+          var up = {};
+          up["catalog/trainers/" + tid + "/login"] = { uid: user.uid, acct: acct };
+          up["catalog/trainers/" + tid + "/pin"] = null;
+          up["users/" + user.uid] = { t: tid };
+          up["tname/" + slug] = { t: tid, acct: acct };
+          return db().ref().update(up);
+        }).then(function(){
+          claiming = false;
+          msg.textContent = ""; $("trainerFbPin").value = "";
+          gateStep = null;
+          onAuth(AUTH.currentUser);
+        }, function(e){
+          claiming = false;
+          var t = authErr(e);
+          msg.textContent = t;
+          (user ? user.delete().catch(function(){ return AUTH.signOut(); }) : Promise.resolve()).then(function(){ msg.textContent = t; });
+        });
+      });
+    }, function(){ msg.textContent = "Diesen Namen kennt die Seite nicht."; });
+  }
+
   function renderTeamSwitch(){
     var box = $("teamSwitchList");
     box.innerHTML = "";
@@ -2622,11 +2966,12 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   /* ---------- Hauptrender ---------- */
   function render(){
-    if (me && me.role === "player" && !player(me.id)) {
+    if (mode === "fb" && me && me.role === "trainer" && catalogLoaded && !trainerAcct(me.id)) { me = null; AUTH.signOut(); }
+    if (mode !== "fb" && me && me.role === "player" && !player(me.id)) {
       me = null;
       safe(function(){ localStorage.removeItem(playerAuthKey()); });
     }
-    if (me && me.role === "trainer" && catalogLoaded && !trainerAcct(me.id)) {
+    if (mode !== "fb" && me && me.role === "trainer" && catalogLoaded && !trainerAcct(me.id)) {
       me = null;
       safe(function(){ localStorage.removeItem(TRAINERAUTHKEY); });
       gateStep = Object.keys(catalog.teams || {}).length > 1 ? "team" : null;
@@ -2642,12 +2987,26 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var WRAPS = ["codeWrap","gateWrap","teamGateWrap","trainerGateWrap","teamSwitchWrap","noTeamWrap","shell"];
     function showOnly(id){ WRAPS.forEach(function(w){ $(w).hidden = (w !== id); }); }
 
+    if (mode === "fb" && !me) {
+      $("otherTeamBtn").hidden = false;
+      $("gateAsideFb").hidden = false;
+      if (gateStep === "trainer") { renderTrainerGate(); showOnly("trainerGateWrap"); return; }
+      if (authStep === "code") {
+        $("codeTeamName").textContent = "Willkommen";
+        showOnly("codeWrap");
+        return;
+      }
+      renderGate();
+      showOnly("gateWrap");
+      return;
+    }
+
     if (!me && gateStep === "team") { renderTeamPick(); showOnly("teamGateWrap"); return; }
     if (!me && gateStep === "trainer") { renderTrainerGate(); showOnly("trainerGateWrap"); return; }
     if (me && gateStep === "teamswitch") { renderTeamSwitch(); showOnly("teamSwitchWrap"); return; }
     if (me && gateStep === "noteam") { showOnly("noTeamWrap"); return; }
 
-    var locked = !!state.teamCode && codeOk !== state.teamCode && !me;
+    var locked = mode !== "fb" && !!state.teamCode && codeOk !== state.teamCode && !me;
     if (locked) { showOnly("codeWrap"); return; }
 
     var loggedIn = !!me;
@@ -3452,7 +3811,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var card = el("div","card pad");
       card.style.marginBottom = "10px";
       var top = el("div","row");
-      top.appendChild(el("b", null, t.name + (t.pin ? "" : " (noch keine PIN)")));
+      var hasAcct = mode === "fb" ? !!t.login : !!t.pin;
+      top.appendChild(el("b", null, t.name + (hasAcct ? "" : " (noch nicht eingerichtet)")));
       var adminLbl = el("label", null);
       adminLbl.style.display = "flex"; adminLbl.style.alignItems = "center"; adminLbl.style.gap = "6px";
       var adminCb = el("input"); adminCb.type = "checkbox";
@@ -3461,7 +3821,32 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       adminLbl.appendChild(adminCb);
       adminLbl.appendChild(document.createTextNode("Admin"));
       top.appendChild(adminLbl);
-      if (t.pin) {
+      if (mode === "fb") {
+        if (t.login && id !== me.id) {
+          var rpf = el("button", "btn quiet", "PIN zurücksetzen");
+          rpf.type = "button";
+          rpf.addEventListener("click", function(){
+            var up = {};
+            up["catalog/trainers/" + id + "/login"] = null;
+            up["tname/" + slugName(t.name) + "/acct"] = null;
+            db().ref().update(up);
+            catalogApplyLocal("trainers/" + id + "/login", null);
+            render();
+          });
+          top.appendChild(rpf);
+        }
+        if (!t.login) {
+          var ib = el("button", "btn quiet", shownInv[id] ? "neuen Code erzeugen" : "Einrichtungscode erzeugen");
+          ib.type = "button";
+          ib.addEventListener("click", function(){
+            var code = randInvite();
+            db().ref("tinv/" + code).set({ t: id, exp: Date.now() + 14 * 86400000 }).then(function(){
+              shownInv[id] = code; render();
+            }, function(){ shownInv[id] = "FEHLER"; render(); });
+          });
+          top.appendChild(ib);
+        }
+      } else if (t.pin) {
         var rp = el("button", null, "PIN zurücksetzen");
         rp.type = "button";
         rp.addEventListener("click", function(){ catalogSet("trainers/" + id + "/pin", null); render(); });
@@ -3471,12 +3856,30 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var x = el("button", isArmed ? "confirm" : null, isArmed ? "wirklich löschen?" : "×");
       x.type = "button";
       x.addEventListener("click", function(){
-        if (isArmed) { armed = null; catalogSet("trainers/" + id, null); }
+        if (isArmed) {
+          armed = null;
+          if (mode === "fb") safe(function(){ db().ref("tname/" + slugName(t.name)).remove(); });
+          catalogSet("trainers/" + id, null);
+        }
         else { armed = { k:"tr", id:id }; }
         render();
       });
-      top.appendChild(x);
+      if (!(mode === "fb" && id === me.id)) top.appendChild(x);
       card.appendChild(top);
+      if (mode === "fb" && shownInv[id] && !t.login) {
+        if (shownInv[id] === "FEHLER") card.appendChild(el("p","hint","Der Code konnte nicht gespeichert werden."));
+        else {
+          var ip = el("p","hint");
+          ip.appendChild(document.createTextNode("Einrichtungscode für " + t.name + ": "));
+          var cb2 = el("b", null, shownInv[id]);
+          cb2.style.fontFamily = "ui-monospace,Menlo,Consolas,monospace"; cb2.style.fontSize = "1.1em"; cb2.style.letterSpacing = ".08em";
+          cb2.style.color = "var(--text-strong)";
+          ip.appendChild(cb2);
+          ip.appendChild(document.createTextNode(" (14 Tage gültig, nur einmal verwendbar). Damit meldet sich " + t.name
+            + " unter „Ich bin Trainer“ mit Namen an und legt die eigene PIN fest."));
+          card.appendChild(ip);
+        }
+      }
 
       if (!t.admin) {
         var teamsRow = el("div","row");
@@ -3585,7 +3988,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         + (before === 1 ? " vergangener Termin liegt davor und zählt nicht mehr." : " vergangene Termine liegen davor und zählen nicht mehr.")
       : "Kein Stichtag gesetzt, es zählen alle Termine.";
 
-    $("teamCodeState").textContent = state.teamCode
+    $("clearTeamCode").hidden = mode === "fb";
+    if (mode === "fb") $("teamCodeState").textContent = state.teamCode
+      ? "Ein Teamcode ist gesetzt. Neue Spieler und neue Geräte brauchen ihn für die erste Anmeldung."
+      : "Noch kein Teamcode gesetzt. Ohne Code kann sich niemand neu anmelden, bitte jetzt einen vergeben.";
+    else $("teamCodeState").textContent = state.teamCode
       ? "Ein Teamcode ist gesetzt. Wer ihn nicht kennt, kommt nicht auf die Seite."
       : "Kein Teamcode gesetzt. Jeder mit der Adresse sieht die Seite.";
 
@@ -3807,11 +4214,12 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   /* Beim Abmelden und Ausschalten: Abo dieses Geräts für den Spieler aus der Datenbank nehmen */
   function pushForget(pid){
     var k = safe(function(){ return localStorage.getItem(pushLocalKey(pid)); }, null);
-    if (!k) return;
+    if (!k) return Promise.resolve();
     safe(function(){ localStorage.removeItem(pushLocalKey(pid)); });
-    if (mode === "fb") safe(function(){ pushRef(pid).child(k).remove(); });
     pushCheckedFor = null;
     pushInfo.on = false;
+    if (mode === "fb") return safe(function(){ return pushRef(pid).child(k).remove(); }, Promise.resolve()) || Promise.resolve();
+    return Promise.resolve();
   }
 
   function renderPush(){
@@ -4035,8 +4443,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       lvGold: levelDefs()[0].min, lvSilver: levelDefs()[1].min, lvBronze: levelDefs()[2].min,
       levelMin: levelMin(), badges: badgeCfg(),
       jokers: jokerBudget(), jokerFrom: jokerFrom(), seasonFrom: seasonFrom(), teamCode: state.teamCode || "",
-      trainerPin: state.trainerPin,
-      players: state.players, sessions: state.sessions, att: state.att, joker: state.joker }, null, 2);
+      trainerPin: mode === "fb" ? null : state.trainerPin,
+      players: mode === "fb" ? state.players.map(function(p){ return { id: p.id, name: p.name }; }) : state.players,
+      sessions: state.sessions, att: state.att, joker: state.joker }, null, 2);
   }
 
   function restoreFrom(text){
@@ -4072,7 +4481,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       $(id).addEventListener("click", gotoTrainer);
     });
     $("trainerBackBtn").addEventListener("click", function(){
-      gateStep = Object.keys(catalog.teams || {}).length > 1 ? "team" : null;
+      gateStep = mode === "fb" ? null : (Object.keys(catalog.teams || {}).length > 1 ? "team" : null);
       render();
     });
     $("teamPickBtn").addEventListener("click", pickTeamAndContinue);
@@ -4081,6 +4490,17 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     $("trainerLoginBtn").addEventListener("click", doTrainerLogin);
     $("trainerPin").addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); doTrainerLogin(); } });
     $("trainerSetupBtn").addEventListener("click", doTrainerLogin);
+    $("trainerFbBtn").addEventListener("click", doTrainerLoginFb);
+    ["trainerFbPin","trainerFbCode"].forEach(function(id){
+      $(id).addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); doTrainerLoginFb(); } });
+    });
+    $("otherTeamBtn").addEventListener("click", function(){
+      safe(function(){ localStorage.removeItem(CODEKEY2); });
+      fbCode = null;
+      detachPre();
+      authStep = "code";
+      render();
+    });
     $("trainerSetupPin").addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); doTrainerLogin(); } });
     $("teamSwitchLogout").addEventListener("click", logout);
     $("noTeamLogout").addEventListener("click", logout);
@@ -4104,6 +4524,18 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var name = $("newTrainerName").value.trim();
       if (!name) return;
       var id = uid("t");
+      if (mode === "fb") {
+        var slug = slugName(name);
+        if (!slug) return;
+        db().ref("tname/" + slug).once("value").then(function(snap){
+          if (snap.exists()) { $("newTrainerName").value = ""; alertTrainerName(name); return; }
+          catalogSet("trainers/" + id, { name: name.slice(0, 60), admin: false });
+          db().ref("tname/" + slug).set({ t: id });
+          $("newTrainerName").value = "";
+          render();
+        });
+        return;
+      }
       catalogSet("trainers/" + id, { name: name, pin: null, admin: false, teams: {} });
       $("newTrainerName").value = "";
       render();
@@ -4270,6 +4702,25 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var v = $("newTeamCode").value.trim();
       var msg = $("teamCodeMsg");
       msg.className = "msg";
+      if (mode === "fb") {
+        if (v.length < 6) { msg.textContent = "Bitte mindestens sechs Zeichen, damit der Code nicht zu erraten ist."; return; }
+        hashPin(v).then(function(h){
+          var up = {}, old = rawTeam && rawTeam.teamCode;
+          up["gate/" + h] = activeTeamKey;
+          up["teams/" + activeTeamKey + "/teamCode"] = h;
+          if (old && old !== h) up["gate/" + old] = null;
+          db().ref().update(up).then(function(){
+            safe(function(){ localStorage.setItem(CODEKEY2, h); });
+            $("newTeamCode").value = "";
+            msg.className = "msg ok";
+            msg.textContent = "Teamcode gesetzt. Gib ihn an die Mannschaft weiter.";
+          }, function(){
+            msg.className = "msg";
+            msg.textContent = "Dieser Code ist schon bei einem anderen Team vergeben. Bitte einen anderen wählen.";
+          });
+        });
+        return;
+      }
       if (v.length < 3) { msg.textContent = "Bitte mindestens drei Zeichen."; return; }
       hashPin(v).then(function(h){
         mutate({ t:"cfg", k:"teamCode", v: h });
@@ -4490,13 +4941,181 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     });
   }
 
+  function alertTrainerName(name){
+    var m = $("teamAddMsg");
+    if (m) m.textContent = "Einen Trainer mit dem Namen „" + name + "“ gibt es schon.";
+  }
+
+  function detachPre(){
+    PRE_REFS.forEach(function(r){ safe(function(){ r.off(); }); });
+    PRE_REFS = [];
+  }
+  function detachAll(){
+    detachPre();
+    if (FB) { safe(function(){ FB.off(); }); FB = null; }
+    if (NOTES_REF) { safe(function(){ NOTES_REF.off(); }); NOTES_REF = null; }
+    if (CATALOG_REF) { safe(function(){ CATALOG_REF.off(); }); CATALOG_REF = null; }
+    catalog = { teams:{}, trainers:{} };
+    catalogLoaded = false;
+    rawTeam = null; notesVal = {}; duelCache = {};
+  }
+
+  /* Teamcode-Hash nachschlagen. Übergang von Version 8: steht noch nichts unter gate,
+     wird der Hash direkt an den Teams verglichen (geht nur, solange die Datenbank offen ist). */
+  function resolveCode(h){
+    return db().ref("gate/" + h).once("value").then(function(snap){
+      if (snap.val()) return snap.val();
+      return db().ref("catalog/teams").once("value").then(function(cs){
+        var keys = Object.keys(cs.val() || {});
+        return Promise.all(keys.map(function(k){
+          return db().ref("teams/" + k + "/teamCode").once("value").then(function(x){ return x.val() === h ? k : null; });
+        })).then(function(list){ return list.filter(Boolean)[0] || null; });
+      }, function(){ return null; });
+    }, function(){ return null; });
+  }
+
+  function onAuth(u){
+    var keepTrainerGate = gateStep === "trainer";
+    detachAll();
+    me = null; pendingMe = null; pendingExc = null;
+    gateStep = null;
+    if (!u) {
+      authStep = "wait";
+      if (keepTrainerGate) gateStep = "trainer";
+      render();
+      AUTH.signInAnonymously().catch(function(e){ setSave("bad", authErr(e)); });
+      return;
+    }
+    if (u.isAnonymous) { enterGate(); if (keepTrainerGate) { gateStep = "trainer"; render(); } return; }
+    authStep = "wait";
+    setSave("busy","meldet an");
+    render();
+    db().ref("users/" + u.uid).once("value").then(function(snap){
+      var v = snap.val() || {};
+      if (v.t) startTrainer(v.t);
+      else if (v.k && v.p) startPlayer(v.k, v.p);
+      else AUTH.signOut();
+    }, function(){ AUTH.signOut(); });
+  }
+
+  function enterGate(){
+    fbCode = safe(function(){ return localStorage.getItem(CODEKEY2); }, null);
+    state = fromDb(null);
+    rawPlayers = {};
+    if (!fbCode) { authStep = "code"; setSave("ok","bereit"); render(); return; }
+    authStep = "wait";
+    render();
+    resolveCode(fbCode).then(function(k){
+      if (!k) {
+        safe(function(){ localStorage.removeItem(CODEKEY2); });
+        fbCode = null; authStep = "code"; render(); return;
+      }
+      var uid0 = authUser && authUser.uid;
+      var go = function(){
+        if (!authUser || authUser.uid !== uid0) return;
+        activeTeamKey = k;
+        detachPre();
+        var pre = { team: "Team", players: {} };
+        var tr = db().ref("teams/" + k + "/team"), pr = db().ref("teams/" + k + "/players");
+        PRE_REFS = [tr, pr];
+        tr.on("value", function(s){ pre.team = s.val() || "Team"; state = fromDb(pre); render(); }, function(){});
+        pr.on("value", function(s){
+          pre.players = s.val() || {}; rawPlayers = pre.players;
+          state = fromDb(pre); authStep = "gate"; setSave("ok","bereit"); render();
+        }, function(){ authStep = "code"; safe(function(){ localStorage.removeItem(CODEKEY2); }); render(); });
+      };
+      if (uid0) db().ref("pending/" + uid0).set({ c: fbCode }).then(go, go);
+    });
+  }
+
+  function startPlayer(k, p){
+    fbCode = safe(function(){ return localStorage.getItem(CODEKEY2); }, null);
+    pendingMe = { role:"player", id:p };
+    route = "heute";
+    initRoute();
+    bindTeamRef(k);
+  }
+
+  function startTrainer(t){
+    CATALOG_REF = db().ref("catalog");
+    CATALOG_REF.on("value", function(snap){
+      var v = snap.val() || {};
+      catalog = { teams: v.teams || {}, trainers: v.trainers || {} };
+      var first = !catalogLoaded;
+      catalogLoaded = true;
+      var acct = catalog.trainers[t];
+      if (!acct || !acct.login || !authUser || acct.login.uid !== authUser.uid) { AUTH.signOut(); return; }
+      if (first) {
+        me = { role:"trainer", id: t };
+        route = "heute";
+        initRoute();
+        migrateCatalog();
+        pickActiveTeamForTrainer();
+      }
+      render();
+    }, function(){ AUTH.signOut(); });
+  }
+
+  /* Einmal je Sitzung: Altbestand aus Version 8 in die neue Form bringen */
+  function migrateTeam(k){
+    if (migrated[k] || !rawTeam) return;
+    migrated[k] = true;
+    var v = rawTeam, up = {}, T = "teams/" + k + "/";
+    Object.keys(v.sessions || {}).forEach(function(sid){
+      var s = v.sessions[sid] || {};
+      if (!s.date) return;
+      var at = startMs({ date: s.date, time: s.time });
+      if (s.at !== at) up[T + "sessions/" + sid + "/at"] = at;
+    });
+    Object.keys(v.att || {}).forEach(function(sid){
+      Object.keys(v.att[sid] || {}).forEach(function(pid){
+        var e = v.att[sid][pid];
+        if (!e || e.n === undefined) return;
+        var nt = String(e.n || "").trim().slice(0, 300);
+        if (nt && e.v === "exc") { up["notes/" + k + "/" + pid + "/" + sid] = nt; up[T + "att/" + sid + "/" + pid + "/r"] = true; }
+        up[T + "att/" + sid + "/" + pid + "/n"] = null;
+      });
+    });
+    Object.keys(v.players || {}).forEach(function(pid){
+      if (v.players[pid] && v.players[pid].pin !== undefined) up[T + "players/" + pid + "/pin"] = null;
+    });
+    if (v.trainerPin !== undefined) up[T + "trainerPin"] = null;
+    if (v.teamCode && /^[0-9a-f]{64}$/.test(v.teamCode)) up["gate/" + v.teamCode] = k;
+    if (Object.keys(up).length) db().ref().update(up).catch(function(){ migrated[k] = false; });
+  }
+  function migrateCatalog(){
+    if (!isAdmin() || migrated._catalog) return;
+    migrated._catalog = true;
+    var up = {};
+    Object.keys(catalog.trainers || {}).forEach(function(id){
+      var t = catalog.trainers[id] || {};
+      var slug = slugName(t.name);
+      if (slug) {
+        up["tname/" + slug + "/t"] = id;
+        if (t.login && t.login.acct) up["tname/" + slug + "/acct"] = t.login.acct;
+      }
+      if (t.pin !== undefined) up["catalog/trainers/" + id + "/pin"] = null;
+    });
+    if (Object.keys(up).length) db().ref().update(up).catch(function(){ migrated._catalog = false; });
+  }
+
   function bootFirebase(){
     mode = "fb";
     state = fromDb(null);
     initRoute();
     wire();
+    authStep = "wait";
     render();
     setSave("busy","verbindet");
+    if (!AUTH) { setSave("bad","Anmeldedienst nicht geladen"); return; }
+    AUTH.onAuthStateChanged(function(u){
+      authUser = u;
+      if (claiming) return;
+      onAuth(u);
+    });
+  }
+
+  function bootFirebaseV8(){
     CATALOG_REF = firebase.database().ref("catalog");
     CATALOG_REF.on("value", function(snap){
       var v = snap.val() || {};
@@ -4524,6 +5143,12 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   var seed = safe(function(){ return JSON.parse($("tb-seed").textContent); }, {});
   if (standalone) {
     if (fbStart()) { bootFirebase(); return; }
+    if (window.TB_FIREBASE && window.TB_FIREBASE.apiKey) {
+      mode = "fb"; state = fromDb(null); initRoute(); wire(); authStep = "wait"; render();
+      setSave("bad", "Datenbank nicht erreichbar, bitte Seite neu laden");
+      $("gateHint").textContent = "Die Verbindung zur Datenbank konnte nicht aufgebaut werden. Bitte die Seite neu laden.";
+      return;
+    }
     mode = "local";
     boot(safe(function(){ return JSON.parse(localStorage.getItem(LOCALKEY) || "null"); }, null) || seed);
     return;

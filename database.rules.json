@@ -1,0 +1,223 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "gate": {
+      "$h": {
+        ".read": true,
+        ".write": "(newData.exists() && ((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child(newData.val()).val() === true))) || (!newData.exists() && ((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child(data.val()).val() === true)))",
+        ".validate": "newData.isString() && root.child('catalog').child('teams').child(newData.val()).exists() && (!data.exists() || data.val() === newData.val()) && $h.matches(/^[0-9a-f]{64}$/)"
+      }
+    },
+    "pending": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        "c": {
+          ".validate": "newData.isString() && root.child('gate').child(newData.val()).exists()"
+        },
+        "inv": {
+          ".validate": "newData.isString() && newData.val().length <= 40"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        "t": {
+          ".validate": "newData.isString() && newData.val().length <= 64"
+        },
+        "k": {
+          ".validate": "newData.isString() && newData.val().length <= 64"
+        },
+        "p": {
+          ".validate": "newData.isString() && newData.val().length <= 64"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "tname": {
+      "$slug": {
+        ".read": true,
+        ".write": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true) || (data.exists() && newData.child('t').val() === data.child('t').val() && newData.parent().parent().child('catalog').child('trainers').child(data.child('t').val()).child('login').child('uid').val() === auth.uid)",
+        ".validate": "newData.hasChild('t') && $slug.matches(/^[a-z0-9-]{1,60}$/)",
+        "t": {
+          ".validate": "newData.isString() && newData.val().length <= 64"
+        },
+        "acct": {
+          ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{8,40}$/)"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "tinv": {
+      "$code": {
+        ".read": true,
+        ".write": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true) || (!newData.exists() && data.exists() && newData.parent().parent().child('catalog').child('trainers').child(data.child('t').val()).child('login').child('uid').val() === auth.uid)",
+        "t": {
+          ".validate": "newData.isString() && newData.val().length <= 64"
+        },
+        "exp": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "catalog": {
+      ".read": "(auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid)",
+      "teams": {
+        "$k": {
+          ".write": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true)",
+          ".validate": "newData.val() === true"
+        }
+      },
+      "trainers": {
+        "$tid": {
+          ".write": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true)",
+          "name": {
+            ".validate": "newData.isString() && newData.val().length <= 60"
+          },
+          "admin": {
+            ".validate": "newData.isBoolean()"
+          },
+          "teams": {
+            "$k": {
+              ".validate": "newData.val() === true"
+            }
+          },
+          "pin": {
+            ".validate": "newData.isString()"
+          },
+          "login": {
+            ".write": "auth != null && !data.exists() && newData.child('uid').val() === auth.uid && root.child('pending').child(auth.uid).child('inv').isString() && root.child('tinv').child(root.child('pending').child(auth.uid).child('inv').val()).child('t').val() === $tid && root.child('tinv').child(root.child('pending').child(auth.uid).child('inv').val()).child('exp').val() > now",
+            "uid": {
+              ".validate": "newData.isString() && newData.val().length <= 128"
+            },
+            "acct": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{8,40}$/)"
+            },
+            "$other": {
+              ".validate": false
+            }
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
+    },
+    "teams": {
+      "$k": {
+        ".read": "(auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) || (auth != null && root.child('users').child(auth.uid).child('k').val() === $k && root.child('users').child(auth.uid).child('p').isString() && (auth != null && root.child('teams').child($k).child('players').child(root.child('users').child(auth.uid).child('p').val()).child('login').child('uid').val() === auth.uid)) || (auth != null && root.child('users').child(auth.uid).child('k').isString() && root.child('users').child(auth.uid).child('p').isString() && (auth != null && root.child('teams').child(root.child('users').child(auth.uid).child('k').val()).child('players').child(root.child('users').child(auth.uid).child('p').val()).child('login').child('uid').val() === auth.uid) && root.child('teams').child(root.child('users').child(auth.uid).child('k').val()).child('compareWith').child($k).val() === true)",
+        ".write": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child($k).val() === true))",
+        "team": {
+          ".read": "(auth != null && root.child('pending').child(auth.uid).child('c').isString() && root.child('gate').child(root.child('pending').child(auth.uid).child('c').val()).val() === $k)",
+          ".validate": "newData.isString() && newData.val().length <= 80"
+        },
+        "players": {
+          ".read": "(auth != null && root.child('pending').child(auth.uid).child('c').isString() && root.child('gate').child(root.child('pending').child(auth.uid).child('c').val()).val() === $k)",
+          "$pid": {
+            "name": {
+              ".validate": "newData.isString() && newData.val().length <= 60"
+            },
+            "pin": {
+              ".validate": "newData.isString()"
+            },
+            "login": {
+              ".write": "auth != null && !data.exists() && newData.child('uid').val() === auth.uid && (auth != null && root.child('pending').child(auth.uid).child('c').isString() && root.child('gate').child(root.child('pending').child(auth.uid).child('c').val()).val() === $k) && root.child('teams').child($k).child('players').child($pid).child('name').exists()",
+              "uid": {
+                ".validate": "newData.isString() && newData.val().length <= 128"
+              },
+              "acct": {
+                ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{8,40}$/)"
+              },
+              "$other": {
+                ".validate": false
+              }
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "sessions": {
+          "$sid": {
+            "at": {
+              ".validate": "newData.isNumber()"
+            }
+          }
+        },
+        "att": {
+          "$sid": {
+            "$pid": {
+              ".write": "(auth != null && root.child('teams').child($k).child('players').child($pid).child('login').child('uid').val() === auth.uid) && root.child('teams').child($k).child('sessions').child($sid).child('at').val() > now && (!newData.exists() || ((newData.child('ts').val() === now || (newData.child('ts').val() === data.child('ts').val() && newData.child('v').val() === data.child('v').val())) && newData.child('by').val() !== 't' && newData.child('v').val() !== 'late' && (newData.child('r').val() !== true || newData.parent().parent().parent().parent().parent().child('notes').child($k).child($pid).child($sid).isString())))",
+              ".validate": "newData.hasChild('v')",
+              "v": {
+                ".validate": "newData.isString() && newData.val().matches(/^(yes|late|exc|no)$/)"
+              },
+              "r": {
+                ".validate": "newData.isBoolean()"
+              },
+              "by": {
+                ".validate": "newData.isString() && newData.val().length <= 8"
+              },
+              "ts": {
+                ".validate": "newData.isNumber()"
+              },
+              "n": {
+                ".validate": false
+              },
+              "$other": {
+                ".validate": false
+              }
+            }
+          }
+        },
+        "joker": {
+          "$sid": {
+            "$pid": {
+              ".write": "(auth != null && root.child('teams').child($k).child('players').child($pid).child('login').child('uid').val() === auth.uid) && root.child('teams').child($k).child('sessions').child($sid).child('at').val() < now",
+              ".validate": "newData.val() === 1"
+            }
+          }
+        }
+      }
+    },
+    "notes": {
+      "$k": {
+        ".read": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child($k).val() === true))",
+        ".write": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child($k).val() === true))",
+        "$pid": {
+          ".read": "(auth != null && root.child('teams').child($k).child('players').child($pid).child('login').child('uid').val() === auth.uid)",
+          "$sid": {
+            ".write": "(auth != null && root.child('teams').child($k).child('players').child($pid).child('login').child('uid').val() === auth.uid) && root.child('teams').child($k).child('sessions').child($sid).child('at').val() > now",
+            ".validate": "newData.isString() && newData.val().length <= 300"
+          }
+        }
+      }
+    },
+    "push": {
+      "$k": {
+        ".read": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child($k).val() === true))",
+        ".write": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child($k).val() === true))",
+        "$pid": {
+          ".read": "(auth != null && root.child('teams').child($k).child('players').child($pid).child('login').child('uid').val() === auth.uid)",
+          ".write": "(auth != null && root.child('teams').child($k).child('players').child($pid).child('login').child('uid').val() === auth.uid)",
+          "$abo": {
+            ".validate": "newData.hasChildren(['endpoint','keys']) && newData.child('endpoint').isString() && newData.child('endpoint').val().beginsWith('https://') && newData.child('endpoint').val().length <= 1000"
+          }
+        }
+      }
+    }
+  }
+}
