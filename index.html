@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-QPevyUpG4Hn+Xo2f9UBwsOMYuoPABTIySfkxg8oKOjA=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-ee3WTQCsNalpPV7rQBHnn0pfD4X9tZMFbB9o3z5cXPA=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Trainingsbeteiligung</title>
@@ -1372,6 +1372,19 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     if (/operation-not-allowed|admin-restricted/.test(c)) return "Die Anmeldung ist in Firebase noch nicht eingeschaltet.";
     return "Das hat nicht geklappt. Bitte noch einmal versuchen.";
   }
+  function signOutWhy(r){
+    safe(function(){ (window.__tbWhy = window.__tbWhy || []).push(r + " " + new Date().toISOString()); });
+    AUTH.signOut();
+  }
+  function delay(ms){ return new Promise(function(res){ setTimeout(res, ms); }); }
+  /* Direkt nach dem Anmelden kann die Datenbankverbindung noch das alte Token benutzen.
+     Lesen deshalb bei "keine Berechtigung" einige Male wiederholen. */
+  function readRetry(ref, n, uid0){
+    return ref.once("value").catch(function(e){
+      if (n <= 0 || !authUser || authUser.uid !== uid0) throw e;
+      return delay(700).then(function(){ return readRetry(ref, n - 1, uid0); });
+    });
+  }
   function hasReason(e){ return !!e && (e.r === true || !!String(e.n || "").trim()); }
   function codeKeyFor(){ return CODEKEY + ":" + activeTeamKey; }
   function teamDisplayName(k){
@@ -1645,6 +1658,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       if (rawTeam) { state = fromDb(rawTeam, notesVal); render(); }
     }, function(){ notesVal = {}; });
     FB.on("value", function(snap){
+      bindTeamRef.tries = 0;
       rawTeam = snap.val() || {};
       rawPlayers = rawTeam.players || {};
       state = fromDb(rawTeam, notesVal);
@@ -1653,21 +1667,28 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         if (pendingMe) {
           var pp = rawPlayers[pendingMe.id];
           if (pp && pp.login && authUser && pp.login.uid === authUser.uid) { me = pendingMe; route = route || "heute"; }
-          else { pendingMe = null; AUTH.signOut(); return; }
+          else { pendingMe = null; signOutWhy("spieler-konto passt nicht"); return; }
           pendingMe = null;
         }
       }
       if (me && me.role === "player") {
         var p2 = rawPlayers[me.id];
-        if (!p2 || !p2.login || !authUser || p2.login.uid !== authUser.uid) { AUTH.signOut(); return; }
+        if (!p2 || !p2.login || !authUser || p2.login.uid !== authUser.uid) { signOutWhy("spieler entfernt oder zurückgesetzt"); return; }
       }
       if (isTrainer()) migrateTeam(key);
       if (!fbPending) setSave("ok","gespeichert");
       render();
       installManifest();
     }, function(){
+      /* Direkt nach der Anmeldung kann das neue Token noch fehlen: dann neu verbinden */
+      if (first && (bindTeamRef.tries = (bindTeamRef.tries || 0) + 1) <= 4 && authUser && !authUser.isAnonymous) {
+        var uidB = authUser.uid;
+        delay(800).then(function(){ if (authUser && authUser.uid === uidB && activeTeamKey === key) bindTeamRef(key); });
+        return;
+      }
+      bindTeamRef.tries = 0;
       setSave("bad","kein Zugriff auf dieses Team");
-      if (authUser && !authUser.isAnonymous) AUTH.signOut();
+      if (authUser && !authUser.isAnonymous) signOutWhy("team nicht lesbar");
     });
     render();
   }
@@ -2966,7 +2987,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   /* ---------- Hauptrender ---------- */
   function render(){
-    if (mode === "fb" && me && me.role === "trainer" && catalogLoaded && !trainerAcct(me.id)) { me = null; AUTH.signOut(); }
+    if (mode === "fb" && me && me.role === "trainer" && catalogLoaded && !trainerAcct(me.id)) { me = null; signOutWhy("trainer entfernt"); }
     if (mode !== "fb" && me && me.role === "player" && !player(me.id)) {
       me = null;
       safe(function(){ localStorage.removeItem(playerAuthKey()); });
@@ -4990,12 +5011,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     authStep = "wait";
     setSave("busy","meldet an");
     render();
-    db().ref("users/" + u.uid).once("value").then(function(snap){
+    u.getIdToken().then(function(){ return readRetry(db().ref("users/" + u.uid), 4, u.uid); }).then(function(snap){
+      if (!authUser || authUser.uid !== u.uid) return;
       var v = snap.val() || {};
       if (v.t) startTrainer(v.t);
       else if (v.k && v.p) startPlayer(v.k, v.p);
-      else AUTH.signOut();
-    }, function(){ AUTH.signOut(); });
+      else signOutWhy("kein users-Eintrag");
+    }, function(){ if (authUser && authUser.uid === u.uid) signOutWhy("users nicht lesbar"); });
   }
 
   function enterGate(){
@@ -5022,7 +5044,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         pr.on("value", function(s){
           pre.players = s.val() || {}; rawPlayers = pre.players;
           state = fromDb(pre); authStep = "gate"; setSave("ok","bereit"); render();
-        }, function(){ authStep = "code"; safe(function(){ localStorage.removeItem(CODEKEY2); }); render(); });
+        }, function(){
+          if ((enterGate.tries = (enterGate.tries || 0) + 1) <= 3) { delay(800).then(function(){ if (authUser && authUser.uid === uid0) go(); }); return; }
+          enterGate.tries = 0;
+          authStep = "code"; safe(function(){ localStorage.removeItem(CODEKEY2); }); render();
+        });
       };
       if (uid0) db().ref("pending/" + uid0).set({ c: fbCode }).then(go, go);
     });
@@ -5044,7 +5070,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var first = !catalogLoaded;
       catalogLoaded = true;
       var acct = catalog.trainers[t];
-      if (!acct || !acct.login || !authUser || acct.login.uid !== authUser.uid) { AUTH.signOut(); return; }
+      if (!acct || !acct.login || !authUser || acct.login.uid !== authUser.uid) { signOutWhy("trainerkonto passt nicht"); return; }
       if (first) {
         me = { role:"trainer", id: t };
         route = "heute";
@@ -5053,7 +5079,15 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         pickActiveTeamForTrainer();
       }
       render();
-    }, function(){ AUTH.signOut(); });
+    }, function(){
+      if (!catalogLoaded && (startTrainer.tries = (startTrainer.tries || 0) + 1) <= 4 && authUser && !authUser.isAnonymous) {
+        var uidT = authUser.uid;
+        delay(800).then(function(){ if (authUser && authUser.uid === uidT) startTrainer(t); });
+        return;
+      }
+      startTrainer.tries = 0;
+      signOutWhy("katalog nicht lesbar");
+    });
   }
 
   /* Einmal je Sitzung: Altbestand aus Version 8 in die neue Form bringen */
