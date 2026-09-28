@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-ee3WTQCsNalpPV7rQBHnn0pfD4X9tZMFbB9o3z5cXPA=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-2o3lSL/LoQxyVjUYo89R+Le7wjowGrpprHahDh0Pyrg=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Trainingsbeteiligung</title>
@@ -253,6 +253,8 @@ window.TB_ICONS = {
   .btn:disabled{opacity:.42;cursor:not-allowed;}
 
   .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+  label.check{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:14px;color:var(--text-body);white-space:nowrap;}
+  label.check input{width:18px;height:18px;margin:0;}
   .hint{font-size:13.5px;color:var(--text-muted);max-width:66ch;}
   .hint.warn{color:var(--sand-700);}
   .msg{font:600 13.5px/1.35 var(--font-sans);color:var(--status-absent);}
@@ -289,6 +291,7 @@ window.TB_ICONS = {
   .pick.exc[aria-pressed="true"]{background:var(--status-excused);}
   .pick.no[aria-pressed="true"]{background:var(--status-absent);}
   .pick.late[aria-pressed="true"]{background:var(--status-present);}
+  .pick.maybe[aria-pressed="true"]{background:var(--info);}
   .pick:disabled{opacity:.42;cursor:not-allowed;}
   .pick.pend,.mini.pend{border-color:var(--status-excused);border-style:dashed;color:var(--status-excused);}
 
@@ -299,6 +302,7 @@ window.TB_ICONS = {
   .chip.exc{background:var(--status-excused-soft);color:var(--status-excused);}
   .chip.no{background:var(--status-absent-soft);color:var(--status-absent);}
   .chip.late{background:var(--status-present-soft);color:var(--status-present);}
+  .chip.maybe{background:var(--info-soft);color:var(--info);}
   .chip.open{background:var(--status-unknown-soft);color:var(--text-muted);}
 
   .names{display:flex;flex-direction:column;gap:6px;margin-top:14px;}
@@ -308,6 +312,7 @@ window.TB_ICONS = {
   .nl.exc{color:var(--status-excused);}
   .nl.no{color:var(--status-absent);}
   .nl.late{color:var(--status-present);}
+  .nl.maybe{color:var(--info);}
   .nl.open{color:var(--text-muted);}
   @media (max-width:560px){.nl{display:block;min-width:0;}}
 
@@ -336,6 +341,7 @@ window.TB_ICONS = {
   .mini.exc[aria-pressed="true"]{background:var(--status-excused);}
   .mini.no[aria-pressed="true"]{background:var(--status-absent);}
   .mini.late[aria-pressed="true"]{background:var(--status-present);}
+  .mini.maybe[aria-pressed="true"]{background:var(--info);}
   .mini:disabled{opacity:.42;cursor:not-allowed;}
   .empty{padding:20px;color:var(--text-muted);font-size:14px;}
 
@@ -359,6 +365,12 @@ window.TB_ICONS = {
   .mark.exc{background:var(--status-excused);}
   .mark.no{background:var(--status-absent);}
   .mark.late{background:var(--status-present) var(--watch) center/13px 13px no-repeat;}
+  .mark.maybe{background:var(--info);}
+  .mark.no.auto{background:repeating-linear-gradient(135deg,var(--status-absent) 0 3px,var(--status-absent-soft) 3px 6px);}
+  th.sp{color:var(--text-muted);font-style:italic;}
+  th small{display:block;font:600 9.5px/1.1 var(--font-narrow);letter-spacing:.06em;text-transform:uppercase;}
+  .sptag{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:var(--radius-pill);background:var(--surface-sunken);
+    color:var(--text-muted);font:700 10.5px/1.5 var(--font-narrow);letter-spacing:.06em;text-transform:uppercase;vertical-align:2px;}
   .mark.byt{box-shadow:0 0 0 2px var(--surface-card),0 0 0 3.5px var(--info);}
   button.cell{border:0;background:transparent;padding:6px;border-radius:7px;cursor:pointer;line-height:0;}
   button.cell:hover{background:var(--surface-sunken);}
@@ -452,6 +464,7 @@ window.TB_ICONS = {
   .sdot.exc{background:var(--status-excused);}
   .sdot.no{background:var(--status-absent);}
   .sdot.late{background:var(--status-present) var(--watch) center/9px 9px no-repeat;}
+  .sdot.maybe{background:var(--info);}
   .sdot.jok{box-shadow:inset 0 0 0 2px var(--sand-500);}
 
   /* Saisonkalender */
@@ -463,6 +476,7 @@ window.TB_ICONS = {
   .calgrid i.exc{background:var(--status-excused);}
   .calgrid i.no{background:var(--status-absent);}
   .calgrid i.late{background:var(--status-present) var(--watch) center/10px 10px no-repeat;}
+  .calgrid i.maybe{background:var(--info);}
   .calgrid i.jok{box-shadow:inset 0 0 0 2px var(--sand-500);}
 
   /* ---------- Erklärungen: i im Kreis mit Blase ---------- */
@@ -645,7 +659,7 @@ window.TB_ICONS = {
         <p class="eyebrow">So läuft es</p>
         <ul>
           <li>Beim ersten Mal legst du deine PIN selbst fest.</li>
-          <li>Du trägst nur für dich ein: anwesend, entschuldigt oder gefehlt.</li>
+          <li>Du meldest nur für dich zurück: bin da, vielleicht oder bin nicht da (mit Grund).</li>
           <li>Jede Rückmeldung bringt Punkte, jede Anwesenheit verlängert deine Serie.</li>
           <li>Der Trainer pflegt Kader und Termine und kann Einträge nachträglich korrigieren.</li>
           <li>PIN vergessen? Der Trainer setzt sie zurück, dann vergibst du beim nächsten Login eine neue.</li>
@@ -874,8 +888,10 @@ window.TB_ICONS = {
           <div class="legend">
             <span><i class="mark yes"></i> anwesend</span>
             <span id="legendLate" hidden><i class="mark late"></i> zu spät</span>
+            <span><i class="mark maybe"></i> vielleicht</span>
             <span><i class="mark exc"></i> entschuldigt</span>
-            <span><i class="mark no"></i> gefehlt</span>
+            <span><i class="mark no"></i> unentschuldigt</span>
+            <span><i class="mark no auto"></i> keine Rückmeldung bis zur Frist</span>
             <span><i class="mark"></i> nichts eingetragen</span>
             <span id="legendTrainer" hidden><i class="mark yes byt"></i> vom Trainer korrigiert</span>
           </div>
@@ -955,12 +971,12 @@ Auf dem iPhone geht das nur, wenn die Seite als App auf dem Home-Bildschirm lieg
 
         <details class="adminblock fold">
           <summary><span data-info="Beide Fristen gibst du in Stunden vor Trainingsbeginn an, damit sie für jeden Termin passen. Den Spielern zeigt die Seite daraus immer die konkrete Uhrzeit.
-Absagefrist: bis dahin bringt eine Entschuldigung Punkte und die Serie pausiert. Danach kann sich jeder weiter entschuldigen, es gibt aber keine Punkte und die Serie reißt.
-Bonusfrist: wer bis dahin eingetragen ist, bekommt Bonuspunkte, auch für eine Zusage. Wer danach noch einmal umträgt, verliert sie wieder.
-Ab Trainingsbeginn kann ohnehin nur noch der Trainer etwas ändern." data-title="Fristen">Fristen</span><span class="sumval" id="sumFrist"></span></summary>
+Absagefrist: bis dahin müssen sich die Spieler festlegen (bin da oder bin nicht da mit Grund). Danach können sie nichts mehr ändern, nur noch du. Wer dann gar nichts eingetragen hat oder noch auf vielleicht steht, zählt automatisch als unentschuldigt.
+Bonusfrist: wer bis dahin fest zu- oder abgesagt hat, bekommt Bonuspunkte. Wer danach noch einmal umträgt, verliert sie wieder.
+Bei 0 Stunden liegt die Absagefrist genau beim Trainingsbeginn." data-title="Fristen">Fristen</span><span class="sumval" id="sumFrist"></span></summary>
           <div class="fbody">
             <div class="row">
-              <label for="excInput">Absage zählt bis</label>
+              <label for="excInput">Rückmeldung bis</label>
               <input type="number" id="excInput" min="0" max="336" step="1" style="width:96px">
               <span class="hint">Stunden vor Trainingsbeginn</span>
             </div>
@@ -976,7 +992,8 @@ Ab Trainingsbeginn kann ohnehin nur noch der Trainer etwas ändern." data-title=
                 <input type="checkbox" id="remindOnInput" style="width:18px;height:18px">
                 <span data-info="Wer bis dahin noch keine Rückmeldung gegeben hat, bekommt eine Push-Nachricht aufs Handy. Das gilt nur für Spieler, die unter Mein Profil Erinnerungen auf ihrem Gerät eingeschaltet haben.
 Verschickt wird automatisch über GitHub, etwa alle 15 Minuten. Die Nachricht kann deshalb ein paar Minuten später ankommen als eingestellt.
-Jeder bekommt pro Termin höchstens eine Erinnerung." data-title="Erinnerung">Push-Erinnerung an Spieler ohne Rückmeldung</span>
+Wer auf vielleicht steht, wird ebenfalls erinnert, weil vielleicht mit der Absagefrist zu unentschuldigt wird.
+Jeder bekommt pro Termin höchstens eine Erinnerung." data-title="Erinnerung">Push-Erinnerung an Spieler ohne feste Rückmeldung</span>
               </label>
             </div>
             <div class="row">
@@ -1069,8 +1086,9 @@ Gezählt ab ist der Stichtag: nur Joker ab diesem Tag zählen gegen das Budget. 
         </details>
 
         <details class="adminblock fold">
-          <summary><span data-info="Ein Code vor der Seite, damit nicht jeder mit der Adresse Kader, Quoten und Entschuldigungsgründe sieht. Das Gerät merkt sich den Code danach.
-Das ist eine Hürde, kein echter Schutz: Wer die Adresse der Datenbank kennt, kommt weiterhin an die Daten. Echter Schutz bräuchte Firebase-Regeln mit Anmeldung." data-title="Teamcode">Teamcode</span><span class="sumval" id="sumCode"></span></summary>
+          <summary><span id="codeHead" data-info="Der Teamcode ist der Schlüssel zum Team: Nur wer ihn kennt, sieht Teamname und Kader und kann sich bei der ersten Anmeldung einen noch freien Namen aus dem Kader nehmen und eine PIN festlegen. Danach meldet sich der Spieler nur noch mit Name und PIN an.
+Die Daten selbst schützt die Firebase-Datenbank mit Anmeldung und Regeln: Spieler lesen nur ihr eigenes Team, ändern nur ihre eigenen Einträge, und Gründe sehen nur der Spieler selbst und die Trainer. Ohne Anmeldung liefert die Datenbank nichts.
+Der Code muss mindestens 6 Zeichen haben und darf keinem anderen Team gehören. Ein neuer Code ersetzt den alten, bestehende Anmeldungen bleiben gültig. Gespeichert wird nur ein Hash, nicht der Code selbst." data-title="Teamcode">Teamcode</span><span class="sumval" id="sumCode"></span></summary>
           <div class="fbody">
             <div class="row">
               <input type="password" id="newTeamCode" maxlength="40" placeholder="neuer Teamcode" style="width:200px">
@@ -1107,15 +1125,26 @@ Die Endzeit schlägt die Seite 90 Minuten nach der Startzeit vor, du kannst sie 
         </div>
 
         <div class="adminblock">
-          <h3 data-info="Für alles, was nicht in den festen Rhythmus passt: Zusatztraining, Turnier, Wanderfahrt. Bezeichnung und Ort sind freiwillig, sie stehen den Spielern beim Termin.">Einzeltermin</h3>
+          <h3 data-info="Für alles, was nicht in den festen Rhythmus passt: Turnier, Wanderfahrt, Trainingslager, Zusatztraining. Bezeichnung und Ort sind freiwillig, sie stehen den Spielern beim Termin.
+Mehrtägig: ein Enddatum eintragen. Die Spieler melden sich einmal für den ganzen Termin zurück.
+Ganztägig: statt Uhrzeiten nur eine Treffzeit, die auch leer bleiben darf. Die Fristen rechnen dann ab der Treffzeit, ohne Treffzeit ab 0 Uhr am ersten Tag.
+Außer Wertung (Standard): keine Punkte, zählt nicht in Quote, Serie, Stufen und Abzeichen. Nimm den Haken raus, wenn der Termin wie ein normales Training zählen soll. Umstellen geht später unter Termine bei bearbeiten.">Sondertermin</h3>
           <div class="row">
-            <input type="date" id="oneDate">
-            <label for="oneTime">von</label><input type="time" id="oneTime" value="19:30">
-            <label for="oneEnd">bis</label><input type="time" id="oneEnd" value="21:00">
-            <input type="text" id="oneLabel" placeholder="Bezeichnung, zum Beispiel Zusatztraining" style="flex:1;min-width:190px">
+            <label for="oneDate">am</label><input type="date" id="oneDate">
+            <label for="oneUntil">bis</label><input type="date" id="oneUntil" title="Enddatum, nur bei mehrtägigen Terminen">
+            <label class="check"><input type="checkbox" id="oneAllDay"> ganztägig</label>
+          </div>
+          <div class="row" id="oneTimesRow">
+            <label for="oneTime" id="oneTimeLab">von</label><input type="time" id="oneTime" value="19:30">
+            <label for="oneEnd" id="oneEndLab">bis</label><input type="time" id="oneEnd" value="21:00">
+          </div>
+          <div class="row">
+            <input type="text" id="oneLabel" placeholder="Bezeichnung, zum Beispiel Turnier" style="flex:1;min-width:190px">
             <input type="text" id="onePlace" placeholder="Ort" style="width:150px">
+            <label class="check"><input type="checkbox" id="oneSp" checked> außer Wertung</label>
             <button class="btn primary" id="addOne" type="button">Hinzufügen</button>
           </div>
+          <p class="msg" id="oneMsg"></p>
         </div>
 
         <div class="adminblock">
@@ -1214,7 +1243,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   var WD = ["So","Mo","Di","Mi","Do","Fr","Sa"];
   var MON = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
   var MONLONG = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
-  var WORD = { yes:"Anwesend", late:"Zu spät", exc:"Entschuldigt", no:"Gefehlt" };
+  var WORD = { yes:"Anwesend", late:"Zu spät", maybe:"Vielleicht", exc:"Entschuldigt", no:"Unentschuldigt" };
   var AUTHKEY = "tb:auth:v2";
   var QKEY = "tb:queue:v2";
   var SALT = "kcw-trainingsbeteiligung-v2";
@@ -1296,6 +1325,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   var PUSHHIDE = "tb:pushhide:v1";  /* Hinweis auf Heute weggeklickt */
   var LATE_MAX = 20;
   var HOUR = 3600000;
+  /* Ab diesem Termin wird eine fehlende Rückmeldung (oder ein offenes Vielleicht) mit Ablauf
+     der Absagefrist automatisch als unentschuldigt gewertet. Ältere Termine bleiben wie sie sind. */
+  var AUTO_FROM = "2026-09-29";
 
   var NAV = [
     { k:"heute",   label:"Heute",   icon:"calendar-check" },
@@ -1314,7 +1346,28 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function fmtLong(iso){ var d = parseISO(iso); return WD[d.getDay()] + ", " + d.getDate() + ". " + MON[d.getMonth()] + " " + d.getFullYear(); }
   function fmtShort(iso){ var d = parseISO(iso); return WD[d.getDay()] + " " + d.getDate() + "." + MON[d.getMonth()]; }
   function uid(p){ return p + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-  function span(s){ return s.time + (s.end ? " bis " + s.end : ""); }
+  function span(s){
+    if (s.allDay) return s.time ? "ganztägig, Treffen " + s.time : "ganztägig";
+    return s.time + (s.end ? " bis " + s.end : "");
+  }
+  function spanUhr(s){ return span(s) + (s.allDay && !s.time ? "" : " Uhr"); }
+  function multiDay(s){ return !!s.until && s.until > s.date; }
+  function lastDay(s){ return multiDay(s) ? s.until : s.date; }
+  function dateSpan(s, long){
+    var f = long ? fmtLong : fmtShort;
+    return f(s.date) + (multiDay(s) ? " bis " + f(s.until) : "");
+  }
+  /* Termin so, wie er in der Datenbank und in Sicherungen steht */
+  function sessRec(s){
+    return { date:s.date, time:s.time || "", end:s.end || "", until: multiDay(s) ? s.until : "", allDay: !!s.allDay,
+      sp: !!s.sp, label:s.label || "Training", place:s.place || "", cancelled: !!s.cancelled, reason: s.reason || "",
+      at: startMs(s) };
+  }
+  function sessOf(id, s){
+    return { id:id, date:s.date, time: s.allDay ? (s.time || "") : (s.time || "19:30"), end: s.allDay ? "" : (s.end || ""),
+      until: (typeof s.until === "string" && s.until > s.date) ? s.until : "", allDay: !!s.allDay, sp: !!s.sp,
+      label: s.label || "Training", place: s.place || "", cancelled: !!s.cancelled, reason: s.reason || "" };
+  }
   function plusMinutes(t, mins){
     var p = String(t || "").split(":");
     if (p.length < 2) return "";
@@ -1572,7 +1625,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     } else if (op.t === "addPlayer") {
       var dup = false;
       for (var j=0;j<st.players.length;j++) if (st.players[j].id === op.id) dup = true;
-      if (!dup) st.players.push({ id: op.id, name: op.name, pin: null });
+      if (!dup) st.players.push({ id: op.id, name: op.name, pin: null, since: op.since || "" });
     } else if (op.t === "delPlayer") {
       st.players = st.players.filter(function(p){ return p.id !== op.id; });
       Object.keys(st.att).forEach(function(sid){ delete st.att[sid][op.id]; });
@@ -1763,7 +1816,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       up[TK + "players/" + op.who + "/pin"] = null;
       fbDo(db().ref().update(up));
     } else if (op.t === "addPlayer") {
-      fbDo(FB.child("players/" + op.id).set({ name: String(op.name).slice(0, 60) }));
+      var prec = { name: String(op.name).slice(0, 60) };
+      if (op.since) prec.since = op.since;
+      fbDo(FB.child("players/" + op.id).set(prec));
     } else if (op.t === "delPlayer") {
       fbDo(FB.child("players/" + op.id).remove());
       safe(function(){ firebase.database().ref("push/" + activeTeamKey + "/" + op.id).remove(); });
@@ -1774,8 +1829,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       });
     } else if (op.t === "addSession") {
       var s2 = op.s;
-      fbDo(FB.child("sessions/" + s2.id).set({ date:s2.date, time:s2.time, end:s2.end || "", label:s2.label || "Training",
-        place:s2.place || "", cancelled: !!s2.cancelled, reason: s2.reason || "", at: startMs(s2) }));
+      fbDo(FB.child("sessions/" + s2.id).set(sessRec(s2)));
     } else if (op.t === "updSession") {
       var patch = {};
       for (var pk in op.patch) patch[pk] = op.patch[pk];
@@ -1800,12 +1854,12 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var notes = {};
       op.st.players.forEach(function(p){
         var rec = { name: String(p.name).slice(0, 60) };
+        if (p.since) rec.since = p.since;
         var old = rawPlayers[p.id];
         if (old && old.login) rec.login = old.login;   /* bestehende Konten bleiben verknüpft */
         payload.players[p.id] = rec;
       });
-      op.st.sessions.forEach(function(s){ payload.sessions[s.id] = { date:s.date, time:s.time, end:s.end || "",
-        label:s.label || "Training", place:s.place || "", cancelled: !!s.cancelled, reason: s.reason || "", at: startMs(s) }; });
+      op.st.sessions.forEach(function(s){ payload.sessions[s.id] = sessRec(s); });
       Object.keys(op.st.att || {}).forEach(function(sid){
         Object.keys(op.st.att[sid] || {}).forEach(function(pid){
           var e = op.st.att[sid][pid];
@@ -1829,7 +1883,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     Object.keys(v.players || {}).forEach(function(id){
       var p = v.players[id] || {};
       /* pin steht hier nur noch als Merker "hat ein Konto" für die Oberfläche */
-      players.push({ id: id, name: p.name || "?", pin: p.login ? "konto" : null });
+      players.push({ id: id, name: p.name || "?", pin: p.login ? "konto" : null, since: typeof p.since === "string" ? p.since : "" });
     });
     var att = {};
     Object.keys(v.att || {}).forEach(function(sid){
@@ -1844,8 +1898,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     });
     Object.keys(v.sessions || {}).forEach(function(id){
       var s = v.sessions[id] || {};
-      sessions.push({ id: id, date: s.date, time: s.time, end: s.end || "", label: s.label || "Training",
-        place: s.place || "", cancelled: !!s.cancelled, reason: s.reason || "" });
+      if (s.date) sessions.push(sessOf(id, s));
     });
     return normalize({ demo:false, team: v.team, goal: v.goal, excHours: v.excHours, bonusHours: v.bonusHours,
       remindOn: v.remindOn, remindHours: v.remindHours,
@@ -1913,18 +1966,26 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   /* ---------- abgeleitete Werte ---------- */
   function seasonFrom(){ return typeof state.seasonFrom === "string" ? state.seasonFrom : ""; }
+  /* Gewertete Termine: vorbei oder heute, nicht abgesagt, ab Saisonstichtag und keine
+     Sondertermine. Sondertermine (sp) stehen komplett außerhalb der Wertung. */
   function heldSessions(){
     var t = todayISO(), from = seasonFrom();
-    return byDate(state.sessions).filter(function(s){ return !s.cancelled && s.date <= t && s.date >= from; });
+    return byDate(state.sessions).filter(function(s){ return !s.cancelled && !s.sp && s.date <= t && s.date >= from; });
+  }
+  /* Für die Anzeige: alle begonnenen Termine inklusive Sondertermine */
+  function pastSessions(){
+    var t = todayISO(), from = seasonFrom();
+    return byDate(state.sessions).filter(function(s){ return !s.cancelled && s.date <= t && (s.sp || s.date >= from); });
   }
   function upcoming(){
     var t = todayISO();
-    return byDate(state.sessions).filter(function(s){ return s.date >= t; });
+    return byDate(state.sessions).filter(function(s){ return lastDay(s) >= t; });
   }
   function counts(sid){
-    var c = { yes:0, late:0, exc:0, no:0, open:0 };
+    var c = { yes:0, late:0, maybe:0, exc:0, no:0, open:0 };
+    var s = sessById(sid);
     state.players.forEach(function(p){
-      var v = effV(entry(sid, p.id));
+      var v = effV(entry(sid, p.id), s, p.id);
       if (v && c[v] != null) c[v]++; else c.open++;
     });
     return c;
@@ -1932,10 +1993,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function quota(pid){
     var y = 0, tot = 0;
     heldSessions().forEach(function(s){
-      var e = entry(s.id, pid);
-      if (!e) return;
+      var v = effV(entry(s.id, pid), s, pid);
+      if (!v || v === "maybe") return;
       tot++;
-      if (present(e)) y++;
+      if (v === "yes" || v === "late") y++;
     });
     return { y:y, tot:tot, pct: tot ? Math.round(y/tot*100) : null };
   }
@@ -1949,8 +2010,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   /* Saisonquote eines FREMDEN Teams für den Vergleich, unabhängig vom globalen state.
      Spiegelt effV()/heldSessions()/teamQuota() für einen fremden, bereits normalisierten
      Datensatz, ohne die eigenen globalen Funktionen umzubauen. */
-  function foreignEffV(e, st){
-    if (!e) return null;
+  function foreignEffV(e, st, s, p){
+    var closedF = !!s && Date.now() >= startMs(s) - (typeof st.excHours === "number" ? st.excHours : DEFAULT_EXC) * HOUR;
+    if (!e) return (closedF && !s.cancelled && s.date >= AUTO_FROM && !(p && p.since && s.date < p.since)) ? "no" : null;
+    if (e.v === "maybe") return closedF ? "no" : "maybe";
     if (e.v === "exc" && !hasReason(e)) return "no";
     if (e.v === "late" && !st.lateOn) return "yes";
     return e.v;
@@ -1958,14 +2021,14 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function foreignQuota(st){
     if (st.demo) return { pct:null, name: st.team, tot:0 };
     var t = todayISO(), from = typeof st.seasonFrom === "string" ? st.seasonFrom : "";
-    var held = st.sessions.filter(function(s){ return !s.cancelled && s.date <= t && s.date >= from; });
+    var held = st.sessions.filter(function(s){ return !s.cancelled && !s.sp && s.date <= t && s.date >= from; });
     var y = 0, tot = 0;
     st.players.forEach(function(p){
       held.forEach(function(s){
         var e = (st.att[s.id] || {})[p.id];
-        if (!e) return;
+        var v = foreignEffV(e, st, s, p);
+        if (!v || v === "maybe") return;
         tot++;
-        var v = foreignEffV(e, st);
         if (v === "yes" || v === "late") y++;
       });
     });
@@ -2025,8 +2088,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   function lateOn(){ return !!state.lateOn; }
   function latePts(){ return typeof state.latePts === "number" ? state.latePts : DEFAULT_LATE; }
-  function cycleVals(){ return lateOn() ? [null,"yes","late","exc","no"] : [null,"yes","exc","no"]; }
-  function pickVals(){ return (isTrainer() && lateOn()) ? ["yes","late","exc","no"] : ["yes","exc","no"]; }
+  function cycleVals(){ return lateOn() ? [null,"yes","late","maybe","exc","no"] : [null,"yes","maybe","exc","no"]; }
+  /* Spieler: Bin da, Vielleicht, Bin nicht da (mit Grund). Unentschuldigt können sie nicht wählen,
+     das vergibt die Seite nach der Absagefrist von selbst. Der Trainer hat alle Werte. */
+  function pickVals(){
+    if (!isTrainer()) return ["yes","maybe","exc"];
+    return lateOn() ? ["yes","late","maybe","exc","no"] : ["yes","maybe","exc","no"];
+  }
   function excHours(){ return typeof state.excHours === "number" ? state.excHours : DEFAULT_EXC; }
   function bonusHours(){ return typeof state.bonusHours === "number" ? state.bonusHours : DEFAULT_BONUS; }
   function deadlineMs(s, hours){ return startMs(s) - (hours || 0) * HOUR; }
@@ -2054,35 +2122,50 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function excOnTime(e, s){ return beforeDeadline(e, s, excHours()); }
   function bonusOnTime(e, s){ return beforeDeadline(e, s, bonusHours()); }
 
-  /* Der gewertete Status. Entschuldigt ohne Grund zählt wie gefehlt. Zu spät zählt wie
-     anwesend, solange die Kategorie ausgeschaltet ist. */
-  function effV(e){
-    if (!e) return null;
+  /* Absagefrist vorbei: ab dann können Spieler nichts mehr ändern */
+  function closed(s){ return !!s && Date.now() >= deadlineMs(s, excHours()); }
+  /* Keine Rückmeldung bis zur Absagefrist: automatisch unentschuldigt (ab AUTO_FROM,
+     und nur für Termine ab dem Tag, an dem der Spieler in den Kader kam). */
+  function autoNo(s, pid){
+    if (!s || !pid || s.cancelled || !closed(s) || s.date < AUTO_FROM) return false;
+    var p = player(pid);
+    return !(p && p.since && s.date < p.since);
+  }
+  function isAuto(e, s, pid){ return (!e && autoNo(s, pid)) || (!!e && e.v === "maybe" && closed(s)); }
+  /* Der gewertete Status. Entschuldigt ohne Grund zählt wie unentschuldigt. Zu spät zählt wie
+     anwesend, solange die Kategorie ausgeschaltet ist. Vielleicht wird mit Ablauf der
+     Absagefrist zu unentschuldigt, ebenso gar keine Rückmeldung. */
+  function effV(e, s, pid){
+    if (!e) return autoNo(s, pid) ? "no" : null;
+    if (e.v === "maybe") return closed(s) ? "no" : "maybe";
     if (e.v === "exc" && !hasReason(e)) return "no";
     if (e.v === "late" && !lateOn()) return "yes";
     return e.v;
   }
-  function present(e){ var v = effV(e); return v === "yes" || v === "late"; }
+  function present(e){ return !!e && (e.v === "yes" || (e.v === "late")); }
   function noReason(e){ return !!e && e.v === "exc" && !hasReason(e); }
-  function lateExc(e, s){ return effV(e) === "exc" && !excOnTime(e, s); }
+  function lateExc(e, s){ return !!e && effV(e, s) === "exc" && !excOnTime(e, s); }
+  /* Endgültige Rückmeldung (nicht Vielleicht): nur die zählt für Bonus und Pünktlichkeit */
+  function firm(e){ return !!e && e.v !== "maybe"; }
   /* Rückmeldung nach der Bonusfrist eingegangen oder geändert: der Bonus ist weg */
   function bonusLost(e, s){ return !!e && !!e.ts && bonusHours() > 0 && !bonusOnTime(e, s); }
   function wouldBreak(s, pid){
-    var e = entry(s.id, pid), v = effV(e);
+    var e = entry(s.id, pid), v = effV(e, s, pid);
     if (v === "yes" || v === "late") return false;
     if (v === "exc" && excOnTime(e, s)) return false;
     return true;
   }
   function jokerOffered(s, pid){
-    if (!jokerBudget()) return false;
+    if (!jokerBudget() || s.sp) return false;
     if (!wouldBreak(s, pid)) return false;
     if (s.date < jokerFrom()) return false;
     return hasJoker(s.id, pid) || jokersLeft(pid) > 0;
   }
 
   function pointsFor(e, s){
-    var v = effV(e);
-    if (!v) return 0;
+    if (s && s.sp) return 0;
+    var v = effV(e, s);
+    if (!v || v === "maybe" || v === "no") return 0;
     var bonus = bonusOnTime(e, s) ? BONUS : 0;
     if (v === "yes") return PTS.yes + bonus;
     if (v === "late") return latePts() + bonus;
@@ -2096,12 +2179,12 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     if (readOnly) return false;
     if (isTrainer()) return true;
     if (!me || me.id !== pid) return false;
-    return !started(s);
+    return !closed(s);
   }
 
   /* Frist als Uhrzeit, wie die Spieler sie sehen */
   function fmtDeadline(s, hours){
-    if (!hours) return "Trainingsbeginn";
+    if (!hours) return (s.allDay && !s.time) ? "0 Uhr am " + fmtShort(s.date) : (s.sp ? "Terminbeginn" : "Trainingsbeginn");
     var d = new Date(deadlineMs(s, hours));
     var clock = pad(d.getHours()) + ":" + pad(d.getMinutes()) + " Uhr";
     var day = isoOf(d);
@@ -2124,7 +2207,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function streakOf(pid){
     var cur = 0, best = 0;
     heldSessions().forEach(function(s){
-      var e = entry(s.id, pid), v = effV(e);
+      var e = entry(s.id, pid), v = effV(e, s, pid);
+      if (v === "maybe" || (!v && !closed(s))) return;   /* noch offen, die Frist läuft */
       if (v === "yes" || v === "late") { cur++; if (cur > best) best = cur; }
       else if (v === "exc" && excOnTime(e, s)) { /* rechtzeitige Absage pausiert die Serie */ }
       else if (hasJoker(s.id, pid)) { /* Joker rettet die Serie */ }
@@ -2167,7 +2251,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     held.forEach(function(s){
       var e = entry(s.id, pid);
       if (present(e)) yes++;
-      if (e && e.ts && bonusOnTime(e, s)) early++;
+      if (firm(e) && e.ts && bonusOnTime(e, s)) early++;
     });
     var st = streakOf(pid);
 
@@ -2176,7 +2260,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var key = s.date.slice(0,7);
       if (!months[key]) months[key] = { tot:0, miss:0 };
       months[key].tot++;
-      if (!entry(s.id, pid)) months[key].miss++;
+      if (!firm(entry(s.id, pid))) months[key].miss++;
     });
     var cleanMonths = 0;
     Object.keys(months).forEach(function(k){ if (months[k].tot >= 3 && months[k].miss === 0) cleanMonths++; });
@@ -2188,14 +2272,14 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       if (m !== 12 && m !== 1 && m !== 2) return;
       win++;
       var e = entry(s.id, pid);
-      if (!e || effV(e) === "no" || lateExc(e, s)) winBad++;
+      if (!e || effV(e, s, pid) === "no" || lateExc(e, s)) winBad++;
     });
 
     /* Pünktlichkeitsserie: fünf Rückmeldungen in Folge vor der Bonusfrist */
     var pc = 0, pcBest = 0;
     held.forEach(function(s){
       var e = entry(s.id, pid);
-      if (!e) pc = 0;
+      if (!firm(e)) pc = 0;
       else if (!e.ts) { /* Altbestand ohne Zeitstempel zählt hier weder mit noch gegen */ }
       else if (bonusOnTime(e, s)) { pc++; if (pc > pcBest) pcBest = pc; }
       else pc = 0;
@@ -2212,7 +2296,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         run++;
         if (run >= 3 && gapBefore) comeback = true;
         lastYes = s.date;
-      } else if (!e || effV(e) === "no" || lateExc(e, s)) {
+      } else if (!e || effV(e, s, pid) === "no" || lateExc(e, s)) {
         run = 0;
       }
     });
@@ -2246,10 +2330,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     setInfo("nextHead", isTrainer()
       ? "Wer schon zugesagt, abgesagt oder noch nichts eingetragen hat. Eintragen und korrigieren kannst du im Trainerbereich unter Termin abhaken oder in der Beteiligungstabelle.\n"
         + "Gründe siehst nur du und der Spieler selbst."
-      : "Hier trägst du dich für die nächste Einheit ein: anwesend, entschuldigt oder gefehlt. Entschuldigt braucht einen Grund, sonst wird nichts gespeichert.\n"
-        + "Nach der Absagefrist kannst du dich weiter entschuldigen, es gibt dann aber keine Punkte und die Serie reißt.\n"
-        + "Wer bis zur Bonusfrist eingetragen ist, bekommt " + BONUS + " Punkte Bonus. Wer danach noch einmal umträgt, verliert sie wieder.\n"
-        + "Ab Trainingsbeginn steht deine Rückmeldung fest, ändern kann sie dann nur noch der Trainer.",
+      : "Hier meldest du dich für den nächsten Termin zurück: bin da, vielleicht oder bin nicht da. Bin nicht da braucht einen Grund, sonst wird nichts gespeichert.\n"
+        + "Vielleicht ist nur vorläufig. Bis zur Absagefrist musst du dich festlegen. Wer dann noch vielleicht steht oder gar nichts eingetragen hat, zählt als unentschuldigt.\n"
+        + "Wer bis zur Bonusfrist fest zu- oder abgesagt hat, bekommt " + BONUS + " Punkte Bonus. Wer danach noch einmal umträgt, verliert sie wieder.\n"
+        + "Ab der Absagefrist steht deine Rückmeldung fest, ändern kann sie dann nur noch der Trainer.\n"
+        + "Sondertermine wie Turniere oder Fahrten stehen außerhalb der Wertung: keine Punkte, und die Serie läuft einfach weiter.",
       "Nächster Termin");
     setInfo("goalHead",
       "Die Saisonquote der Mannschaft ist anwesend geteilt durch alle eingetragenen Termine, über den ganzen Kader. Die senkrechte Marke im Balken ist euer Ziel von "
@@ -2332,23 +2417,27 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var lp = latePts();
 
     var rueck = [
-      "Jeder trägt sich selbst ein: anwesend, entschuldigt oder gefehlt.",
-      "Entschuldigt lässt sich nur mit einem Grund speichern. Wer entschuldigt antippt und das Feld leer lässt, hat nichts eingetragen.",
+      "Jeder meldet sich selbst zurück: bin da, vielleicht oder bin nicht da.",
+      "Bin nicht da lässt sich nur mit einem Grund speichern und zählt dann als entschuldigt. Wer das Feld leer lässt, hat nichts eingetragen.",
+      "Vielleicht ist nur vorläufig. Bis zur Absagefrist musst du dich auf bin da oder bin nicht da festlegen.",
+      "Wer bis zur Absagefrist gar nichts eingetragen hat oder noch auf vielleicht steht, wird automatisch als unentschuldigt gewertet. Selbst auswählen kann man unentschuldigt nicht.",
       "Den Grund sehen nur du und der Trainer, sonst niemand.",
-      "Ab Trainingsbeginn steht deine Rückmeldung fest. Ändern kann sie dann nur noch der Trainer.",
-      "Wer sich gar nicht einträgt, bekommt keine Punkte und die Serie reißt."
+      "Ab der Absagefrist steht deine Rückmeldung fest. Ändern kann sie dann nur noch der Trainer.",
+      "Sondertermine (zum Beispiel Turniere, Fahrten, Trainingslager) stehen außerhalb der Wertung. Eine Rückmeldung ist trotzdem wichtig, sie bringt aber keine Punkte und die Serie läuft einfach weiter."
     ];
     if (lateOn()) rueck.push("Zu spät trägt der Trainer nach dem Training ein, das kannst du nicht selbst setzen.");
 
     var punkte = ["Anwesend: " + PTS.yes + " Punkte."];
     if (lateOn()) punkte.push("Zu spät gekommen: " + lp + (lp === 1 ? " Punkt" : " Punkte") + ".");
-    punkte.push("Rechtzeitig entschuldigt: " + PTS.exc + " Punkte.");
-    punkte.push("Zu spät entschuldigt, entschuldigt ohne Grund, gefehlt oder nichts eingetragen: 0 Punkte.");
-    punkte.push("Bonus: " + BONUS + " Punkte zusätzlich für jede Rückmeldung, die bis zur Bonusfrist steht. Der Bonus gilt auch für eine Zusage.");
+    punkte.push("Entschuldigt (bin nicht da mit Grund): " + PTS.exc + " Punkte.");
+    punkte.push("Unentschuldigt, also keine Rückmeldung, vielleicht nicht festgelegt oder vom Trainer so gesetzt: 0 Punkte.");
+    punkte.push("Bonus: " + BONUS + " Punkte zusätzlich für jede feste Rückmeldung (bin da oder bin nicht da), die bis zur Bonusfrist steht. Vielleicht bringt keinen Bonus.");
+    punkte.push("Sondertermine bringen keine Punkte.");
 
     var fristen = [
       "Absagefrist: bis " + excAt + "." + excTxt
-        + " Danach kannst du dich weiter entschuldigen, es gibt dafür aber keine Punkte und die Serie reißt.",
+        + " Bis dahin muss deine Rückmeldung feststehen, danach kannst du sie nicht mehr ändern.",
+      "Bei ganztägigen Terminen rechnen die Fristen ab der Treffzeit, oder ab 0 Uhr am ersten Tag, wenn keine Treffzeit angegeben ist.",
       "Bonusfrist: bis " + bonusAt + "." + bonusTxt,
       "Wer seine Rückmeldung nach der Bonusfrist noch einmal ändert, verliert die " + BONUS
         + " Bonuspunkte für diesen Termin. Gezählt wird der Zeitpunkt der letzten Änderung.",
@@ -2356,18 +2445,19 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       "Ältere Einträge ohne Zeitstempel und Korrekturen des Trainers gelten als rechtzeitig."
     ];
     if (remindOn()) fristen.push("Erinnerung: " + remindHours() + (remindHours() === 1 ? " Stunde" : " Stunden")
-      + " vor der Absagefrist bekommt jeder ohne Rückmeldung eine Push-Nachricht, sofern er Erinnerungen unter Mein Profil eingeschaltet hat."
+      + " vor der Absagefrist bekommt jeder ohne Rückmeldung oder mit vielleicht eine Push-Nachricht, sofern er Erinnerungen unter Mein Profil eingeschaltet hat."
       + ((ref && !ref.cancelled) ? " Beim nächsten Termin ist das " + fmtDeadline(ref, remindLead()) + "." : ""));
 
     var serie = [
       "Die Serie zählt Einheiten in Folge, bei denen du dabei warst.",
       "Eine rechtzeitige Absage pausiert die Serie, sie setzt sie nicht zurück.",
-      "Gefehlt, zu spät abgesagt, entschuldigt ohne Grund oder nichts eingetragen reißt die Serie."
+      "Unentschuldigt reißt die Serie, auch wenn es automatisch vergeben wurde.",
+      "Sondertermine zählen für die Serie nicht, weder dafür noch dagegen."
     ];
     if (lateOn()) serie.push("Zu spät gekommen zählt für die Serie wie anwesend.");
 
     var quote = [
-      "Die Quote ist anwesend geteilt durch eingetragene Termine. Geplante Termine zählen erst, wenn sie vorbei sind."
+      "Die Quote ist anwesend geteilt durch gewertete Termine. Unentschuldigt zählt mit, auch wenn es automatisch vergeben wurde. Geplante Termine zählen erst, wenn sie vorbei sind. Sondertermine zählen nicht."
         + (seasonFrom() ? " Gewertet wird ab " + fmtLong(seasonFrom()) + ", alles davor zählt nicht mehr." : ""),
       "Ab " + levelMin() + " gewerteten Einheiten gibt es eine Stufe: Bronze ab " + levelDefs()[2].min
         + " Prozent, Silber ab " + levelDefs()[1].min + ", Gold ab " + levelDefs()[0].min + ".",
@@ -2399,7 +2489,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
     var rechte = [
       "Du änderst nur deine eigenen Einträge und setzt deine Joker selbst.",
-      "Ab Trainingsbeginn ändert nur noch der Trainer.",
+      "Ab der Absagefrist ändert nur noch der Trainer.",
       "Der Trainer kann jeden Eintrag korrigieren. Seine Korrekturen sind in der Beteiligungstabelle blau umrandet.",
       "Termine, Fristen, Mannschaftsziel, Joker und den Saisonstichtag legt der Trainer fest."
     ];
@@ -2538,13 +2628,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     if (!me) return 0;
     var t = todayISO();
     var limit = isoOf(new Date(Date.now() + 8*86400000));
-    var soon = upcoming().filter(function(s){ return !s.cancelled && s.date >= t && s.date <= limit; });
+    var soon = upcoming().filter(function(s){ return !s.cancelled && !closed(s) && s.date <= limit; });
     if (isTrainer()) {
       var n = 0;
-      soon.forEach(function(s){ n += counts(s.id).open; });
+      soon.forEach(function(s){ var c = counts(s.id); n += c.open + c.maybe; });
       return n;
     }
-    return soon.filter(function(s){ return !entry(s.id, me.id); }).length;
+    return soon.filter(function(s){ return !firm(entry(s.id, me.id)); }).length;
   }
   function go(k){
     if (navKeys().indexOf(k) === -1) k = "heute";
@@ -3153,9 +3243,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       st.best > st.cur ? "beste Serie: " + st.best : "in Folge anwesend", true);
     var trail = el("div","streakline");
     held.slice(-10).forEach(function(s){
-      var e = entry(s.id, me.id);
-      var d = el("i","sdot" + (effV(e) ? " " + effV(e) : ""));
-      d.title = fmtShort(s.date) + ": " + (effV(e) ? WORD[effV(e)] : "nichts eingetragen");
+      var e = entry(s.id, me.id), ev = effV(e, s, me.id);
+      var d = el("i","sdot" + (ev ? " " + ev : ""));
+      d.title = fmtShort(s.date) + ": " + (ev ? WORD[ev] + (isAuto(e, s, me.id) ? " (keine Rückmeldung)" : "") : "nichts eingetragen");
       trail.appendChild(d);
     });
     if (held.length) t1.appendChild(trail);
@@ -3166,9 +3256,12 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       : (lv.ready ? "ab " + levelDefs()[2].min + " Prozent Bronze" : "ab " + levelMin() + " gewerteten Einheiten"));
   }
 
-  var BIGWORD = { yes:["Bin da","anwesend"], late:["Zu spät","trotzdem da"],
-                  exc:["Entschuldigt","mit Grund"], no:["Bin nicht da","ohne Grund"] };
-  var SIGN = { yes:"✓", late:"⏱", exc:"!", no:"✕" };
+  var BIGWORD = { yes:["Bin da","anwesend"], late:["Zu spät","trotzdem da"], maybe:["Vielleicht","noch offen"],
+                  exc:["Bin nicht da","mit Grund"], no:["Unentschuldigt","ohne Grund"] };
+  var SIGN = { yes:"✓", late:"⏱", maybe:"?", exc:"!", no:"✕" };
+  /* Beschriftung der Auswahlknöpfe: Spieler sehen ihre Worte, der Trainer die Statuswörter */
+  function pickWord(v){ return isTrainer() ? WORD[v] : BIGWORD[v][0]; }
+  function pickSign(v){ return (!isTrainer() && v === "exc") ? "✕" : SIGN[v]; }
 
   function pickButtons(sid, pid, big){
     var s = sessById(sid);
@@ -3183,13 +3276,15 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
          sonst überlagert die volle Füllfarbe von [aria-pressed="true"] die gestrichelte
          Warte-Darstellung, und Text und Hintergrund landen in derselben Farbe (unsichtbar). */
       b.setAttribute("aria-pressed", (cur && cur.v === v) ? "true" : "false");
-      b.setAttribute("aria-label", WORD[v]);
-      b.title = v === "late" ? "Zu spät gekommen, setzt nur der Trainer" : WORD[v];
+      b.setAttribute("aria-label", pickWord(v));
+      b.title = v === "late" ? "Zu spät gekommen, setzt nur der Trainer"
+        : v === "maybe" ? "Vielleicht: bis zur Absagefrist festlegen, sonst unentschuldigt"
+        : v === "exc" ? "Bin nicht da, nur mit Grund" : pickWord(v);
       if (big) {
         b.appendChild(el("span", null, BIGWORD[v][0]));
         b.appendChild(el("small", null, BIGWORD[v][1]));
       } else {
-        b.textContent = SIGN[v];
+        b.textContent = pickSign(v);
       }
       b.disabled = !open;
       b.addEventListener("click", function(){
@@ -3267,11 +3362,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     wrap.appendChild(row);
     var note, warn = true;
     if (readOnly) { note = "Diese Ansicht ist nur lesend."; }
-    else if (!open) { note = started(s)
-      ? "Das Training hat begonnen. Ändern kann das jetzt nur noch der Trainer."
+    else if (!open) { note = closed(s)
+      ? "Die Absagefrist ist vorbei. Ändern kann das jetzt nur noch der Trainer."
       : "Ändern kann das nur der Trainer."; }
-    else if (pend) { note = "Ohne Grund wird nichts gespeichert. Den Grund sieht nur der Trainer."; }
-    else if (!cur.n) { note = "Ohne Grund zählt dieser Eintrag als gefehlt. Trag den Grund nach."; }
+    else if (pend) { note = "Bin nicht da geht nur mit Grund, ohne wird nichts gespeichert. Den Grund sieht nur der Trainer."; }
+    else if (!cur.n) { note = "Ohne Grund zählt dieser Eintrag als unentschuldigt. Trag den Grund nach."; }
     else { note = "Den Grund sieht nur der Trainer."; warn = false; }
     wrap.appendChild(el("p", warn ? "hint warn" : "hint", note));
     return wrap;
@@ -3280,11 +3375,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function tally(sid){
     var c = counts(sid);
     var box = el("div","tally");
-    [["yes", c.yes + " anwesend"],["late", c.late + " zu spät"],["exc", c.exc + " entschuldigt"],
-     ["no", c.no + " gefehlt"],["open", c.open + " offen"]]
+    [["yes", c.yes + " anwesend"],["late", c.late + " zu spät"],["maybe", c.maybe + " vielleicht"],
+     ["exc", c.exc + " entschuldigt"],["no", c.no + " unentschuldigt"],["open", c.open + " offen"]]
       .forEach(function(pair){
         if (pair[0] === "open" && c.open === 0) return;
-        if (pair[0] === "late" && !c.late) return;
+        if ((pair[0] === "late" || pair[0] === "maybe") && !c[pair[0]]) return;
         box.appendChild(el("span","chip " + pair[0], pair[1]));
       });
     return box;
@@ -3296,13 +3391,14 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var next = upcoming().filter(function(s){ return !s.cancelled; })[0];
     if (!next) {
       card.appendChild(el("p","hint", isTrainer()
-        ? "Kein Termin im Plan. Leg im Trainerbereich den Rhythmus oder einen Einzeltermin an."
+        ? "Kein Termin im Plan. Leg im Trainerbereich den Rhythmus oder einen Sondertermin an."
         : "Kein Termin im Plan. Der Trainer trägt die nächsten Einheiten ein."));
       return;
     }
     var head = el("div","next-head");
     head.appendChild(el("h3", null, next.label || "Training"));
-    head.appendChild(el("div","next-meta", fmtLong(next.date) + " · " + span(next) + " Uhr" + (next.place ? " · " + next.place : "")));
+    head.appendChild(el("div","next-meta", dateSpan(next, true) + " · " + spanUhr(next) + (next.place ? " · " + next.place : "")
+      + (next.sp ? " · außer Wertung" : "")));
     card.appendChild(head);
 
     if (isTrainer()) {
@@ -3311,19 +3407,22 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       card.appendChild(pickButtons(next.id, me.id, true));
       var mine = entry(next.id, me.id);
       var now = Date.now();
-      var excOpen = now <= deadlineMs(next, excHours());
+      var excOpen = now < deadlineMs(next, excHours());
       var bonusOpen = now <= deadlineMs(next, bonusHours());
       var line = el("p", excOpen ? "hint" : "hint warn");
-      line.textContent = "Absage zählt bis " + fmtDeadline(next, excHours()) + (excOpen ? "" : " (vorbei)")
-        + " · Bonus bis " + fmtDeadline(next, bonusHours()) + (bonusOpen ? "" : " (vorbei)");
+      line.textContent = "Rückmeldung bis " + fmtDeadline(next, excHours()) + (excOpen ? "" : " (vorbei)")
+        + (next.sp ? "" : " · Bonus bis " + fmtDeadline(next, bonusHours()) + (bonusOpen ? "" : " (vorbei)"));
       card.appendChild(line);
-      if (started(next)) card.appendChild(el("p","hint warn",
-        "Training läuft, ändern kann jetzt nur noch der Trainer."));
-      else if (!bonusOpen) card.appendChild(el("p","hint",
+      if (!excOpen) card.appendChild(el("p","hint warn",
+        "Die Frist ist vorbei, ändern kann jetzt nur noch der Trainer."
+          + (isAuto(mine, next, me.id) ? " Ohne feste Rückmeldung zählt das als unentschuldigt." : "")));
+      else if (!bonusOpen && !next.sp) card.appendChild(el("p","hint",
         "Eine Änderung kostet jetzt die " + BONUS + " Bonuspunkte."));
-      if (mine && bonusLost(mine, next)) card.appendChild(el("p","hint warn",
+      if (mine && !next.sp && mine.v !== "maybe" && bonusLost(mine, next)) card.appendChild(el("p","hint warn",
         "Für diesen Termin gibt es keine Bonuspunkte."));
-      if (!mine && excOpen) card.appendChild(el("p","hint warn","Noch nicht eingetragen."));
+      if (!mine && excOpen) card.appendChild(el("p","hint warn","Noch nicht eingetragen. Ohne Rückmeldung bis zur Frist zählt das als unentschuldigt."));
+      if (mine && mine.v === "maybe" && excOpen) card.appendChild(el("p","hint warn",
+        "Vielleicht ist nur vorläufig. Leg dich bis " + fmtDeadline(next, excHours()) + " fest, sonst zählt es als unentschuldigt."));
       var rr = reasonRow(next.id, me.id);
       if (rr) card.appendChild(rr);
     }
@@ -3334,10 +3433,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   function nameLists(sid){
     var box = el("div","names");
-    [["yes","Anwesend"],["late","Zu spät"],["exc","Entschuldigt"],["no","Gefehlt"],["open","Noch offen"]].forEach(function(pair){
+    var ss = sessById(sid);
+    [["yes","Anwesend"],["late","Zu spät"],["maybe","Vielleicht"],["exc","Entschuldigt"],["no","Unentschuldigt"],["open","Noch offen"]].forEach(function(pair){
       var kind = pair[0];
       var members = state.players.filter(function(p){
-        var v = effV(entry(sid, p.id));
+        var v = effV(entry(sid, p.id), ss, p.id);
         return kind === "open" ? !v : v === kind;
       });
       if (!members.length) return;
@@ -3348,6 +3448,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         var s = null;
         state.sessions.forEach(function(x){ if (x.id === sid) s = x; });
         var reason = "";
+        if (kind === "no" && isAuto(e, s, p.id)) reason = " (keine Rückmeldung)";
         if (e && e.v === "exc" && mayNote(p.id)) {
           reason = e.n ? " (" + e.n + ")" : " (ohne Grund)";
           if (s && lateExc(e, s)) reason += " (zu spät abgesagt)";
@@ -3370,20 +3471,21 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     list.slice(0,20).forEach(function(s){
       var row = el("div","sess" + (s.cancelled ? " off" : ""));
       var when = el("div","when");
-      when.appendChild(document.createTextNode(fmtShort(s.date)));
+      when.appendChild(document.createTextNode(dateSpan(s)));
       when.appendChild(el("em", null, span(s)));
       row.appendChild(when);
       var what = el("div","what");
       what.appendChild(document.createTextNode(s.label || "Training"));
+      if (s.sp) what.appendChild(el("span","sptag","außer Wertung"));
       if (s.cancelled) what.appendChild(el("em", null, "fällt aus" + (s.reason ? ": " + s.reason : "")));
       else if (s.place) what.appendChild(el("em", null, s.place));
       if (!s.cancelled && !isTrainer()) {
-        var over = Date.now() > deadlineMs(s, excHours());
-        what.appendChild(el("em", null, started(s)
-          ? "Training läuft, Änderungen macht jetzt nur noch der Trainer"
-          : over
-            ? "Absagefrist vorbei, eine Absage bringt keine Punkte mehr"
-            : "Absage zählt bis " + fmtDeadline(s, excHours())));
+        var mineU = entry(s.id, me.id);
+        what.appendChild(el("em", null, closed(s)
+          ? "Frist vorbei, Änderungen macht jetzt nur noch der Trainer"
+          : (mineU && mineU.v === "maybe")
+            ? "Vielleicht: bis " + fmtDeadline(s, excHours()) + " festlegen"
+            : "Rückmeldung bis " + fmtDeadline(s, excHours())));
       }
       row.appendChild(what);
       if (s.cancelled || isTrainer()) row.appendChild(el("div","mine"));
@@ -3404,27 +3506,30 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function renderPast(){
     var box = $("pastList");
     box.innerHTML = "";
-    var list = heldSessions().slice().reverse().slice(0,20);
+    var list = pastSessions().slice().reverse().slice(0,20);
     if (!list.length) {
-      box.appendChild(el("p","empty","Noch keine Einheit gewertet."));
+      box.appendChild(el("p","empty","Noch kein Termin vorbei."));
       return;
     }
     list.forEach(function(s){
       var row = el("div","sess");
       var when = el("div","when");
-      when.appendChild(document.createTextNode(fmtShort(s.date)));
+      when.appendChild(document.createTextNode(dateSpan(s)));
       when.appendChild(el("em", null, span(s)));
       row.appendChild(when);
       var what = el("div","what");
       what.appendChild(document.createTextNode(s.label || "Training"));
+      if (s.sp) what.appendChild(el("span","sptag","außer Wertung"));
       if (!isTrainer()) {
-        var e = entry(s.id, me.id);
-        what.appendChild(el("em", null, e
-          ? WORD[effV(e)] + (noReason(e) ? " (entschuldigt ohne Grund)" : "")
+        var e = entry(s.id, me.id), ev = effV(e, s, me.id);
+        var pts = s.sp ? "keine Punkte" : pointsFor(e, s) + " Punkte";
+        what.appendChild(el("em", null, ev
+          ? WORD[ev] + (noReason(e) ? " (entschuldigt ohne Grund)" : "")
+            + (isAuto(e, s, me.id) ? " (keine feste Rückmeldung)" : "")
             + (lateExc(e, s) ? " (zu spät abgesagt)" : "")
-            + (bonusLost(e, s) ? " (ohne Bonus)" : "")
-            + " · " + pointsFor(e, s) + " Punkte"
-          : "nichts eingetragen · 0 Punkte"));
+            + (!s.sp && firm(e) && bonusLost(e, s) ? " (ohne Bonus)" : "")
+            + " · " + pts
+          : "nichts eingetragen · " + (s.sp ? "keine Punkte" : "0 Punkte")));
       } else if (s.place) {
         what.appendChild(el("em", null, s.place));
       }
@@ -3562,7 +3667,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function renderStats(){
     var t = $("statsTable");
     t.innerHTML = "";
-    var held = heldSessions().slice(-10);
+    var held = pastSessions().slice(-10);
     var heldIds = held.map(function(s){ return s.id; });
     var soon = upcoming().filter(function(s){ return !s.cancelled && heldIds.indexOf(s.id) === -1; }).slice(0, 6);
     var cols = held.concat(soon);
@@ -3571,10 +3676,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var thead = el("thead"), hr = el("tr");
     hr.appendChild(el("th","name","Spieler"));
     cols.forEach(function(s, i){
-      var th = el("th", (i >= firstFuture ? "future" : "") + (i === firstFuture && held.length ? " split" : ""));
+      var th = el("th", (i >= firstFuture ? "future" : "") + (i === firstFuture && held.length ? " split" : "") + (s.sp ? " sp" : ""));
       th.appendChild(document.createTextNode(fmtShort(s.date)));
-      th.title = (s.label || "Training") + " · " + fmtLong(s.date) + " · " + span(s) + " Uhr"
-        + (i >= firstFuture ? " · geplant, zählt noch nicht in die Quote" : "");
+      if (s.sp) th.appendChild(el("small", null, "Sonder"));
+      th.title = (s.label || "Training") + " · " + dateSpan(s, true) + " · " + spanUhr(s)
+        + (s.sp ? " · Sondertermin, außer Wertung" : i >= firstFuture ? " · geplant, zählt noch nicht in die Quote" : "");
       hr.appendChild(th);
     });
     var qh = el("th","q","Quote");
@@ -3605,11 +3711,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       cols.forEach(function(s, i){
         var td = el("td", (i >= firstFuture ? "future" : "") + (i === firstFuture && held.length ? " split" : ""));
         var e = entry(s.id, p.id);
-        var v = effV(e);
+        var v = effV(e, s, p.id);
+        var auto = isAuto(e, s, p.id);
         var pend = !!pendingExc && pendingExc.sid === s.id && pendingExc.pid === p.id;
-        var mark = el("i","mark" + (pend ? " exc" : (v ? " " + v : "")) + (e && e.by === "t" ? " byt" : ""));
+        var mark = el("i","mark" + (pend ? " exc" : (v ? " " + v : "")) + (auto ? " auto" : "") + (e && e.by === "t" ? " byt" : ""));
         var title = p.name + " · " + fmtShort(s.date) + " · " + (v ? WORD[v] : "nichts eingetragen");
-        if (noReason(e)) title += " (entschuldigt ohne Grund, zählt als gefehlt)";
+        if (auto) title += e ? " (war vielleicht, nicht festgelegt)" : " (keine Rückmeldung)";
+        if (noReason(e)) title += " (entschuldigt ohne Grund, zählt als unentschuldigt)";
         else if (e && e.v === "exc" && e.n && mayNote(p.id)) title += " (" + e.n + ")";
         if (lateExc(e, s)) title += " (zu spät abgesagt)";
         if (isTrainer() && !readOnly) {
@@ -3722,9 +3830,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         groups[k].forEach(function(s){
           var e = entry(s.id, me.id);
           var j = hasJoker(s.id, me.id);
-          var v = effV(e);
+          var v = effV(e, s, me.id);
           var d = el("i", (v ? v : "") + (j ? " jok" : ""));
           d.title = fmtShort(s.date) + ": " + (v ? WORD[v] + (noReason(e) ? " (entschuldigt ohne Grund)" : "")
+              + (isAuto(e, s, me.id) ? " (keine feste Rückmeldung)" : "")
               + (lateExc(e, s) ? " (zu spät abgesagt)" : "") : "nichts eingetragen")
             + (j ? " · Joker" : "") + " · " + pointsFor(e, s) + " Punkte";
           g.appendChild(d);
@@ -3736,8 +3845,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var lg = el("div","legend");
       lg.style.marginTop = "14px";
       (lateOn()
-        ? [["yes","anwesend"],["late","zu spät"],["exc","entschuldigt"],["no","gefehlt"],["","nichts eingetragen"]]
-        : [["yes","anwesend"],["exc","entschuldigt"],["no","gefehlt"],["","nichts eingetragen"]]
+        ? [["yes","anwesend"],["late","zu spät"],["exc","entschuldigt"],["no","unentschuldigt"],["","nichts eingetragen"]]
+        : [["yes","anwesend"],["exc","entschuldigt"],["no","unentschuldigt"],["","nichts eingetragen"]]
       ).forEach(function(pair){
         var sp = el("span");
         sp.appendChild(el("i","mark" + (pair[0] ? " " + pair[0] : "")));
@@ -3974,18 +4083,18 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var ref = upcoming().filter(function(s){ return !s.cancelled; })[0] || heldSessions().slice(-1)[0];
     var pre = function(id, hours, what){
       if (!ref) { $(id).textContent = "Sobald ein Termin im Plan steht, steht hier die konkrete Uhrzeit."; return; }
-      $(id).textContent = "Beim Termin am " + fmtShort(ref.date) + ", " + ref.time + " Uhr heißt das: "
+      $(id).textContent = "Beim Termin am " + fmtShort(ref.date) + ", " + spanUhr(ref) + " heißt das: "
         + what + " bis " + fmtDeadline(ref, hours) + ".";
     };
-    pre("excPreview", excHours(), "Absage zählt");
+    pre("excPreview", excHours(), "Rückmeldung");
     pre("bonusPreview", bonusHours(), "Bonuspunkte");
     $("remindOnInput").checked = remindOn();
     $("remindInput").value = remindHours();
     $("remindInput").disabled = !remindOn();
     if (!remindOn()) $("remindPreview").textContent = "Push-Erinnerungen sind für dieses Team aus.";
     else if (!ref) $("remindPreview").textContent = "Sobald ein Termin im Plan steht, steht hier die konkrete Uhrzeit.";
-    else $("remindPreview").textContent = "Beim Termin am " + fmtShort(ref.date) + ", " + ref.time
-      + " Uhr kommt die Erinnerung um " + fmtDeadline(ref, remindLead()) + ".";
+    else $("remindPreview").textContent = "Beim Termin am " + fmtShort(ref.date) + ", " + spanUhr(ref)
+      + ", kommt die Erinnerung um " + fmtDeadline(ref, remindLead()) + ".";
     renderRemindCount();
 
     $("jokerInput").value = jokerBudget();
@@ -4010,6 +4119,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       : "Kein Stichtag gesetzt, es zählen alle Termine.";
 
     $("clearTeamCode").hidden = mode === "fb";
+    if (mode !== "fb") setInfo("codeHead", "Ein Code vor der Seite, damit nicht jeder mit der Adresse Kader, Quoten und Entschuldigungsgründe sieht. Das Gerät merkt sich den Code danach.\n"
+      + "In dieser Betriebsart ohne Firebase ist das nur eine Hürde, kein echter Schutz.", "Teamcode");
     if (mode === "fb") $("teamCodeState").textContent = state.teamCode
       ? "Ein Teamcode ist gesetzt. Neue Spieler und neue Geräte brauchen ihn für die erste Anmeldung."
       : "Noch kein Teamcode gesetzt. Ohne Code kann sich niemand neu anmelden, bitte jetzt einen vergeben.";
@@ -4049,8 +4160,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     list.innerHTML = "";
     var t = todayISO();
     var sorted = byDate(state.sessions);
-    var future = sorted.filter(function(s){ return s.date >= t; });
-    var past = sorted.filter(function(s){ return s.date < t; }).reverse();
+    var future = sorted.filter(function(s){ return lastDay(s) >= t; });
+    var past = sorted.filter(function(s){ return lastDay(s) < t; }).reverse();
     var ordered = future.concat(past);
 
     ordered.forEach(function(s, i){
@@ -4060,7 +4171,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         list.appendChild(sep);
       }
       var row = el("div","srow" + (s.cancelled ? " off" : ""));
-      row.appendChild(el("span","g", fmtShort(s.date) + " " + span(s) + " · " + (s.label || "Training") + (s.place ? " · " + s.place : "")));
+      var gl = el("span","g", dateSpan(s) + " " + span(s) + " · " + (s.label || "Training") + (s.place ? " · " + s.place : ""));
+      if (s.sp) gl.appendChild(el("span","sptag","außer Wertung"));
+      row.appendChild(gl);
 
       var edit = el("button","btn quiet", editing === s.id ? "schließen" : "bearbeiten");
       edit.type = "button";
@@ -4087,10 +4200,19 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       if (editing === s.id) {
         var box = el("div","edit");
         var d = el("input"); d.type = "date"; d.value = s.date;
-        var lv = el("label", null, "von"); lv.style.alignSelf = "center";
+        var lu = el("label", null, "bis"); lu.style.alignSelf = "center";
+        var un = el("input"); un.type = "date"; un.value = s.until || ""; un.title = "Enddatum, nur bei mehrtägigen Terminen";
+        var adl = el("label","check"), ad = el("input"); ad.type = "checkbox"; ad.checked = !!s.allDay;
+        adl.appendChild(ad); adl.appendChild(document.createTextNode(" ganztägig"));
+        var spl = el("label","check"), spc = el("input"); spc.type = "checkbox"; spc.checked = !!s.sp;
+        spl.appendChild(spc); spl.appendChild(document.createTextNode(" außer Wertung"));
+        var lv = el("label", null, s.allDay ? "Treffzeit" : "von"); lv.style.alignSelf = "center";
         var ti = el("input"); ti.type = "time"; ti.value = s.time;
         var lb = el("label", null, "bis"); lb.style.alignSelf = "center";
         var en = el("input"); en.type = "time"; en.value = s.end || "";
+        var syncAd = function(){ lv.textContent = ad.checked ? "Treffzeit" : "von"; lb.hidden = ad.checked; en.hidden = ad.checked; };
+        ad.addEventListener("change", syncAd);
+        syncAd();
         ti.addEventListener("change", function(){
           if (ti.value && (!en.value || en.value <= ti.value)) en.value = plusMinutes(ti.value, 90);
         });
@@ -4101,10 +4223,14 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         ok.type = "button";
         ok.addEventListener("click", function(){
           editing = null;
-          mutate({ t:"updSession", id:s.id, patch:{ date: d.value || s.date, time: ti.value || s.time, end: en.value,
+          var nd = d.value || s.date;
+          var allDay = ad.checked;
+          mutate({ t:"updSession", id:s.id, patch:{ date: nd, until: (un.value && un.value > nd) ? un.value : "",
+            allDay: allDay, sp: spc.checked,
+            time: allDay ? (ti.value || "") : (ti.value || s.time || "19:30"), end: allDay ? "" : en.value,
             label: la.value.trim() || "Training", place: pl.value.trim(), reason: rs.value.trim() } });
         });
-        [d,lv,ti,lb,en,la,pl,ok].forEach(function(n){ box.appendChild(n); });
+        [d,lu,un,adl,lv,ti,lb,en,la,pl,spl,ok].forEach(function(n){ box.appendChild(n); });
         if (s.cancelled) box.insertBefore(rs, ok);
         row.appendChild(box);
       }
@@ -4317,23 +4443,24 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var box = $("nudge"), txt = $("nudgeText");
     var t = todayISO();
     var limit = isoOf(new Date(Date.now() + 8 * 86400000));
-    var soon = upcoming().filter(function(s){ return !s.cancelled && s.date >= t && s.date <= limit; });
+    var soon = upcoming().filter(function(s){ return !s.cancelled && !closed(s) && s.date <= limit; });
     if (!soon.length || !state.players.length) { box.hidden = true; return; }
 
     if (isTrainer()) {
       var offen = soon.map(function(s){
         var c = counts(s.id);
-        return c.open ? fmtShort(s.date) + ": " + c.open : null;
+        return (c.open || c.maybe) ? fmtShort(s.date) + ": " + c.open + (c.maybe ? " (+" + c.maybe + " vielleicht)" : "") : null;
       }).filter(Boolean);
       if (!offen.length) { box.hidden = true; return; }
       txt.textContent = "Es fehlen noch Rückmeldungen. " + offen.join(", ") + ".";
       box.hidden = false;
       return;
     }
-    var mine = soon.filter(function(s){ return !entry(s.id, me.id); });
+    var mine = soon.filter(function(s){ return !firm(entry(s.id, me.id)); });
     if (!mine.length) { box.hidden = true; return; }
     txt.textContent = mine.length === 1
-      ? "Für " + fmtShort(mine[0].date) + " hast du dich noch nicht eingetragen."
+      ? (entry(mine[0].id, me.id) ? "Für " + fmtShort(mine[0].date) + " steht bei dir noch vielleicht. Leg dich bis " + fmtDeadline(mine[0], excHours()) + " fest."
+        : "Für " + fmtShort(mine[0].date) + " hast du dich noch nicht eingetragen.")
       : "Für " + mine.length + " Termine fehlt noch deine Rückmeldung: " + mine.map(function(s){ return fmtShort(s.date); }).join(", ") + ".";
     box.hidden = false;
   }
@@ -4349,7 +4476,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
     sel.innerHTML = "";
     ordered.forEach(function(s){
-      var o = el("option", null, fmtShort(s.date) + " " + span(s) + " · " + (s.label || "Training") + (s.cancelled ? " (abgesagt)" : ""));
+      var o = el("option", null, dateSpan(s) + " " + span(s) + " · " + (s.label || "Training") + (s.sp ? " (außer Wertung)" : "") + (s.cancelled ? " (abgesagt)" : ""));
       o.value = s.id;
       sel.appendChild(o);
     });
@@ -4406,18 +4533,18 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   /* ---------- CSV ---------- */
   function buildCsv(){
-    var held = heldSessions();
+    var held = pastSessions();
     var sep = ";";
-    var head = ["Spieler"].concat(held.map(function(s){ return fmtShort(s.date) + " " + span(s) + " " + (s.label || "Training"); }))
+    var head = ["Spieler"].concat(held.map(function(s){ return dateSpan(s) + " " + span(s) + " " + (s.label || "Training") + (s.sp ? " (außer Wertung)" : ""); }))
       .concat(["Anwesend","Eingetragen","Quote in Prozent","Punkte","Serie","Stufe","Joker übrig"]);
     var lines = [head.join(sep)];
     state.players.forEach(function(p){
       var cells = [p.name];
       held.forEach(function(s){
         var e = entry(s.id, p.id);
-        var v = effV(e);
-        cells.push(v ? WORD[v] + (noReason(e) ? " (entschuldigt ohne Grund)" : "")
-          + (e.v === "exc" && e.n ? " (" + e.n.replace(/[;\r\n]/g," ") + ")" : "") : "Offen");
+        var v = effV(e, s, p.id);
+        cells.push(v ? WORD[v] + (noReason(e) ? " (entschuldigt ohne Grund)" : "") + (isAuto(e, s, p.id) ? " (keine Rückmeldung)" : "")
+          + (e && e.v === "exc" && e.n ? " (" + e.n.replace(/[;\r\n]/g," ") + ")" : "") : "Offen");
       });
       var q = quota(p.id);
       var lv = levelOf(p.id);
@@ -4458,14 +4585,14 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   /* ---------- Sicherung ---------- */
   function backupJson(){
-    return JSON.stringify({ v:8, team: state.team, goal: goalPct(), excHours: excHours(), bonusHours: bonusHours(),
+    return JSON.stringify({ v:10, team: state.team, goal: goalPct(), excHours: excHours(), bonusHours: bonusHours(),
       remindOn: remindOn(), remindHours: remindHours(),
       lateOn: lateOn(), latePts: latePts(),
       lvGold: levelDefs()[0].min, lvSilver: levelDefs()[1].min, lvBronze: levelDefs()[2].min,
       levelMin: levelMin(), badges: badgeCfg(),
       jokers: jokerBudget(), jokerFrom: jokerFrom(), seasonFrom: seasonFrom(), teamCode: state.teamCode || "",
       trainerPin: mode === "fb" ? null : state.trainerPin,
-      players: mode === "fb" ? state.players.map(function(p){ return { id: p.id, name: p.name }; }) : state.players,
+      players: mode === "fb" ? state.players.map(function(p){ return { id: p.id, name: p.name, since: p.since || "" }; }) : state.players,
       sessions: state.sessions, att: state.att, joker: state.joker }, null, 2);
   }
 
@@ -4624,7 +4751,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var inp = $("newPlayer"), name = inp.value.trim();
       if (!name) { inp.focus(); return; }
       inp.value = "";
-      mutate({ t:"addPlayer", id: uid("p"), name: name });
+      mutate({ t:"addPlayer", id: uid("p"), name: name, since: todayISO() });
       inp.focus();
     });
     $("newPlayer").addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); $("addPlayer").click(); } });
@@ -4663,12 +4790,31 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       msg.textContent = added ? added + (added === 1 ? " Termin angelegt." : " Termine angelegt.") : "Diese Termine stehen schon im Plan.";
     });
 
+    var syncAllDay = function(){
+      var ad = $("oneAllDay").checked;
+      $("oneTimeLab").textContent = ad ? "Treffzeit (optional)" : "von";
+      $("oneEnd").hidden = ad;
+      $("oneEndLab").hidden = ad;
+      if (ad && $("oneTime").value === "19:30") $("oneTime").value = "";
+      if (!ad && !$("oneTime").value) $("oneTime").value = "19:30";
+    };
+    $("oneAllDay").addEventListener("change", syncAllDay);
     $("addOne").addEventListener("click", function(){
-      var date = $("oneDate").value;
+      var date = $("oneDate").value, until = $("oneUntil").value;
+      var msg = $("oneMsg");
+      msg.className = "msg"; msg.textContent = "";
       if (!date) { $("oneDate").focus(); return; }
-      mutate({ t:"addSession", s:{ id: uid("s"), date: date, time: $("oneTime").value || "19:30", end: $("oneEnd").value || "",
-        label: $("oneLabel").value.trim() || "Training", place: $("onePlace").value.trim(), cancelled:false, reason:"" } });
+      if (until && until < date) { msg.textContent = "Das Enddatum liegt vor dem ersten Tag."; $("oneUntil").focus(); return; }
+      var ad = $("oneAllDay").checked;
+      var s = { id: uid("s"), date: date, until: (until && until > date) ? until : "", allDay: ad,
+        time: ad ? ($("oneTime").value || "") : ($("oneTime").value || "19:30"), end: ad ? "" : ($("oneEnd").value || ""),
+        sp: $("oneSp").checked, label: $("oneLabel").value.trim() || ($("oneSp").checked ? "Sondertermin" : "Training"),
+        place: $("onePlace").value.trim(), cancelled:false, reason:"" };
+      mutate({ t:"addSession", s:s });
       $("oneLabel").value = "";
+      $("oneUntil").value = "";
+      msg.className = "msg ok";
+      msg.textContent = "Angelegt: " + (s.label) + ", " + dateSpan(s) + ", " + spanUhr(s) + (s.sp ? ", außer Wertung." : ".");
     });
 
     linkTimes("rhythmTime","rhythmEnd");
@@ -4855,10 +5001,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       trainerPin: typeof st.trainerPin === "string" ? st.trainerPin : null,
       compareWith: st.compareWith && typeof st.compareWith === "object" ? st.compareWith : {},
       players: Array.isArray(st.players) ? st.players.filter(function(p){ return p && p.id; }).map(function(p){
-        return { id:p.id, name:String(p.name || "?"), pin: typeof p.pin === "string" ? p.pin : null }; }) : [],
+        return { id:p.id, name:String(p.name || "?"), pin: typeof p.pin === "string" ? p.pin : null,
+                 since: typeof p.since === "string" ? p.since : "" }; }) : [],
       sessions: Array.isArray(st.sessions) ? st.sessions.filter(function(s){ return s && s.id && s.date; }).map(function(s){
-        return { id:s.id, date:s.date, time:s.time || "19:30", end: s.end || "", label:s.label || "Training", place:s.place || "",
-                 cancelled: !!s.cancelled, reason: s.reason || "" }; }) : [],
+        return sessOf(s.id, s); }) : [],
       att: st.att && typeof st.att === "object" ? st.att : {},
       joker: st.joker && typeof st.joker === "object" ? st.joker : {}
     };
