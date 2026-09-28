@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-2o3lSL/LoQxyVjUYo89R+Le7wjowGrpprHahDh0Pyrg=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-BcxeSp4r+w5acPkkOHt1I1etZq0M1PY2ZRT/aBe6RyQ=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Trainingsbeteiligung</title>
@@ -307,7 +307,7 @@ window.TB_ICONS = {
 
   .names{display:flex;flex-direction:column;gap:6px;margin-top:14px;}
   .nameline{font-size:14px;color:var(--text-body);}
-  .nl{display:inline-block;min-width:112px;font:700 11px/1.6 var(--font-narrow);letter-spacing:.1em;text-transform:uppercase;vertical-align:baseline;}
+  .nl{display:inline-block;min-width:132px;font:700 11px/1.6 var(--font-narrow);letter-spacing:.1em;text-transform:uppercase;vertical-align:baseline;}
   .nl.yes{color:var(--status-present);}
   .nl.exc{color:var(--status-excused);}
   .nl.no{color:var(--status-absent);}
@@ -366,6 +366,7 @@ window.TB_ICONS = {
   .mark.no{background:var(--status-absent);}
   .mark.late{background:var(--status-present) var(--watch) center/13px 13px no-repeat;}
   .mark.maybe{background:var(--info);}
+  .mark.hid{background:transparent;box-shadow:inset 0 0 0 1.5px var(--border-strong);border-radius:5px;opacity:.7;}
   .mark.no.auto{background:repeating-linear-gradient(135deg,var(--status-absent) 0 3px,var(--status-absent-soft) 3px 6px);}
   th.sp{color:var(--text-muted);font-style:italic;}
   th small{display:block;font:600 9.5px/1.1 var(--font-narrow);letter-spacing:.06em;text-transform:uppercase;}
@@ -466,6 +467,82 @@ window.TB_ICONS = {
   .sdot.late{background:var(--status-present) var(--watch) center/9px 9px no-repeat;}
   .sdot.maybe{background:var(--info);}
   .sdot.jok{box-shadow:inset 0 0 0 2px var(--sand-500);}
+
+  /* ---------- Kalender ---------- */
+  .calbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;}
+  .seg{display:inline-flex;border:1.5px solid var(--border-strong);border-radius:var(--radius-control);overflow:hidden;}
+  .seg button{font:600 13.5px/1 var(--font-sans);height:36px;padding:0 16px;border:0;background:var(--surface-card);color:var(--text-body);cursor:pointer;}
+  .seg button+button{border-left:1.5px solid var(--border-strong);}
+  .seg button[aria-pressed="true"]{background:var(--surface-brand);color:var(--text-on-brand);}
+  .calnav{display:flex;align-items:center;gap:6px;}
+  .calnav b{font:700 16px/1.2 var(--font-sans);color:var(--text-strong);min-width:150px;text-align:center;font-variant-numeric:tabular-nums;}
+  .calnav .btn.quiet{font-size:22px;width:36px;height:36px;padding:0;}
+  .mgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));}
+  .mgrid .wd{font:700 10.5px/1 var(--font-narrow);letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);
+    padding:10px 8px 8px;border-bottom:1px solid var(--border-subtle);text-align:left;}
+  .mday{min-height:104px;padding:6px 6px 8px;border:0;border-right:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);
+    background:var(--surface-card);cursor:pointer;display:flex;flex-direction:column;gap:3px;min-width:0;text-align:left;
+    font:inherit;color:inherit;}
+  .mgrid .mday:nth-child(7n){border-right:0;}
+  .mday.other{background:var(--surface-page);}
+  .mday.other .dn{color:var(--text-muted);opacity:.6;}
+  .mday:hover{background:var(--surface-brand-soft);}
+  .mday .dn{font:600 13px/1 var(--font-narrow);color:var(--text-strong);width:24px;height:24px;display:grid;place-items:center;border-radius:999px;font-variant-numeric:tabular-nums;flex:none;}
+  .mday.today .dn{background:var(--surface-brand);color:var(--text-on-brand);}
+  .mday.sel,.wday.sel{box-shadow:inset 0 0 0 2px var(--surface-brand);}
+  .ev{display:block;font:600 11.5px/1.25 var(--font-sans);padding:3px 6px;border-radius:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    background:var(--status-unknown-soft);color:var(--text-body);border-left:3px solid var(--status-unknown);}
+  .ev small{font-weight:400;opacity:.85;font-size:inherit;}
+  .ev.yes,.ev.late{background:var(--status-present-soft);border-left-color:var(--status-present);}
+  .ev.maybe{background:var(--info-soft);border-left-color:var(--info);}
+  .ev.exc{background:var(--status-excused-soft);border-left-color:var(--status-excused);}
+  .ev.no{background:var(--status-absent-soft);border-left-color:var(--status-absent);}
+  .ev.open{background:transparent;box-shadow:inset 0 0 0 1px var(--border-strong);border-left-color:var(--text-muted);}
+  .ev.tr{background:var(--surface-brand-soft);border-left-color:var(--surface-brand);}
+  .ev.off{text-decoration:line-through;opacity:.6;}
+  .ev.sp{border-left-style:dashed;}
+  .ev.swatch{display:inline-block;width:22px;height:12px;padding:0;flex:none;}
+  .more{font:600 11px/1.2 var(--font-narrow);color:var(--text-muted);padding-left:4px;}
+  @media (max-width:640px){
+    .mgrid .wd{padding:8px 4px 6px;text-align:center;}
+    .mday{min-height:60px;padding:4px 3px;align-items:center;}
+    .mday .ev{font-size:0;padding:0;height:6px;width:100%;border-left-width:0;border-radius:3px;}
+    .mday .ev.yes,.mday .ev.late{background:var(--status-present);}
+    .mday .ev.maybe{background:var(--info);}
+    .mday .ev.exc{background:var(--status-excused);}
+    .mday .ev.no{background:var(--status-absent);}
+    .mday .ev.tr{background:var(--surface-brand);}
+    .mday .ev.open{background:var(--border-strong);box-shadow:none;}
+    .mday .ev small{display:none;}
+    .mday .more{font-size:10px;padding:0;}
+    .calnav b{min-width:0;font-size:15px;}
+  }
+  .wgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));}
+  .wday{border:0;border-right:1px solid var(--border-subtle);min-height:220px;display:flex;flex-direction:column;cursor:pointer;min-width:0;
+    background:var(--surface-card);text-align:left;font:inherit;color:inherit;padding:0;}
+  .wday:last-child{border-right:0;}
+  .wday:hover{background:var(--surface-brand-soft);}
+  .wday .wh{padding:10px 10px 8px;border-bottom:1px solid var(--border-subtle);display:flex;gap:6px;align-items:baseline;}
+  .wday .wh span{font:700 10.5px/1 var(--font-narrow);letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);}
+  .wday .wh b{font:700 18px/1 var(--font-sans);color:var(--text-strong);font-variant-numeric:tabular-nums;}
+  .wday.today .wh b{color:var(--text-brand);}
+  .wday .wb{padding:8px;display:flex;flex-direction:column;gap:6px;min-width:0;}
+  .wday .ev{white-space:normal;font-size:12.5px;padding:6px 8px;}
+  .wday .ev em{display:block;font-style:normal;font-weight:400;font-size:11.5px;opacity:.85;}
+  .wday .none{font-size:12px;color:var(--text-muted);opacity:.7;}
+  @media (max-width:760px){
+    .wgrid{grid-template-columns:1fr;}
+    .wday{min-height:0;border-right:0;border-bottom:1px solid var(--border-subtle);flex-direction:row;}
+    .wday:last-child{border-bottom:0;}
+    .wday .wh{flex-direction:column;align-items:center;justify-content:center;gap:4px;border-bottom:0;border-right:1px solid var(--border-subtle);min-width:62px;}
+    .wday .wb{flex:1;}
+  }
+  .dayitem{padding:16px 18px;border-top:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:6px;}
+  .dayitem:first-child{border-top:0;}
+  .dayitem h3{font:700 16px/1.25 var(--font-sans);color:var(--text-strong);}
+  .dayitem .meta{font-size:13.5px;color:var(--text-muted);}
+  .dayitem.off h3{text-decoration:line-through;color:var(--text-muted);}
+  .dayitem .picks,.dayitem .tally{margin-top:8px;}
 
   /* Saisonkalender */
   .cal{display:flex;flex-wrap:wrap;gap:18px 22px;}
@@ -858,6 +935,43 @@ window.TB_ICONS = {
         </section>
       </section>
 
+      <!-- ---------- KALENDER ---------- -->
+      <section class="view" id="view-kalender" hidden>
+        <div class="viewhead">
+          <h1 id="calViewHead">Kalender</h1>
+          <p id="calSub">Alle Termine im Überblick.</p>
+        </div>
+        <div class="calbar">
+          <div class="seg" role="group" aria-label="Ansicht">
+            <button type="button" id="calModeMonth">Monat</button>
+            <button type="button" id="calModeWeek">Woche</button>
+          </div>
+          <div class="calnav">
+            <button type="button" class="btn quiet" id="calPrev" aria-label="zurück">‹</button>
+            <b id="calTitle"></b>
+            <button type="button" class="btn quiet" id="calNext" aria-label="weiter">›</button>
+            <button type="button" class="btn" id="calToday">Heute</button>
+          </div>
+        </div>
+        <div class="card" id="calGrid"></div>
+        <div class="legend" id="calLegend"></div>
+        <section>
+          <h2 id="calDayHead">Tag</h2>
+          <div class="card" id="calDay"></div>
+        </section>
+        <section>
+          <h2 data-info="Lädt alle kommenden Termine als Datei im Kalenderformat (.ics) herunter. Die Datei kannst du in Google Kalender, Apple Kalender oder Outlook öffnen und importieren.
+Das ist ein einmaliger Stand, kein Abo: Kommen neue Termine dazu oder ändert sich etwas, lade die Datei einfach noch einmal herunter. Bereits importierte Termine werden dabei in den meisten Kalendern aktualisiert statt doppelt angelegt." data-title="Export">In den Handy-Kalender</h2>
+          <div class="card pad">
+            <div class="row">
+              <button type="button" class="btn primary" id="icsBtn">Kommende Termine als .ics herunterladen</button>
+              <span class="msg ok" id="icsMsg"></span>
+            </div>
+            <textarea id="icsBox" hidden rows="6" style="width:100%;margin-top:10px"></textarea>
+          </div>
+        </section>
+      </section>
+
       <!-- ---------- TEAM ---------- -->
       <section class="view" id="view-team" hidden>
         <div class="viewhead">
@@ -893,6 +1007,7 @@ window.TB_ICONS = {
             <span><i class="mark no"></i> unentschuldigt</span>
             <span><i class="mark no auto"></i> keine Rückmeldung bis zur Frist</span>
             <span><i class="mark"></i> nichts eingetragen</span>
+            <span id="legendHid" hidden><i class="mark hid"></i> sichtbar ab der Absagefrist</span>
             <span id="legendTrainer" hidden><i class="mark yes byt"></i> vom Trainer korrigiert</span>
           </div>
         </section>
@@ -1332,6 +1447,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   var NAV = [
     { k:"heute",   label:"Heute",   icon:"calendar-check" },
     { k:"termine", label:"Termine", icon:"clock" },
+    { k:"kalender", label:"Kalender", icon:"calendar-days" },
     { k:"team",    label:"Team",    icon:"users" },
     { k:"ich",     label:"Ich",     icon:"user-round" },
     { k:"trainer", label:"Trainer", icon:"settings" }
@@ -2131,6 +2247,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var p = player(pid);
     return !(p && p.since && s.date < p.since);
   }
+  /* Wer kommt, sehen Spieler erst ab der Absagefrist. Vorher nur Anzahlen und der eigene Eintrag,
+     damit niemand absagt, nur weil jemand anderes schon abgesagt hat. Der Trainer sieht immer alles. */
+  function revealed(s){ return isTrainer() || !s || !!s.cancelled || closed(s); }
   function isAuto(e, s, pid){ return (!e && autoNo(s, pid)) || (!!e && e.v === "maybe" && closed(s)); }
   /* Der gewertete Status. Entschuldigt ohne Grund zählt wie unentschuldigt. Zu spät zählt wie
      anwesend, solange die Kategorie ausgeschaltet ist. Vielleicht wird mit Ablauf der
@@ -2333,7 +2452,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       : "Hier meldest du dich für den nächsten Termin zurück: bin da, vielleicht oder bin nicht da. Bin nicht da braucht einen Grund, sonst wird nichts gespeichert.\n"
         + "Vielleicht ist nur vorläufig. Bis zur Absagefrist musst du dich festlegen. Wer dann noch vielleicht steht oder gar nichts eingetragen hat, zählt als unentschuldigt.\n"
         + "Wer bis zur Bonusfrist fest zu- oder abgesagt hat, bekommt " + BONUS + " Punkte Bonus. Wer danach noch einmal umträgt, verliert sie wieder.\n"
-        + "Ab der Absagefrist steht deine Rückmeldung fest, ändern kann sie dann nur noch der Trainer.\n"
+        + "Ab der Absagefrist steht deine Rückmeldung fest, ändern kann sie dann nur noch der Trainer. Ab dann siehst du auch, wer kommt und wer nicht, vorher nur die Anzahlen.\n"
         + "Sondertermine wie Turniere oder Fahrten stehen außerhalb der Wertung: keine Punkte, und die Serie läuft einfach weiter.",
       "Nächster Termin");
     setInfo("goalHead",
@@ -2422,6 +2541,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       "Vielleicht ist nur vorläufig. Bis zur Absagefrist musst du dich auf bin da oder bin nicht da festlegen.",
       "Wer bis zur Absagefrist gar nichts eingetragen hat oder noch auf vielleicht steht, wird automatisch als unentschuldigt gewertet. Selbst auswählen kann man unentschuldigt nicht.",
       "Den Grund sehen nur du und der Trainer, sonst niemand.",
+      "Wie sich die anderen gemeldet haben, siehst du erst ab der Absagefrist. Vorher stehen nur die Anzahlen da, damit jeder für sich entscheidet.",
       "Ab der Absagefrist steht deine Rückmeldung fest. Ändern kann sie dann nur noch der Trainer.",
       "Sondertermine (zum Beispiel Turniere, Fahrten, Trainingslager) stehen außerhalb der Wertung. Eine Rückmeldung ist trotzdem wichtig, sie bringt aber keine Punkte und die Serie läuft einfach weiter."
     ];
@@ -2622,7 +2742,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   /* ---------- Navigation ---------- */
   function navKeys(){
-    return isTrainer() ? ["heute","termine","team","trainer"] : ["heute","termine","team","ich"];
+    return isTrainer() ? ["heute","termine","kalender","team","trainer"] : ["heute","termine","kalender","team","ich"];
   }
   function openCount(){
     if (!me) return 0;
@@ -2678,7 +2798,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       tabs.appendChild(t);
     });
 
-    ["heute","termine","team","ich","trainer"].forEach(function(k){
+    ["heute","termine","kalender","team","ich","trainer"].forEach(function(k){
       var v = $("view-" + k);
       if (v) v.hidden = (k !== route);
     });
@@ -3132,6 +3252,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     $("whoTag").hidden = !isTrainer();
     $("legendTrainer").hidden = !isTrainer();
     $("legendLate").hidden = !lateOn();
+    $("legendHid").hidden = isTrainer();
     setInfo("tableHead",
       "Ein Feld je Spieler und Termin, eingefärbt nach dem gewerteten Status. Grün hinterlegte Spalten sind geplante Termine, sie zählen noch nicht in die Quote.\n"
       + "Die Quote rechts ist anwesend geteilt durch eingetragene Termine.\n"
@@ -3139,7 +3260,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         ? "Auf ein Feld tippen öffnet die Auswahl: " + cycleVals().filter(function(v){ return v; })
             .map(function(v){ return WORD[v].toLowerCase(); }).join(", ") + " oder Eintrag löschen."
           + " Bei entschuldigt öffnet sich darunter das Feld für den Grund, ohne Grund wird nichts gespeichert. Deine Korrekturen sind blau umrandet."
-        : "Eintragen kannst du dich unter Termine. Der Trainer kann hier korrigieren."),
+        : "Eintragen kannst du dich unter Termine. Der Trainer kann hier korrigieren.\n"
+          + "Bei kommenden Terminen siehst du bis zur Absagefrist nur deinen eigenen Eintrag. Wie die anderen sich gemeldet haben, wird erst danach aufgedeckt."),
       "Beteiligung");
     var footText = mode === "fb"
       ? "Jeder trägt sich selbst ein. Änderungen sind sofort für alle sichtbar."
@@ -3158,6 +3280,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     renderUpcoming();
     closePop();
     renderPast();
+    renderCal();
     renderTeamView();
     renderStats();
     renderIch();
@@ -3428,7 +3551,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     }
 
     card.appendChild(tally(next.id));
-    card.appendChild(nameLists(next.id));
+    if (revealed(next)) card.appendChild(nameLists(next.id));
+    else card.appendChild(el("p","hint","Wer kommt und wer nicht, siehst du ab " + fmtDeadline(next, excHours())
+      + ". Bis dahin stehen hier nur die Anzahlen."));
   }
 
   function nameLists(sid){
@@ -3710,6 +3835,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       tr.appendChild(nameCell);
       cols.forEach(function(s, i){
         var td = el("td", (i >= firstFuture ? "future" : "") + (i === firstFuture && held.length ? " split" : ""));
+        if (!revealed(s) && !(me && p.id === me.id)) {
+          var hm = el("i","mark hid");
+          hm.title = p.name + " · " + fmtShort(s.date) + " · sichtbar ab " + fmtDeadline(s, excHours());
+          td.appendChild(hm);
+          tr.appendChild(td);
+          return;
+        }
         var e = entry(s.id, p.id);
         var v = effV(e, s, p.id);
         var auto = isAuto(e, s, p.id);
@@ -4504,7 +4636,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   }
 
   /* ---------- Datei ausgeben ---------- */
-  function downloadText(name, text, msgEl, boxEl){
+  function downloadText(name, text, msgEl, boxEl, mime){
     var fail = function(){
       if (boxEl) { boxEl.hidden = false; boxEl.value = text; }
       if (msgEl) msgEl.textContent = "Download nicht möglich, hier zum Kopieren:";
@@ -4518,7 +4650,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       return;
     }
     try {
-      var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      var blob = new Blob([text], { type: mime || "text/plain;charset=utf-8" });
       var url = URL.createObjectURL(blob);
       var a = document.createElement("a");
       a.href = url;
@@ -4616,6 +4748,267 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   }
 
   /* ---------- Verdrahtung ---------- */
+  /* ---------- Kalender ---------- */
+  var CALMODEKEY = "tb:calmode:v1";
+  var calMode = safe(function(){ return localStorage.getItem(CALMODEKEY); }, null) === "week" ? "week" : "month";
+  var calCursor = null;   /* Anker der Ansicht (ISO-Datum) */
+  var calSel = null;      /* ausgewählter Tag (ISO-Datum) */
+
+  function dayAdd(d, n){ return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+  function mondayOf(d){ return dayAdd(d, -((d.getDay() + 6) % 7)); }
+  function isoWeek(d){
+    var t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    var wd = t.getUTCDay() || 7;
+    t.setUTCDate(t.getUTCDate() + 4 - wd);
+    var y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+    return Math.ceil(((t - y0) / 86400000 + 1) / 7);
+  }
+  function sessOnDay(iso){ return byDate(state.sessions).filter(function(s){ return s.date <= iso && lastDay(s) >= iso; }); }
+  function ownWord(s){
+    if (isTrainer() || s.cancelled) return "";
+    var e = entry(s.id, me.id), v = effV(e, s, me.id);
+    if (!v) return closed(s) ? "nichts eingetragen" : "noch offen";
+    return (v === "exc" ? "Bin nicht da" : v === "yes" ? "Bin da" : WORD[v]) + (isAuto(e, s, me.id) ? " (keine Rückmeldung)" : "");
+  }
+  function evClass(s){
+    var c = "ev" + (s.sp ? " sp" : "");
+    if (s.cancelled) return c + " off";
+    if (isTrainer()) return c + " tr";
+    return c + " " + (effV(entry(s.id, me.id), s, me.id) || "open");
+  }
+  function calEv(s, iso, rich){
+    var ev = el("span", evClass(s));
+    var first = iso === s.date;
+    var t = s.allDay ? (first && s.time ? s.time : "") : (first ? s.time : "");
+    var own = ownWord(s);
+    ev.title = (s.label || "Training") + " · " + dateSpan(s, true) + " · " + spanUhr(s)
+      + (s.place ? " · " + s.place : "") + (s.sp ? " · außer Wertung" : "")
+      + (s.cancelled ? " · fällt aus" : "") + (own ? " · " + own : "");
+    if (rich) {
+      ev.appendChild(document.createTextNode(s.label || "Training"));
+      var sub = [];
+      if (multiDay(s)) sub.push(dateSpan(s));
+      sub.push(spanUhr(s));
+      if (s.place) sub.push(s.place);
+      if (s.cancelled) sub.push("fällt aus");
+      else if (own) sub.push(own);
+      else if (isTrainer()) { var c = counts(s.id); sub.push(c.yes + c.late + " da, " + (c.open + c.maybe) + " offen"); }
+      ev.appendChild(el("em", null, sub.join(" · ")));
+    } else {
+      if (t) ev.appendChild(el("small", null, t + " "));
+      ev.appendChild(document.createTextNode(s.label || "Training"));
+    }
+    return ev;
+  }
+  function calPick(iso){
+    calSel = iso;
+    if (calMode === "month" && iso.slice(0,7) !== calCursor.slice(0,7)) calCursor = iso.slice(0,8) + "01";
+    renderCal();
+  }
+  function calShift(dir){
+    var t = todayISO();
+    if (calMode === "month") {
+      var c = parseISO(calCursor);
+      var n = new Date(c.getFullYear(), c.getMonth() + dir, 1);
+      calCursor = isoOf(n);
+      calSel = t.slice(0,7) === calCursor.slice(0,7) ? t : calCursor;
+    } else {
+      var m = dayAdd(mondayOf(parseISO(calCursor)), 7 * dir);
+      calCursor = isoOf(m);
+      calSel = (t >= calCursor && t <= isoOf(dayAdd(m, 6))) ? t : calCursor;
+    }
+    renderCal();
+  }
+  function calSetMode(m){
+    calMode = m;
+    safe(function(){ localStorage.setItem(CALMODEKEY, m); });
+    calCursor = calSel || todayISO();
+    renderCal();
+  }
+
+  function renderCal(){
+    var grid = $("calGrid");
+    if (!grid || !me) return;
+    var t = todayISO();
+    if (!calCursor) calCursor = t;
+    if (!calSel) calSel = t;
+    $("calModeMonth").setAttribute("aria-pressed", calMode === "month" ? "true" : "false");
+    $("calModeWeek").setAttribute("aria-pressed", calMode === "week" ? "true" : "false");
+    grid.innerHTML = "";
+    var WDS = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+
+    if (calMode === "month") {
+      var c = parseISO(calCursor);
+      var first = new Date(c.getFullYear(), c.getMonth(), 1);
+      var last = new Date(c.getFullYear(), c.getMonth() + 1, 0);
+      var start = mondayOf(first), end = dayAdd(mondayOf(last), 6);
+      $("calTitle").textContent = MONLONG[c.getMonth()] + " " + c.getFullYear();
+      var g = el("div","mgrid");
+      WDS.forEach(function(w){ g.appendChild(el("div","wd", w)); });
+      for (var d = start; d <= end; d = dayAdd(d, 1)) {
+        (function(day){
+          var iso = isoOf(day);
+          var b = el("button","mday" + (day.getMonth() !== c.getMonth() ? " other" : "") + (iso === t ? " today" : "") + (iso === calSel ? " sel" : ""));
+          b.type = "button";
+          var list = sessOnDay(iso);
+          b.setAttribute("aria-label", fmtLong(iso) + (list.length ? ", " + list.length + (list.length === 1 ? " Termin" : " Termine") : ", kein Termin"));
+          b.appendChild(el("span","dn", String(day.getDate())));
+          list.slice(0, 3).forEach(function(s){ b.appendChild(calEv(s, iso, false)); });
+          if (list.length > 3) b.appendChild(el("span","more", "+" + (list.length - 3) + " weitere"));
+          b.addEventListener("click", function(){ calPick(iso); });
+          g.appendChild(b);
+        })(d);
+      }
+      grid.appendChild(g);
+    } else {
+      var mon = mondayOf(parseISO(calCursor));
+      var sun = dayAdd(mon, 6);
+      $("calTitle").textContent = "KW " + isoWeek(mon) + " · " + mon.getDate() + "." + (mon.getMonth() + 1) + ". bis "
+        + sun.getDate() + "." + (sun.getMonth() + 1) + ".";
+      var w = el("div","wgrid");
+      for (var i = 0; i < 7; i++) {
+        (function(day){
+          var iso = isoOf(day);
+          var b = el("button","wday" + (iso === t ? " today" : "") + (iso === calSel ? " sel" : ""));
+          b.type = "button";
+          var hd = el("div","wh");
+          hd.appendChild(el("span", null, WDS[i]));
+          hd.appendChild(el("b", null, day.getDate() + "."));
+          b.appendChild(hd);
+          var body = el("div","wb");
+          var list = sessOnDay(iso);
+          list.forEach(function(s){ body.appendChild(calEv(s, iso, true)); });
+          if (!list.length) body.appendChild(el("span","none","frei"));
+          b.appendChild(body);
+          b.addEventListener("click", function(){ calPick(iso); });
+          w.appendChild(b);
+        })(dayAdd(mon, i));
+      }
+      grid.appendChild(w);
+    }
+
+    /* Legende */
+    var lg = $("calLegend");
+    lg.innerHTML = "";
+    var items = isTrainer()
+      ? [["tr","Termin"]]
+      : [["yes","bin da"],["maybe","vielleicht"],["exc","bin nicht da"],["no","unentschuldigt"],["open","noch offen"]];
+    items.concat([["open sp","Sondertermin, außer Wertung"],["open off","fällt aus"]]).forEach(function(p){
+      var sp = el("span");
+      var sw = el("i","ev swatch " + p[0]);
+      sp.appendChild(sw);
+      sp.appendChild(document.createTextNode(" " + p[1]));
+      lg.appendChild(sp);
+    });
+
+    /* Tagesdetails */
+    $("calDayHead").textContent = calSel === t ? "Heute, " + fmtLong(calSel) : fmtLong(calSel);
+    var box = $("calDay");
+    box.innerHTML = "";
+    var day = sessOnDay(calSel);
+    if (!day.length) { box.appendChild(el("p","empty","An diesem Tag steht nichts im Plan.")); return; }
+    day.forEach(function(s){
+      var it = el("div","dayitem" + (s.cancelled ? " off" : ""));
+      var h = el("h3", null, s.label || "Training");
+      if (s.sp) h.appendChild(el("span","sptag","außer Wertung"));
+      it.appendChild(h);
+      it.appendChild(el("p","meta", dateSpan(s, true) + " · " + spanUhr(s) + (s.place ? " · " + s.place : "")));
+      if (s.cancelled) {
+        it.appendChild(el("p","hint warn","Fällt aus" + (s.reason ? ": " + s.reason : "") + "."));
+        box.appendChild(it);
+        return;
+      }
+      if (!isTrainer()) {
+        var upcomingS = lastDay(s) >= t;
+        if (upcomingS) it.appendChild(pickButtons(s.id, me.id, true));
+        var e = entry(s.id, me.id);
+        if (!closed(s)) {
+          it.appendChild(el("p", "hint", "Rückmeldung bis " + fmtDeadline(s, excHours())
+            + (e && e.v === "maybe" ? ". Vielleicht ist nur vorläufig, leg dich bis dahin fest." : ".")));
+        } else {
+          var own = ownWord(s);
+          it.appendChild(el("p","hint", "Deine Rückmeldung: " + own + (s.sp || !heldSessions().some(function(x){ return x.id === s.id; })
+            ? "" : " · " + pointsFor(e, s) + " Punkte")));
+        }
+        var rr = reasonRow(s.id, me.id);
+        if (rr) it.appendChild(rr);
+      }
+      it.appendChild(tally(s.id));
+      if (revealed(s)) it.appendChild(nameLists(s.id));
+      else it.appendChild(el("p","hint","Wer kommt und wer nicht, siehst du ab " + fmtDeadline(s, excHours()) + "."));
+      box.appendChild(it);
+    });
+  }
+
+  /* ---------- Export in den Handy-Kalender (.ics) ---------- */
+  function icsEsc(v){ return String(v == null ? "" : v).replace(/\\/g,"\\\\").replace(/;/g,"\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n"); }
+  /* Zeilen nach 75 Byte umbrechen (UTF-8), Folgezeilen beginnen mit einem Leerzeichen */
+  function icsFold(line){
+    var out = [], cur = "", bytes = 0;
+    Array.from(line).forEach(function(ch){
+      var n = unescape(encodeURIComponent(ch)).length;
+      if (bytes + n > 73) { out.push(cur); cur = " "; bytes = 1; }
+      cur += ch; bytes += n;
+    });
+    out.push(cur);
+    return out.join("\r\n");
+  }
+  function icsDate(iso){ return iso.replace(/-/g, ""); }
+  function icsDT(iso, hm){ return icsDate(iso) + "T" + String(hm || "00:00").replace(":", "").slice(0,4) + "00"; }
+  function buildIcs(){
+    var now = new Date();
+    var stamp = now.getUTCFullYear() + pad(now.getUTCMonth()+1) + pad(now.getUTCDate()) + "T"
+      + pad(now.getUTCHours()) + pad(now.getUTCMinutes()) + pad(now.getUTCSeconds()) + "Z";
+    var team = state.team || "Team";
+    var url = safe(function(){ return location.origin + location.pathname; }, "");
+    var L = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//KC Wetter//Trainingsbeteiligung//DE","CALSCALE:GREGORIAN","METHOD:PUBLISH",
+      "X-WR-CALNAME:" + icsEsc(team + " Training"), "X-WR-TIMEZONE:Europe/Berlin",
+      "BEGIN:VTIMEZONE","TZID:Europe/Berlin",
+      "BEGIN:DAYLIGHT","TZOFFSETFROM:+0100","TZOFFSETTO:+0200","TZNAME:CEST","DTSTART:19700329T020000","RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU","END:DAYLIGHT",
+      "BEGIN:STANDARD","TZOFFSETFROM:+0200","TZOFFSETTO:+0100","TZNAME:CET","DTSTART:19701025T030000","RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU","END:STANDARD",
+      "END:VTIMEZONE"];
+    var n = 0;
+    upcoming().forEach(function(s){
+      n++;
+      L.push("BEGIN:VEVENT");
+      L.push("UID:" + s.id + "@" + (activeTeamKey || "team") + ".kcw-trainingstagebuch");
+      L.push("DTSTAMP:" + stamp);
+      if (s.allDay) {
+        L.push("DTSTART;VALUE=DATE:" + icsDate(s.date));
+        L.push("DTEND;VALUE=DATE:" + icsDate(isoOf(dayAdd(parseISO(lastDay(s)), 1))));
+      } else {
+        var endDay = lastDay(s), endT = s.end || plusMinutes(s.time, 90);
+        if (!multiDay(s) && endT <= s.time) endDay = isoOf(dayAdd(parseISO(s.date), 1));
+        L.push("DTSTART;TZID=Europe/Berlin:" + icsDT(s.date, s.time));
+        L.push("DTEND;TZID=Europe/Berlin:" + icsDT(endDay, endT));
+      }
+      L.push("SUMMARY:" + icsEsc((s.label || "Training") + " · " + team));
+      if (s.place) L.push("LOCATION:" + icsEsc(s.place));
+      var desc = [];
+      if (s.allDay && s.time) desc.push("Treffen " + s.time + " Uhr");
+      if (s.sp) desc.push("Sondertermin, außer Wertung");
+      if (s.cancelled) desc.push("Fällt aus" + (s.reason ? ": " + s.reason : ""));
+      else desc.push("Rückmeldung bis " + fmtDeadline(s, excHours()));
+      if (url) desc.push(url);
+      L.push("DESCRIPTION:" + icsEsc(desc.join("\n")));
+      if (url) L.push("URL:" + url);
+      L.push("STATUS:" + (s.cancelled ? "CANCELLED" : "CONFIRMED"));
+      L.push("END:VEVENT");
+    });
+    L.push("END:VCALENDAR");
+    return { text: L.map(icsFold).join("\r\n") + "\r\n", n: n };
+  }
+  function exportIcs(){
+    var msg = $("icsMsg");
+    msg.className = "msg ok";
+    msg.textContent = "";
+    var r = buildIcs();
+    if (!r.n) { msg.className = "msg"; msg.textContent = "Es steht gerade kein kommender Termin im Plan."; return; }
+    var name = String(state.team || "training").toLowerCase().replace(/[^a-z0-9äöüß]+/g, "-").replace(/^-|-$/g, "") + "-termine.ics";
+    downloadText(name, r.text, msg, $("icsBox"), "text/calendar;charset=utf-8");
+    if (msg.textContent === "Datei gespeichert.") msg.textContent = r.n + (r.n === 1 ? " Termin" : " Termine") + " exportiert. Datei öffnen, um sie in den Kalender zu übernehmen.";
+  }
+
   function wire(){
     $("loginWho").addEventListener("change", function(){ $("loginMsg").textContent = ""; syncPinLabel(); });
     $("loginBtn").addEventListener("click", doLogin);
@@ -4821,6 +5214,12 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     linkTimes("oneTime","oneEnd");
 
     $("csvBtn").addEventListener("click", exportCsv);
+    $("icsBtn").addEventListener("click", exportIcs);
+    $("calModeMonth").addEventListener("click", function(){ calSetMode("month"); });
+    $("calModeWeek").addEventListener("click", function(){ calSetMode("week"); });
+    $("calPrev").addEventListener("click", function(){ calShift(-1); });
+    $("calNext").addEventListener("click", function(){ calShift(1); });
+    $("calToday").addEventListener("click", function(){ calCursor = calSel = todayISO(); renderCal(); });
 
     $("sessPick").addEventListener("change", function(){ pickSid = this.value; renderSessionEditor(); });
 
