@@ -81,7 +81,7 @@ function startMs(s) {
 }
 // wie fmtDeadline auf der Seite
 function fmtDeadline(s, hours) {
-  if (!hours) return "Trainingsbeginn";
+  if (!hours) return (s.allDay && !s.time) ? `0 Uhr am ${fmtShort(s.date)}` : (s.sp ? "Terminbeginn" : "Trainingsbeginn");
   const d = new Date(startMs(s) - hours * HOUR);
   const clock = `${pad(d.getHours())}:${pad(d.getMinutes())} Uhr`;
   const day = isoOf(d);
@@ -116,15 +116,17 @@ async function runTeam(key, stats) {
     if (NOW < remindAt || NOW >= deadline) continue;
 
     for (const pid of Object.keys(players)) {
-      if (att[sid] && att[sid][pid]) continue;          // hat schon eine Rückmeldung
+      const cur = att[sid] && att[sid][pid];
+      if (cur && cur.v !== "maybe") continue;           // hat schon fest zu- oder abgesagt
+      const maybe = !!cur;
       if (sent[sid] && sent[sid][pid]) continue;        // schon erinnert
       const subs = subsAll[pid];
       if (!subs || !Object.keys(subs).length) continue; // keine Erinnerungen eingeschaltet
 
       const payload = JSON.stringify({
-        title: `${s.label || "Training"} ${dayWord(s)}, ${s.time} Uhr`,
-        body: "Du hast dich noch nicht eingetragen. "
-          + (exc ? `Absage mit Punkten bis ${fmtDeadline(s, exc)}.` : "Bitte gib bis Trainingsbeginn Bescheid."),
+        title: `${s.label || "Training"} ${dayWord(s)}` + (s.allDay ? (s.time ? `, Treffen ${s.time} Uhr` : ", ganztägig") : `, ${s.time} Uhr`),
+        body: (maybe ? "Bei dir steht noch vielleicht. " : "Du hast dich noch nicht eingetragen. ")
+          + `Bitte leg dich bis ${fmtDeadline(s, exc)} fest, sonst zählt es als unentschuldigt.`,
         tag: `tb-${key}-${sid}`,
         url: PAGE + "#/heute",
       });

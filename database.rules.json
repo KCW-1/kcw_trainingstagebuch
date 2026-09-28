@@ -133,6 +133,9 @@
             "pin": {
               ".validate": "newData.isString()"
             },
+            "since": {
+              ".validate": "newData.isString() && newData.val().length <= 10"
+            },
             "login": {
               ".write": "auth != null && !data.exists() && newData.child('uid').val() === auth.uid && !root.child('users').child(auth.uid).exists() && (auth != null && root.child('pending').child(auth.uid).child('c').isString() && root.child('gate').child(root.child('pending').child(auth.uid).child('c').val()).val() === $k) && root.child('teams').child($k).child('players').child($pid).child('name').exists()",
               "uid": {
@@ -160,10 +163,10 @@
         "att": {
           "$sid": {
             "$pid": {
-              ".write": "(auth != null && root.child('teams').child($k).child('players').child($pid).child('login').child('uid').val() === auth.uid) && root.child('teams').child($k).child('sessions').child($sid).child('at').val() > now && (!newData.exists() || ((newData.child('ts').val() === now || (newData.child('ts').val() === data.child('ts').val() && newData.child('v').val() === data.child('v').val())) && newData.child('by').val() !== 't' && newData.child('v').val() !== 'late' && (newData.child('r').val() !== true || newData.parent().parent().parent().parent().parent().child('notes').child($k).child($pid).child($sid).isString())))",
+              ".write": "(auth != null && root.child('teams').child($k).child('players').child($pid).child('login').child('uid').val() === auth.uid) && ((!root.child('teams').child($k).child('excHours').isNumber() && root.child('teams').child($k).child('sessions').child($sid).child('at').val() > now) || (root.child('teams').child($k).child('excHours').isNumber() && root.child('teams').child($k).child('sessions').child($sid).child('at').val() - root.child('teams').child($k).child('excHours').val() * 3600000 > now)) && (!newData.exists() || ((newData.child('ts').val() === now || (newData.child('ts').val() === data.child('ts').val() && newData.child('v').val() === data.child('v').val())) && newData.child('by').val() !== 't' && newData.child('v').val() !== 'late' && newData.child('v').val() !== 'no' && (newData.child('r').val() !== true || newData.parent().parent().parent().parent().parent().child('notes').child($k).child($pid).child($sid).isString())))",
               ".validate": "newData.hasChild('v')",
               "v": {
-                ".validate": "newData.isString() && newData.val().matches(/^(yes|late|exc|no)$/)"
+                ".validate": "newData.isString() && newData.val().matches(/^(yes|late|maybe|exc|no)$/)"
               },
               "r": {
                 ".validate": "newData.isBoolean()"
@@ -200,7 +203,7 @@
         "$pid": {
           ".read": "(auth != null && root.child('teams').child($k).child('players').child($pid).child('login').child('uid').val() === auth.uid)",
           "$sid": {
-            ".write": "(auth != null && root.child('teams').child($k).child('players').child($pid).child('login').child('uid').val() === auth.uid) && root.child('teams').child($k).child('sessions').child($sid).child('at').val() > now",
+            ".write": "(auth != null && root.child('teams').child($k).child('players').child($pid).child('login').child('uid').val() === auth.uid) && ((!root.child('teams').child($k).child('excHours').isNumber() && root.child('teams').child($k).child('sessions').child($sid).child('at').val() > now) || (root.child('teams').child($k).child('excHours').isNumber() && root.child('teams').child($k).child('sessions').child($sid).child('at').val() - root.child('teams').child($k).child('excHours').val() * 3600000 > now))",
             ".validate": "newData.isString() && newData.val().length <= 300"
           }
         }
