@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-BcxeSp4r+w5acPkkOHt1I1etZq0M1PY2ZRT/aBe6RyQ=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-T5B7UYDkOpKmxEK3iViKdkkRT57uHy+r7Vm1wQ2peyw=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Trainingsbeteiligung</title>
@@ -370,6 +370,12 @@ window.TB_ICONS = {
   .mark.no.auto{background:repeating-linear-gradient(135deg,var(--status-absent) 0 3px,var(--status-absent-soft) 3px 6px);}
   th.sp{color:var(--text-muted);font-style:italic;}
   th small{display:block;font:600 9.5px/1.1 var(--font-narrow);letter-spacing:.06em;text-transform:uppercase;}
+  td .na{color:var(--text-muted);font-size:13px;}
+  .whopick{display:flex;flex-direction:column;gap:8px;width:100%;}
+  .wholist{display:flex;flex-wrap:wrap;gap:6px 16px;padding:10px 12px;border:1px solid var(--border-subtle);border-radius:var(--radius-md, 10px);background:var(--surface-sunken);}
+  .wholist[hidden]{display:none;}
+  .rchip.ns{border-style:dashed;}
+  a.btn{text-decoration:none;}
   .sptag{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:var(--radius-pill);background:var(--surface-sunken);
     color:var(--text-muted);font:700 10.5px/1.5 var(--font-narrow);letter-spacing:.06em;text-transform:uppercase;vertical-align:2px;}
   .mark.byt{box-shadow:0 0 0 2px var(--surface-card),0 0 0 3.5px var(--info);}
@@ -959,12 +965,20 @@ window.TB_ICONS = {
           <h2 id="calDayHead">Tag</h2>
           <div class="card" id="calDay"></div>
         </section>
+        <section id="calSubSec">
+          <h2 data-info="Dein persönlicher Kalender zum Abonnieren. Neue, verschobene und abgesagte Termine kommen von selbst in deinen Handy-Kalender, du musst nichts mehr herunterladen.
+Die Seite erstellt die Kalenderdatei einmal pro Stunde neu. Wie oft dein Handy nachschaut, entscheidet der Kalender selbst: Apple meist stündlich bis täglich, Google Kalender alle 8 bis 24 Stunden.
+iPhone und Mac: auf Abonnieren tippen und bestätigen.
+Android und Google Kalender: Link kopieren, am Computer calendar.google.com öffnen, links bei Weitere Kalender auf das Plus, Per URL, Link einfügen. Danach erscheint er auch auf dem Handy.
+Der Link ist geheim und gehört nur dir. Wer ihn hat, sieht deine Termine, deshalb nicht weitergeben." data-title="Kalender-Abo">Kalender abonnieren</h2>
+          <div class="card pad" id="calSubBox"></div>
+        </section>
         <section>
           <h2 data-info="Lädt alle kommenden Termine als Datei im Kalenderformat (.ics) herunter. Die Datei kannst du in Google Kalender, Apple Kalender oder Outlook öffnen und importieren.
-Das ist ein einmaliger Stand, kein Abo: Kommen neue Termine dazu oder ändert sich etwas, lade die Datei einfach noch einmal herunter. Bereits importierte Termine werden dabei in den meisten Kalendern aktualisiert statt doppelt angelegt." data-title="Export">In den Handy-Kalender</h2>
+Das ist ein einmaliger Stand, kein Abo: Kommen neue Termine dazu oder ändert sich etwas, lade die Datei einfach noch einmal herunter. Bereits importierte Termine werden dabei in den meisten Kalendern aktualisiert statt doppelt angelegt." data-title="Export">Einmal herunterladen</h2>
           <div class="card pad">
             <div class="row">
-              <button type="button" class="btn primary" id="icsBtn">Kommende Termine als .ics herunterladen</button>
+              <button type="button" class="btn" id="icsBtn">Kommende Termine als .ics herunterladen</button>
               <span class="msg ok" id="icsMsg"></span>
             </div>
             <textarea id="icsBox" hidden rows="6" style="width:100%;margin-top:10px"></textarea>
@@ -1217,7 +1231,8 @@ Der Code muss mindestens 6 Zeichen haben und darf keinem anderen Team gehören. 
 
         <div class="adminblock">
           <h3 data-info="Wer hier steht, kann sich anmelden und sich selbst eintragen. Ohne PIN heißt: hat sich noch nie angemeldet, die PIN legt jeder bei der ersten Anmeldung selbst fest.
-Einen Spieler zu löschen entfernt auch alle seine Einträge. Die Seite fragt vorher nach.">Kader</h3>
+Einen Spieler zu löschen entfernt auch alle seine Einträge. Die Seite fragt vorher nach.
+Aus Wertung nimmt einen Spieler ab heute aus den Team-Zahlen: Team-Quote, Mannschaftsziel, Team-Serie, Podium und Duell. Seine eigenen Punkte, Serie und Abzeichen laufen weiter, eintragen kann er sich wie bisher. Wieder werten gilt ab heute, vergangene Termine bleiben so gewertet wie vorher.">Kader</h3>
           <div class="roster" id="rosterList"></div>
           <div class="row">
             <input type="text" id="newPlayer" placeholder="Name" style="flex:1;min-width:200px">
@@ -1243,7 +1258,8 @@ Die Endzeit schlägt die Seite 90 Minuten nach der Startzeit vor, du kannst sie 
           <h3 data-info="Für alles, was nicht in den festen Rhythmus passt: Turnier, Wanderfahrt, Trainingslager, Zusatztraining. Bezeichnung und Ort sind freiwillig, sie stehen den Spielern beim Termin.
 Mehrtägig: ein Enddatum eintragen. Die Spieler melden sich einmal für den ganzen Termin zurück.
 Ganztägig: statt Uhrzeiten nur eine Treffzeit, die auch leer bleiben darf. Die Fristen rechnen dann ab der Treffzeit, ohne Treffzeit ab 0 Uhr am ersten Tag.
-Außer Wertung (Standard): keine Punkte, zählt nicht in Quote, Serie, Stufen und Abzeichen. Nimm den Haken raus, wenn der Termin wie ein normales Training zählen soll. Umstellen geht später unter Termine bei bearbeiten.">Sondertermin</h3>
+Außer Wertung (Standard): keine Punkte, zählt nicht in Quote, Serie, Stufen und Abzeichen. Nimm den Haken raus, wenn der Termin wie ein normales Training zählen soll. Umstellen geht später unter Termine bei bearbeiten.
+Für das ganze Team (Standard) oder nur für ausgewählte Spieler. Wer nicht ausgewählt ist, sieht den Termin gar nicht, bekommt keine Erinnerung und wird nicht automatisch unentschuldigt.">Sondertermin</h3>
           <div class="row">
             <label for="oneDate">am</label><input type="date" id="oneDate">
             <label for="oneUntil">bis</label><input type="date" id="oneUntil" title="Enddatum, nur bei mehrtägigen Terminen">
@@ -1257,6 +1273,9 @@ Außer Wertung (Standard): keine Punkte, zählt nicht in Quote, Serie, Stufen un
             <input type="text" id="oneLabel" placeholder="Bezeichnung, zum Beispiel Turnier" style="flex:1;min-width:190px">
             <input type="text" id="onePlace" placeholder="Ort" style="width:150px">
             <label class="check"><input type="checkbox" id="oneSp" checked> außer Wertung</label>
+          </div>
+          <div class="row" id="oneWhoRow"></div>
+          <div class="row">
             <button class="btn primary" id="addOne" type="button">Hinzufügen</button>
           </div>
           <p class="msg" id="oneMsg"></p>
@@ -1477,12 +1496,53 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function sessRec(s){
     return { date:s.date, time:s.time || "", end:s.end || "", until: multiDay(s) ? s.until : "", allDay: !!s.allDay,
       sp: !!s.sp, label:s.label || "Training", place:s.place || "", cancelled: !!s.cancelled, reason: s.reason || "",
+      who: hasWho(s) ? cleanWho(s.who) : null,
       at: startMs(s) };
   }
   function sessOf(id, s){
     return { id:id, date:s.date, time: s.allDay ? (s.time || "") : (s.time || "19:30"), end: s.allDay ? "" : (s.end || ""),
       until: (typeof s.until === "string" && s.until > s.date) ? s.until : "", allDay: !!s.allDay, sp: !!s.sp,
-      label: s.label || "Training", place: s.place || "", cancelled: !!s.cancelled, reason: s.reason || "" };
+      label: s.label || "Training", place: s.place || "", cancelled: !!s.cancelled, reason: s.reason || "",
+      who: cleanWho(s.who) };
+  }
+  /* Termin nur für ausgewählte Spieler: who = { <pid>: true }. Leer oder fehlend heißt ganzes Team.
+     Nicht ausgewählte Spieler sehen den Termin nicht, bekommen keine Erinnerung und kein
+     automatisches unentschuldigt. */
+  function cleanWho(w){
+    if (!w || typeof w !== "object") return null;
+    var o = {};
+    Object.keys(w).forEach(function(k){ if (w[k]) o[k] = true; });
+    return Object.keys(o).length ? o : null;
+  }
+  function hasWho(s){ return !!s && !!s.who && typeof s.who === "object" && Object.keys(s.who).length > 0; }
+  function invited(s, pid){ return !hasWho(s) || !!s.who[pid]; }
+  function seesSess(s){ return !me || isTrainer() || invited(s, me.id); }
+  function sessPlayers(s){ return state.players.filter(function(p){ return invited(s, p.id); }); }
+  /* Spieler außer Team-Wertung: noScore = { <pid>: { <vonISO>: <bisISO> | true } }.
+     Betrifft nur Team-Zahlen (Team-Quote, Mannschaftsziel, Team-Serie, Podium, Duell),
+     die eigene Wertung des Spielers läuft weiter. Vergangene Zeiträume bleiben erhalten. */
+  function nsMap(st){ st = st || state; return (st && st.noScore && typeof st.noScore === "object") ? st.noScore : {}; }
+  function teamScored(pid, iso, st){
+    var m = nsMap(st)[pid];
+    if (!m || typeof m !== "object") return true;
+    for (var f in m) {
+      var u = m[f];
+      if (iso >= f && (typeof u !== "string" || iso < u)) return false;
+    }
+    return true;
+  }
+  function nsNow(pid){ return !teamScored(pid, todayISO()); }
+  function setNoScore(pid, on){
+    var all = JSON.parse(JSON.stringify(nsMap()));
+    var m = all[pid] || {}, t = todayISO();
+    if (on) { if (!teamScored(pid, t)) return; m[t] = true; }
+    else Object.keys(m).forEach(function(f){
+      var u = m[f];
+      if (typeof u === "string" && u <= t) return;
+      if (f >= t) delete m[f]; else m[f] = t;
+    });
+    if (Object.keys(m).length) all[pid] = m; else delete all[pid];
+    mutate({ t:"cfg", k:"noScore", v: all });
   }
   function plusMinutes(t, mins){
     var p = String(t || "").split(":");
@@ -1775,6 +1835,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       st.seasonFrom = op.st.seasonFrom;
       st.teamCode = op.st.teamCode;
       st.trainerPin = op.st.trainerPin;
+      st.noScore = op.st.noScore || {};
       st.players = op.st.players;
       st.sessions = op.st.sessions;
       st.att = op.st.att;
@@ -1966,6 +2027,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         jokers: op.st.jokers, jokerFrom: op.st.jokerFrom || "", seasonFrom: op.st.seasonFrom || "",
         teamCode: (rawTeam && rawTeam.teamCode) || "",
         compareWith: (rawTeam && rawTeam.compareWith) || {},
+        noScore: op.st.noScore || {},
         players: {}, sessions: {}, att: {}, joker: op.st.joker || {} };
       var notes = {};
       op.st.players.forEach(function(p){
@@ -2022,7 +2084,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       lvGold: v.lvGold, lvSilver: v.lvSilver, lvBronze: v.lvBronze,
       levelMin: v.levelMin, badges: v.badges,
       jokers: v.jokers, jokerFrom: v.jokerFrom, seasonFrom: v.seasonFrom, teamCode: v.teamCode,
-      trainerPin: v.trainerPin || null, compareWith: v.compareWith || {},
+      trainerPin: v.trainerPin || null, compareWith: v.compareWith || {}, noScore: v.noScore || {},
       players: players, sessions: sessions, att: att, joker: JSON.parse(JSON.stringify(v.joker || {})) });
   }
 
@@ -2091,18 +2153,28 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   /* Für die Anzeige: alle begonnenen Termine inklusive Sondertermine */
   function pastSessions(){
     var t = todayISO(), from = seasonFrom();
-    return byDate(state.sessions).filter(function(s){ return !s.cancelled && s.date <= t && (s.sp || s.date >= from); });
+    return byDate(state.sessions).filter(function(s){ return !s.cancelled && s.date <= t && (s.sp || s.date >= from) && seesSess(s); });
   }
   function upcoming(){
     var t = todayISO();
-    return byDate(state.sessions).filter(function(s){ return lastDay(s) >= t; });
+    return byDate(state.sessions).filter(function(s){ return lastDay(s) >= t && seesSess(s); });
   }
   function counts(sid){
     var c = { yes:0, late:0, maybe:0, exc:0, no:0, open:0 };
     var s = sessById(sid);
-    state.players.forEach(function(p){
+    sessPlayers(s).forEach(function(p){
       var v = effV(entry(sid, p.id), s, p.id);
       if (v && c[v] != null) c[v]++; else c.open++;
+    });
+    return c;
+  }
+  /* Nur Spieler, die an diesem Termin in die Team-Wertung eingehen */
+  function teamCounts(s){
+    var c = { yes:0, n:0 };
+    sessPlayers(s).forEach(function(p){
+      if (!teamScored(p.id, s.date)) return;
+      c.n++;
+      if (effV(entry(s.id, p.id), s, p.id) === "yes") c.yes++;
     });
     return c;
   }
@@ -2117,8 +2189,16 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     return { y:y, tot:tot, pct: tot ? Math.round(y/tot*100) : null };
   }
   function teamQuota(){
-    var y = 0, tot = 0;
-    state.players.forEach(function(p){ var q = quota(p.id); y += q.y; tot += q.tot; });
+    var y = 0, tot = 0, held = heldSessions();
+    state.players.forEach(function(p){
+      held.forEach(function(s){
+        if (!teamScored(p.id, s.date)) return;
+        var v = effV(entry(s.id, p.id), s, p.id);
+        if (!v || v === "maybe") return;
+        tot++;
+        if (v === "yes" || v === "late") y++;
+      });
+    });
     return { y:y, tot:tot, pct: tot ? Math.round(y/tot*100) : null };
   }
   function mayNote(pid){ return isTrainer() || (me && me.id === pid); }
@@ -2128,7 +2208,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
      Datensatz, ohne die eigenen globalen Funktionen umzubauen. */
   function foreignEffV(e, st, s, p){
     var closedF = !!s && Date.now() >= startMs(s) - (typeof st.excHours === "number" ? st.excHours : DEFAULT_EXC) * HOUR;
-    if (!e) return (closedF && !s.cancelled && s.date >= AUTO_FROM && !(p && p.since && s.date < p.since)) ? "no" : null;
+    if (!e) return (closedF && !s.cancelled && s.date >= AUTO_FROM && !(p && p.since && s.date < p.since) && !(p && hasWho(s) && !s.who[p.id])) ? "no" : null;
     if (e.v === "maybe") return closedF ? "no" : "maybe";
     if (e.v === "exc" && !hasReason(e)) return "no";
     if (e.v === "late" && !st.lateOn) return "yes";
@@ -2141,6 +2221,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var y = 0, tot = 0;
     st.players.forEach(function(p){
       held.forEach(function(s){
+        if (!teamScored(p.id, s.date, st)) return;
         var e = (st.att[s.id] || {})[p.id];
         var v = foreignEffV(e, st, s, p);
         if (!v || v === "maybe") return;
@@ -2243,7 +2324,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   /* Keine Rückmeldung bis zur Absagefrist: automatisch unentschuldigt (ab AUTO_FROM,
      und nur für Termine ab dem Tag, an dem der Spieler in den Kader kam). */
   function autoNo(s, pid){
-    if (!s || !pid || s.cancelled || !closed(s) || s.date < AUTO_FROM) return false;
+    if (!s || !pid || s.cancelled || !closed(s) || s.date < AUTO_FROM || !invited(s, pid)) return false;
     var p = player(pid);
     return !(p && p.since && s.date < p.since);
   }
@@ -2686,7 +2767,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   }
 
   function ranking(){
-    return state.players.slice().map(function(p){ return { p:p, pts: monthPoints(p.id) }; })
+    var ms = monthSessions();
+    return state.players.filter(function(p){ return !nsNow(p.id); }).map(function(p){
+      return { p:p, pts: scoreIn(p.id, ms.filter(function(s){ return teamScored(p.id, s.date); })) }; })
       .sort(function(a,b){
         if (b.pts !== a.pts) return b.pts - a.pts;
         return a.p.name.localeCompare(b.p.name, "de");
@@ -2709,8 +2792,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var r = weekRange();
     var inWeek = byDate(state.sessions).filter(function(s){ return !s.cancelled && s.date >= r.from && s.date <= r.to; });
     var held = inWeek.filter(function(s){ return s.date <= todayISO(); });
-    var yes = 0, poss = held.length * state.players.length;
-    held.forEach(function(s){ yes += counts(s.id).yes; });
+    var yes = 0, poss = 0;
+    held.forEach(function(s){ var c = teamCounts(s); yes += c.yes; poss += c.n; });
     return { sessions: inWeek.length, held: held.length, yes: yes, poss: poss,
              pct: poss ? Math.round(yes/poss*100) : null };
   }
@@ -2724,8 +2807,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var d = parseISO(s.date);
       var wk = isoOf(new Date(d.getTime() - ((d.getDay()+6)%7)*86400000));
       if (!buckets[wk]) buckets[wk] = { yes:0, poss:0 };
-      buckets[wk].yes += counts(s.id).yes;
-      buckets[wk].poss += state.players.length;
+      var tc = teamCounts(s);
+      buckets[wk].yes += tc.yes;
+      buckets[wk].poss += tc.n;
     });
     var thisWeek = weekRange().from;
     var keys = Object.keys(buckets).filter(function(k){ return k < thisWeek; }).sort();
@@ -3561,7 +3645,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var ss = sessById(sid);
     [["yes","Anwesend"],["late","Zu spät"],["maybe","Vielleicht"],["exc","Entschuldigt"],["no","Unentschuldigt"],["open","Noch offen"]].forEach(function(pair){
       var kind = pair[0];
-      var members = state.players.filter(function(p){
+      var members = sessPlayers(ss).filter(function(p){
         var v = effV(entry(sid, p.id), ss, p.id);
         return kind === "open" ? !v : v === kind;
       });
@@ -3832,9 +3916,21 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var tr = el("tr");
       var nameCell = el("td","name", p.name);
       if (me && p.id === me.id) nameCell.style.fontWeight = "700";
+      if (isTrainer() && nsNow(p.id)) {
+        var nst = el("span","sptag","außer Team-Wertung");
+        nst.title = "Zählt nicht in Team-Quote, Mannschaftsziel, Team-Serie, Podium und Duell";
+        nameCell.appendChild(nst);
+      }
       tr.appendChild(nameCell);
       cols.forEach(function(s, i){
         var td = el("td", (i >= firstFuture ? "future" : "") + (i === firstFuture && held.length ? " split" : ""));
+        if (!invited(s, p.id)) {
+          var na = el("span","na","–");
+          na.title = p.name + " · " + fmtShort(s.date) + " · nicht eingeladen";
+          td.appendChild(na);
+          tr.appendChild(td);
+          return;
+        }
         if (!revealed(s) && !(me && p.id === me.id)) {
           var hm = el("i","mark hid");
           hm.title = p.name + " · " + fmtShort(s.date) + " · sichtbar ab " + fmtDeadline(s, excHours());
@@ -3919,7 +4015,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     tile(box, "Punkte gesamt", String(points(me.id)), null, MONLONG[now.getMonth()] + ": " + monthPoints(me.id));
     tile(box, "Quote", q.pct === null ? "–" : q.pct + " %", null, q.y + " von " + q.tot + " anwesend");
     tile(box, "Platz im Monat", rk ? String(rk.pos) : "–", rk ? "von " + rk.of : null,
-      rk && rk.pts ? rk.pts + " Punkte" : "noch keine Punkte diesen Monat");
+      rk && rk.pts ? rk.pts + " Punkte" : nsNow(me.id) ? "nicht im Podium" : "noch keine Punkte diesen Monat");
     if (jokerBudget()) {
       tile(box, "Joker", String(jokersLeft(me.id)), "von " + jokerBudget(),
         jokersLeft(me.id) ? "rettet die Serie für eine Einheit" : "alle eingesetzt");
@@ -4262,12 +4358,23 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
     renderSessionEditor();
 
+    var owr = $("oneWhoRow");
+    if (owr) { owr.innerHTML = ""; owr.appendChild(whoPicker(oneWho)); }
+
     var r = $("rosterList");
     r.innerHTML = "";
     state.players.forEach(function(p){
       var chip = el("span","rchip");
       chip.appendChild(document.createTextNode(p.name));
       if (!p.pin) chip.appendChild(el("span","pinless","ohne PIN"));
+      var ns = nsNow(p.id);
+      if (ns) { chip.className = "rchip ns"; chip.appendChild(el("span","pinless","außer Wertung")); }
+      var nb = el("button", null, ns ? "wieder werten" : "aus Wertung");
+      nb.type = "button";
+      nb.title = ns ? p.name + " ab heute wieder in die Team-Wertung nehmen"
+                    : p.name + " ab heute aus der Team-Wertung nehmen (Team-Quote, Ziel, Team-Serie, Podium, Duell)";
+      nb.addEventListener("click", function(){ setNoScore(p.id, !ns); });
+      chip.appendChild(nb);
       if (p.pin) {
         var rp = el("button", null, "PIN zurücksetzen");
         rp.type = "button";
@@ -4305,6 +4412,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var row = el("div","srow" + (s.cancelled ? " off" : ""));
       var gl = el("span","g", dateSpan(s) + " " + span(s) + " · " + (s.label || "Training") + (s.place ? " · " + s.place : ""));
       if (s.sp) gl.appendChild(el("span","sptag","außer Wertung"));
+      if (hasWho(s)) gl.appendChild(el("span","sptag", whoText(s)));
       row.appendChild(gl);
 
       var edit = el("button","btn quiet", editing === s.id ? "schließen" : "bearbeiten");
@@ -4351,24 +4459,64 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         var la = el("input"); la.type = "text"; la.value = s.label || ""; la.placeholder = "Bezeichnung"; la.style.flex = "1"; la.style.minWidth = "150px";
         var pl = el("input"); pl.type = "text"; pl.value = s.place || ""; pl.placeholder = "Ort"; pl.style.width = "140px";
         var rs = el("input"); rs.type = "text"; rs.value = s.reason || ""; rs.placeholder = "Grund der Absage, optional"; rs.style.minWidth = "200px"; rs.style.flex = "1";
+        if (!editWho || editWho.sid !== s.id) editWho = whoState(s.id, s.who);
+        var wp = whoPicker(editWho);
         var ok = el("button","btn primary","Übernehmen");
         ok.type = "button";
+        var emsg = el("p","msg");
         ok.addEventListener("click", function(){
-          editing = null;
+          if (!editWho.all && !Object.keys(editWho.sel).length) { emsg.textContent = "Wähle mindestens einen Spieler oder das ganze Team."; return; }
+          var nw = whoOf(editWho);
+          editing = null; editWho = null;
           var nd = d.value || s.date;
           var allDay = ad.checked;
           mutate({ t:"updSession", id:s.id, patch:{ date: nd, until: (un.value && un.value > nd) ? un.value : "",
             allDay: allDay, sp: spc.checked,
             time: allDay ? (ti.value || "") : (ti.value || s.time || "19:30"), end: allDay ? "" : en.value,
-            label: la.value.trim() || "Training", place: pl.value.trim(), reason: rs.value.trim() } });
+            label: la.value.trim() || "Training", place: pl.value.trim(), reason: rs.value.trim(), who: nw } });
         });
-        [d,lu,un,adl,lv,ti,lb,en,la,pl,spl,ok].forEach(function(n){ box.appendChild(n); });
+        [d,lu,un,adl,lv,ti,lb,en,la,pl,spl,wp,ok,emsg].forEach(function(n){ box.appendChild(n); });
         if (s.cancelled) box.insertBefore(rs, ok);
         row.appendChild(box);
       }
       list.appendChild(row);
     });
     if (!state.sessions.length) list.appendChild(el("div","empty","Noch keine Termine."));
+  }
+
+  /* ---------- Auswahl: für wen gilt ein Termin ---------- */
+  var editWho = null;
+  var oneWho = { sid:"new", all:true, sel:{} };
+  function whoState(sid, who){ return { sid: sid, all: !cleanWho(who), sel: cleanWho(who) || {} }; }
+  function whoOf(ws){
+    if (ws.all) return null;
+    var o = {};
+    Object.keys(ws.sel).forEach(function(k){ if (ws.sel[k] && player(k)) o[k] = true; });
+    return Object.keys(o).length ? o : null;
+  }
+  function whoText(s){
+    var n = sessPlayers(s).length;
+    return "nur " + n + (n === 1 ? " Spieler" : " Spieler");
+  }
+  function whoPicker(ws){
+    var wrap = el("div","whopick");
+    var allL = el("label","check"), all = el("input");
+    all.type = "checkbox"; all.checked = ws.all;
+    allL.appendChild(all); allL.appendChild(document.createTextNode(" für das ganze Team"));
+    wrap.appendChild(allL);
+    var list = el("div","wholist");
+    state.players.slice().sort(function(a,b){ return a.name.localeCompare(b.name, "de"); }).forEach(function(p){
+      var l = el("label","check"), c = el("input");
+      c.type = "checkbox"; c.checked = !!ws.sel[p.id];
+      c.addEventListener("change", function(){ if (c.checked) ws.sel[p.id] = true; else delete ws.sel[p.id]; });
+      l.appendChild(c); l.appendChild(document.createTextNode(" " + p.name));
+      list.appendChild(l);
+    });
+    if (!state.players.length) list.appendChild(el("span","hint","Noch niemand im Kader."));
+    list.hidden = ws.all;
+    all.addEventListener("change", function(){ ws.all = all.checked; list.hidden = ws.all; });
+    wrap.appendChild(list);
+    return wrap;
   }
 
   /* ---------- Push-Erinnerungen ---------- */
@@ -4608,7 +4756,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
     sel.innerHTML = "";
     ordered.forEach(function(s){
-      var o = el("option", null, dateSpan(s) + " " + span(s) + " · " + (s.label || "Training") + (s.sp ? " (außer Wertung)" : "") + (s.cancelled ? " (abgesagt)" : ""));
+      var o = el("option", null, dateSpan(s) + " " + span(s) + " · " + (s.label || "Training") + (s.sp ? " (außer Wertung)" : "") + (hasWho(s) ? " (" + whoText(s) + ")" : "") + (s.cancelled ? " (abgesagt)" : ""));
       o.value = s.id;
       sel.appendChild(o);
     });
@@ -4622,7 +4770,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
     box.innerHTML = "";
     if (!state.players.length) { box.appendChild(el("div","empty","Noch kein Kader angelegt.")); return; }
-    state.players.slice().sort(function(a,b){ return a.name.localeCompare(b.name, "de"); }).forEach(function(p){
+    var ps = sessById(pickSid);
+    sessPlayers(ps).sort(function(a,b){ return a.name.localeCompare(b.name, "de"); }).forEach(function(p){
       var row = el("div","prow");
       var e = entry(pickSid, p.id);
       var name = el("span","pn", p.name);
@@ -4675,6 +4824,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       held.forEach(function(s){
         var e = entry(s.id, p.id);
         var v = effV(e, s, p.id);
+        if (!invited(s, p.id)) { cells.push("nicht eingeladen"); return; }
         cells.push(v ? WORD[v] + (noReason(e) ? " (entschuldigt ohne Grund)" : "") + (isAuto(e, s, p.id) ? " (keine Rückmeldung)" : "")
           + (e && e.v === "exc" && e.n ? " (" + e.n.replace(/[;\r\n]/g," ") + ")" : "") : "Offen");
       });
@@ -4717,7 +4867,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   /* ---------- Sicherung ---------- */
   function backupJson(){
-    return JSON.stringify({ v:10, team: state.team, goal: goalPct(), excHours: excHours(), bonusHours: bonusHours(),
+    return JSON.stringify({ v:12, team: state.team, goal: goalPct(), excHours: excHours(), bonusHours: bonusHours(),
       remindOn: remindOn(), remindHours: remindHours(),
       lateOn: lateOn(), latePts: latePts(),
       lvGold: levelDefs()[0].min, lvSilver: levelDefs()[1].min, lvBronze: levelDefs()[2].min,
@@ -4725,7 +4875,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       jokers: jokerBudget(), jokerFrom: jokerFrom(), seasonFrom: seasonFrom(), teamCode: state.teamCode || "",
       trainerPin: mode === "fb" ? null : state.trainerPin,
       players: mode === "fb" ? state.players.map(function(p){ return { id: p.id, name: p.name, since: p.since || "" }; }) : state.players,
-      sessions: state.sessions, att: state.att, joker: state.joker }, null, 2);
+      sessions: state.sessions, att: state.att, joker: state.joker, noScore: nsMap() }, null, 2);
   }
 
   function restoreFrom(text){
@@ -4738,7 +4888,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       lvGold: raw.lvGold, lvSilver: raw.lvSilver, lvBronze: raw.lvBronze,
       levelMin: raw.levelMin, badges: raw.badges,
       jokers: raw.jokers, jokerFrom: raw.jokerFrom, seasonFrom: raw.seasonFrom, teamCode: raw.teamCode,
-      trainerPin: raw.trainerPin,
+      trainerPin: raw.trainerPin, noScore: raw.noScore,
       players: raw.players, sessions: raw.sessions, att: raw.att, joker: raw.joker });
     if (!st.players.length && !st.sessions.length) { msg.className = "msg"; msg.textContent = "Die Datei enthält weder Kader noch Termine."; return; }
     mutate({ t:"restore", st: st });
@@ -4763,7 +4913,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
     return Math.ceil(((t - y0) / 86400000 + 1) / 7);
   }
-  function sessOnDay(iso){ return byDate(state.sessions).filter(function(s){ return s.date <= iso && lastDay(s) >= iso; }); }
+  function sessOnDay(iso){ return byDate(state.sessions).filter(function(s){ return s.date <= iso && lastDay(s) >= iso && seesSess(s); }); }
   function ownWord(s){
     if (isTrainer() || s.cancelled) return "";
     var e = entry(s.id, me.id), v = effV(e, s, me.id);
@@ -4791,7 +4941,6 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       sub.push(spanUhr(s));
       if (s.place) sub.push(s.place);
       if (s.cancelled) sub.push("fällt aus");
-      else if (own) sub.push(own);
       else if (isTrainer()) { var c = counts(s.id); sub.push(c.yes + c.late + " da, " + (c.open + c.maybe) + " offen"); }
       ev.appendChild(el("em", null, sub.join(" · ")));
     } else {
@@ -4829,6 +4978,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function renderCal(){
     var grid = $("calGrid");
     if (!grid || !me) return;
+    renderCalSub();
     var t = todayISO();
     if (!calCursor) calCursor = t;
     if (!calSel) calSel = t;
@@ -4941,7 +5091,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   }
 
   /* ---------- Export in den Handy-Kalender (.ics) ---------- */
-  function icsEsc(v){ return String(v == null ? "" : v).replace(/\\/g,"\\\\").replace(/;/g,"\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n"); }
+  function icsEsc(v){ return String(v == null ? "" : v).replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n"); }
   /* Zeilen nach 75 Byte umbrechen (UTF-8), Folgezeilen beginnen mit einem Leerzeichen */
   function icsFold(line){
     var out = [], cur = "", bytes = 0;
@@ -4998,6 +5148,72 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     L.push("END:VCALENDAR");
     return { text: L.map(icsFold).join("\r\n") + "\r\n", n: n };
   }
+  /* ---------- Kalender-Abo ----------
+     Die Kalenderdateien baut calendar.mjs stündlich per GitHub-Workflow und legt sie je Person
+     in einem geheimen Gist ab. Den Link liest die Seite aus calP/<team>/<spieler> bzw. calT/<trainer>. */
+  var calSub = { key:null, url:null, st:"idle" };
+  function calSubPath(){
+    if (mode !== "fb" || !me) return null;
+    return isTrainer() ? "calT/" + me.id : (activeTeamKey ? "calP/" + activeTeamKey + "/" + me.id : null);
+  }
+  function loadCalSub(force){
+    var path = calSubPath();
+    if (!path) return;
+    if (!force && calSub.key === path) return;
+    calSub = { key: path, url: null, st: "loading" };
+    db().ref(path).once("value").then(function(sn){
+      if (calSub.key !== path) return;
+      var v = sn.val();
+      calSub.url = v && typeof v.u === "string" && v.u.indexOf("https://gist.githubusercontent.com/") === 0 ? v.u : null;
+      calSub.st = "done";
+      renderCalSub();
+    }, function(){
+      if (calSub.key !== path) return;
+      calSub.st = "err";
+      renderCalSub();
+    });
+  }
+  function renderCalSub(){
+    var box = $("calSubBox"), sec = $("calSubSec");
+    if (!box || !sec) return;
+    sec.hidden = mode !== "fb";
+    if (mode !== "fb") return;
+    loadCalSub(false);
+    box.innerHTML = "";
+    if (calSub.st === "loading" || calSub.st === "idle") { box.appendChild(el("p","hint","Lädt …")); return; }
+    if (!calSub.url) {
+      box.appendChild(el("p","hint", "Dein Abo-Link wird gerade eingerichtet und steht spätestens in einer Stunde hier."));
+      var again = el("button","btn quiet","Erneut prüfen");
+      again.type = "button";
+      again.addEventListener("click", function(){ loadCalSub(true); renderCalSub(); });
+      box.appendChild(again);
+      return;
+    }
+    var url = calSub.url;
+    box.appendChild(el("p","hint", isTrainer()
+      ? "Alle Termine deiner Teams, sie aktualisieren sich von selbst."
+      : "Alle Termine, zu denen du eingeladen bist, sie aktualisieren sich von selbst."));
+    var row = el("div","row");
+    var sub = el("a","btn primary","Im Kalender abonnieren");
+    sub.href = url.replace(/^https:/, "webcal:");
+    row.appendChild(sub);
+    var cp = el("button","btn","Link kopieren");
+    cp.type = "button";
+    var msg = el("span","msg ok");
+    cp.addEventListener("click", function(){
+      var done = function(){ msg.textContent = "Kopiert."; };
+      var fail = function(){ inp.hidden = false; inp.select(); msg.textContent = "Bitte den Link unten markieren und kopieren."; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, fail); else fail();
+    });
+    row.appendChild(cp);
+    row.appendChild(msg);
+    box.appendChild(row);
+    var inp = el("input");
+    inp.type = "text"; inp.readOnly = true; inp.value = url; inp.hidden = true;
+    inp.style.width = "100%"; inp.style.marginTop = "10px";
+    box.appendChild(inp);
+  }
+
   function exportIcs(){
     var msg = $("icsMsg");
     msg.className = "msg ok";
@@ -5198,16 +5414,19 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       msg.className = "msg"; msg.textContent = "";
       if (!date) { $("oneDate").focus(); return; }
       if (until && until < date) { msg.textContent = "Das Enddatum liegt vor dem ersten Tag."; $("oneUntil").focus(); return; }
+      if (!oneWho.all && !whoOf(oneWho)) { msg.textContent = "Wähle mindestens einen Spieler oder das ganze Team."; return; }
       var ad = $("oneAllDay").checked;
       var s = { id: uid("s"), date: date, until: (until && until > date) ? until : "", allDay: ad,
         time: ad ? ($("oneTime").value || "") : ($("oneTime").value || "19:30"), end: ad ? "" : ($("oneEnd").value || ""),
         sp: $("oneSp").checked, label: $("oneLabel").value.trim() || ($("oneSp").checked ? "Sondertermin" : "Training"),
-        place: $("onePlace").value.trim(), cancelled:false, reason:"" };
+        place: $("onePlace").value.trim(), cancelled:false, reason:"", who: whoOf(oneWho) };
       mutate({ t:"addSession", s:s });
+      oneWho = { sid:"new", all:true, sel:{} };
       $("oneLabel").value = "";
       $("oneUntil").value = "";
       msg.className = "msg ok";
-      msg.textContent = "Angelegt: " + (s.label) + ", " + dateSpan(s) + ", " + spanUhr(s) + (s.sp ? ", außer Wertung." : ".");
+      msg.textContent = "Angelegt: " + (s.label) + ", " + dateSpan(s) + ", " + spanUhr(s) + (s.sp ? ", außer Wertung" : "")
+        + (s.who ? ", " + whoText(s) : "") + ".";
     });
 
     linkTimes("rhythmTime","rhythmEnd");
@@ -5399,6 +5618,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       teamCode: typeof st.teamCode === "string" ? st.teamCode : "",
       trainerPin: typeof st.trainerPin === "string" ? st.trainerPin : null,
       compareWith: st.compareWith && typeof st.compareWith === "object" ? st.compareWith : {},
+      noScore: st.noScore && typeof st.noScore === "object" ? st.noScore : {},
       players: Array.isArray(st.players) ? st.players.filter(function(p){ return p && p.id; }).map(function(p){
         return { id:p.id, name:String(p.name || "?"), pin: typeof p.pin === "string" ? p.pin : null,
                  since: typeof p.since === "string" ? p.since : "" }; }) : [],
@@ -5428,6 +5648,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       seeded.teamCode = out.teamCode;
       seeded.trainerPin = out.trainerPin;
       seeded.compareWith = out.compareWith;
+      seeded.noScore = out.noScore;
       return seeded;
     }
     return out;

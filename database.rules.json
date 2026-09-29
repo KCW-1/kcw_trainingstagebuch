@@ -221,6 +221,18 @@
           }
         }
       }
+    },
+    "calP": {
+      "$k": {
+        "$pid": {
+          ".read": "auth != null && root.child('teams').child($k).child('players').child($pid).child('login').child('uid').val() === auth.uid"
+        }
+      }
+    },
+    "calT": {
+      "$tid": {
+        ".read": "auth != null && root.child('users').child(auth.uid).child('t').val() === $tid && root.child('catalog').child('trainers').child($tid).child('login').child('uid').val() === auth.uid"
+      }
     }
   }
 }

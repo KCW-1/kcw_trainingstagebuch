@@ -115,7 +115,9 @@ async function runTeam(key, stats) {
     // Fenster: Erinnerungszeit erreicht, Absagefrist noch nicht vorbei
     if (NOW < remindAt || NOW >= deadline) continue;
 
+    const who = s.who && typeof s.who === "object" && Object.keys(s.who).length ? s.who : null;
     for (const pid of Object.keys(players)) {
+      if (who && !who[pid]) continue;                   // Termin gilt nur für ausgewählte Spieler
       const cur = att[sid] && att[sid][pid];
       if (cur && cur.v !== "maybe") continue;           // hat schon fest zu- oder abgesagt
       const maybe = !!cur;
