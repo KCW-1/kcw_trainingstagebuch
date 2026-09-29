@@ -1,0 +1,38 @@
+name: Kalender-Abo
+
+on:
+  schedule:
+    - cron: "41 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: calendar
+  cancel-in-progress: false
+
+jobs:
+  calendar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: calendar.mjs
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node calendar.mjs
+        env:
+          TZ: Europe/Berlin
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          DB_URL: https://kcw-trainingstagebuch-default-rtdb.europe-west1.firebasedatabase.app
+          PAGE_URL: https://kcw-1.github.io/kcw_trainingstagebuch/
+      # Hält den Workflow aktiv, damit GitHub ihn nach 60 Tagen ohne Commit nicht abschaltet
+      - if: always()
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/calendar.yml/enable"
+        env:
+          GH_TOKEN: ${{ github.token }}
