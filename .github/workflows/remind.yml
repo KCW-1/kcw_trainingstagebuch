@@ -1,42 +1,110 @@
 name: Push-Erinnerungen
 
+# Verschickt die Push-Erinnerungen (remind.mjs) und aktualisiert die Kalender-Abos (calendar.mjs).
+# GitHub startet geplante Läufe nur unzuverlässig (seit Mitte Oktober 2026 oft nur alle 2 bis 7 Stunden).
+# Deshalb läuft hier eine Schleife: Ein Lauf bleibt etwa 5,5 Stunden aktiv, ruft beide Skripte zu jeder
+# Viertelstunde auf und startet am Ende selbst seinen Nachfolger. Die geplanten Läufe dienen nur noch als
+# Reserve: Sie prüfen, ob schon eine Schleife läuft, und starten nur dann eine neue, wenn keine aktiv ist
+# (z. B. nach einer Störung bei GitHub).
+
 on:
   schedule:
     - cron: "*/15 * * * *"
     # Einmal pro Woche: Workflow aktiv halten, damit GitHub ihn nach 60 Tagen nicht abschaltet
     - cron: "17 3 * * 1"
   workflow_dispatch:
-
-concurrency:
-  group: remind
-  cancel-in-progress: false
+    inputs:
+      chain:
+        description: "Nur intern: Übergabe von der vorherigen Schleife"
+        required: false
+        default: "false"
 
 jobs:
-  remind:
+  # Prüft, ob schon eine ältere Schleife läuft oder wartet. Dann ist dieser Lauf überflüssig.
+  gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 2
+    permissions:
+      actions: read
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHAIN: ${{ inputs.chain }}
+        run: |
+          if [ "$CHAIN" = "true" ]; then
+            echo "Übergabe von der vorherigen Schleife."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          older=$(gh api "repos/${{ github.repository }}/actions/workflows/remind.yml/runs?per_page=30" \
+            --jq '[.workflow_runs[] | select(.id < ${{ github.run_id }} and (.status == "in_progress" or .status == "queued" or .status == "waiting" or .status == "pending" or .status == "requested"))] | length')
+          if [ "$older" -gt 0 ]; then
+            echo "Es läuft schon eine Schleife ($older), nichts zu tun."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Keine Schleife aktiv, starte eine neue."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  remind:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    permissions:
+      contents: read
+      actions: write
     steps:
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: remind.mjs
+          sparse-checkout: |
+            remind.mjs
+            calendar.mjs
           sparse-checkout-cone-mode: false
       - uses: actions/setup-node@v4
         with:
           node-version: 20
       - run: npm install --no-save --no-package-lock web-push@3
-      - run: node remind.mjs
+
+      # Ruft beide Skripte sofort und danach jeweils eine Minute nach jeder Viertelstunde auf,
+      # insgesamt etwa 5,5 Stunden lang. Ein Fehler in einem Skript beendet die Schleife nicht.
+      # calendar.mjs schreibt einen Gist nur, wenn sich dessen Inhalt geändert hat.
+      - name: Schleife alle 15 Minuten
         env:
           TZ: Europe/Berlin
           VAPID_PUBLIC: BNJUWg0HNBYiNiwZP4dy50fiFtAQY-GvbWXxrkyq64QgjFWk41I5rgvbHmwcovTJy3Xnf1cG3CffvNehfhc-nfQ
           VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           DB_URL: https://kcw-trainingstagebuch-default-rtdb.europe-west1.firebasedatabase.app
           PAGE_URL: https://kcw-1.github.io/kcw_trainingstagebuch/
+        run: |
+          start=$(date +%s)
+          limit=$((340 * 60))
+          while true; do
+            echo "== $(date '+%d.%m.%Y %H:%M:%S') =="
+            node remind.mjs || echo "::warning::remind.mjs mit Fehler beendet ($(date '+%d.%m. %H:%M'))"
+            node calendar.mjs || echo "::warning::calendar.mjs mit Fehler beendet ($(date '+%d.%m. %H:%M'))"
+            now=$(date +%s)
+            next=$(( (now / 900 + 1) * 900 + 60 ))
+            if [ $(( next - start )) -ge $limit ]; then break; fi
+            sleep $(( next - now ))
+          done
+
+      # Startet den nächsten Lauf. Klappt das nicht, springt der geplante Reserve-Lauf ein.
+      - name: Nachfolger starten
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run remind.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}" -f chain=true
 
   # Schaltet den Workflow über die GitHub-API erneut ein. Das setzt die 60-Tage-Frist
   # zurück, ganz ohne Commit und ohne neuen Aufbau von GitHub Pages.
   keepalive:
-    if: github.event.schedule == '17 3 * * 1' || github.event_name == 'workflow_dispatch'
+    if: github.event.schedule == '17 3 * * 1' || (github.event_name == 'workflow_dispatch' && inputs.chain != 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:
