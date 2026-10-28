@@ -1,8 +1,10 @@
 name: Kalender-Abo
 
+# Seit 28.10.2026 aktualisiert der Workflow Push-Erinnerungen (remind.yml) die Kalender-Abos
+# alle 15 Minuten mit. Dieser Workflow ist nur noch zum sofortigen Aktualisieren von Hand da
+# (Actions, Kalender-Abo, Run workflow).
+
 on:
-  schedule:
-    - cron: "41 * * * *"
   workflow_dispatch:
 
 concurrency:
@@ -15,7 +17,6 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-      actions: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,8 +32,3 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           DB_URL: https://kcw-trainingstagebuch-default-rtdb.europe-west1.firebasedatabase.app
           PAGE_URL: https://kcw-1.github.io/kcw_trainingstagebuch/
-      # Hält den Workflow aktiv, damit GitHub ihn nach 60 Tagen ohne Commit nicht abschaltet
-      - if: always()
-        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/calendar.yml/enable"
-        env:
-          GH_TOKEN: ${{ github.token }}
