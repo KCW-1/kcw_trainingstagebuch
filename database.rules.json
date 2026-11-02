@@ -148,6 +148,12 @@
                 ".validate": false
               }
             },
+            "left": {
+              ".validate": "newData.isString() && newData.val().length <= 10"
+            },
+            "hist": {
+              ".validate": "newData.hasChild('s')"
+            },
             "$other": {
               ".validate": false
             }
@@ -232,6 +238,21 @@
     "calT": {
       "$tid": {
         ".read": "auth != null && root.child('users').child(auth.uid).child('t').val() === $tid && root.child('catalog').child('trainers').child($tid).child('login').child('uid').val() === auth.uid"
+      }
+    },
+    "moved": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "(newData.exists() && ((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child(newData.child('k').val()).val() === true))) || (!newData.exists() && auth != null && auth.uid === $uid)",
+        "k": {
+          ".validate": "newData.isString() && newData.val().length <= 64"
+        },
+        "p": {
+          ".validate": "newData.isString() && newData.val().length <= 64"
+        },
+        "$other": {
+          ".validate": false
+        }
       }
     }
   }
