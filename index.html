@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-GROYM4Zvd3YUkycTV7q0m3wmypWwe8eaZjXTSW+rowI=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-PdVDT/yzz1xB88J+hQ9N4XJX1dMvZQzNMqMi5WMlW00=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Trainingsbeteiligung</title>
@@ -442,6 +442,52 @@ window.TB_ICONS = {
   .badge.got{border-color:var(--green-300);background:var(--surface-brand-soft);}
   .badge.got .pin{background:var(--surface-brand);color:var(--text-on-brand);}
   .badge .bt{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px;}
+  .seg{flex-wrap:wrap;}
+  .planbody{margin-top:16px;display:flex;flex-direction:column;gap:12px;}
+  .planbody h2{margin-top:12px;}
+  .prow{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--border-subtle);flex-wrap:wrap;}
+  .card>.prow:first-child,.card.pad>.prow:first-child{border-top:0;}
+  .card.pad>.prow{padding-left:0;padding-right:0;}
+  .pwhat{flex:1;min-width:200px;display:flex;flex-direction:column;gap:4px;}
+  .pwhat b{color:var(--text-strong);}
+  .ptags{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+  .peditor{padding:14px 16px 16px;border-top:1px dashed var(--border-strong);background:var(--surface-sunken);display:flex;flex-direction:column;gap:8px;}
+  .peditor label{display:block;white-space:normal;}
+  .peditor label.check{white-space:normal;align-items:flex-start;} .peditor label.check input{flex:none;margin-top:1px;}
+  .peditor input[type=text],.peditor select{width:100%;}
+  .pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;}
+  .pblocks{display:flex;flex-direction:column;gap:8px;}
+  .pblock{display:grid;grid-template-columns:130px minmax(140px,1fr) minmax(120px,1fr) 84px minmax(140px,1.4fr) auto;gap:6px;align-items:center;
+    padding:8px;border:1px solid var(--border-subtle);border-radius:var(--radius-control);background:var(--surface-card);}
+  .pblock .pexd{grid-column:1/-1;margin:0;}
+  .pblock input[type=text],.pblock select{width:100%;}
+  .pblock input[hidden]{display:none;}
+  .ptools{display:flex;gap:2px;}
+  .btn.small{height:30px;padding:0 9px;font-size:12.5px;}
+  .pexd{white-space:pre-wrap;}
+  .ptest{display:grid;grid-template-columns:1fr auto;gap:8px 14px;align-items:center;padding:12px 0;border-top:1px solid var(--border-subtle);}
+  .ptest:first-child{border-top:0;}
+  .ptest>.row,.ptest>details{grid-column:1/-1;}
+  .spark polyline{fill:none;stroke:var(--surface-brand);stroke-width:2;}
+  .spark circle{fill:var(--surface-brand);}
+  .pplist{margin:6px 0 0 18px;padding:0;display:flex;flex-direction:column;gap:6px;font-size:14px;}
+  .pobs{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 0;border-top:1px solid var(--border-subtle);}
+  .pobs>div{grid-column:1/2;white-space:pre-wrap;font-size:14px;}
+  .pobs>button{grid-row:1/3;grid-column:2;align-self:start;}
+  .pclub{padding:14px 16px;border-top:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:8px;}
+  .card>.pclub:first-child{border-top:0;}
+  .pcomments{display:flex;flex-direction:column;gap:6px;margin-top:6px;padding-top:8px;border-top:1px dotted var(--border-subtle);}
+  .pcomment{font-size:13.5px;display:flex;flex-wrap:wrap;gap:4px 6px;align-items:baseline;}
+  .pcomment>div{flex-basis:100%;}
+  .ptable{border-collapse:collapse;width:100%;font-size:14px;}
+  .ptable th,.ptable td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--border-subtle);white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .ptable th{font:600 12px/1.2 var(--font-narrow);letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);}
+  .ptable .up{color:var(--status-present);} .ptable .down{color:var(--status-absent);}
+  .linkbtn{border:0;background:none;padding:0;font:600 14px/1.3 var(--font-sans);color:var(--text-strong);text-decoration:underline;cursor:pointer;}
+  @media (max-width:700px){
+    .pblock{grid-template-columns:1fr 1fr;}
+    .pblock .ptools,.pblock .pnote{grid-column:1/-1;}
+  }
   .badge .bbar{height:6px;margin-top:6px;border-radius:var(--radius-pill);background:var(--surface-sunken);overflow:hidden;}
   .badge .bbar i{display:block;height:100%;border-radius:var(--radius-pill);background:var(--surface-brand);}
   .badge.t1 .bbar i{background:#9C6B3F;} .badge.t2 .bbar i{background:#8E968F;} .badge.t3 .bbar i{background:var(--sand-500);}
@@ -1079,6 +1125,14 @@ Auf dem iPhone geht das nur, wenn die Seite als App auf dem Home-Bildschirm lieg
       </section>
 
       <!-- ---------- TRAINER ---------- -->
+      <section class="view" id="view-planung" hidden>
+        <div class="viewhead">
+          <h1>Planung</h1>
+          <p>Einheiten planen, Übungen sammeln, Leistung festhalten.</p>
+        </div>
+        <div id="planBox"></div>
+      </section>
+
       <section class="view" id="view-trainer" hidden>
         <div class="viewhead">
           <h1>Trainerbereich</h1>
@@ -1246,7 +1300,7 @@ Der Code muss mindestens 6 Zeichen haben und darf keinem anderen Team gehören. 
 
         <div class="adminblock">
           <h3 data-info="Wer hier steht, kann sich anmelden und sich selbst eintragen. Ohne PIN heißt: hat sich noch nie angemeldet, die PIN legt jeder bei der ersten Anmeldung selbst fest.
-Einen Spieler zu löschen entfernt auch alle seine Einträge. Die Seite fragt vorher nach.
+Mit × nimmst du einen Spieler aus dem Kader. Er bleibt als ehemalig erhalten, damit die alten Team-Zahlen gleich bleiben, und kann sich nicht mehr anmelden. Unter Ehemalige kannst du ihn wieder aufnehmen oder endgültig löschen. Endgültig löschen entfernt alle seine Einträge, dadurch ändern sich auch die alten Team-Zahlen.
 Aus Wertung nimmt einen Spieler ab heute aus den Team-Zahlen: Team-Quote, Mannschaftsziel, Team-Serie, Podium und Duell. Seine eigenen Punkte, Serie und Abzeichen laufen weiter, eintragen kann er sich wie bisher. Wieder werten gilt ab heute, vergangene Termine bleiben so gewertet wie vorher.
 Team wechseln verschiebt einen Spieler in ein anderes Team, bei dem du auch etwas ändern darfst. Seine persönliche Wertung (Punkte, Serie, Quote, Abzeichen, Rekorde, Joker) nimmt er mit, Konto und PIN bleiben gleich. Hier bleibt er als ehemalig stehen, die alten Team-Zahlen ändern sich dadurch nicht.">Kader</h3>
           <div class="roster" id="rosterList"></div>
@@ -1506,6 +1560,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     { k:"kalender", label:"Kalender", icon:"calendar-days" },
     { k:"team",    label:"Team",    icon:"users" },
     { k:"ich",     label:"Ich",     icon:"user-round" },
+    { k:"planung", label:"Planung", icon:"clipboard-list" },
     { k:"trainer", label:"Trainer", icon:"settings" }
   ];
 
@@ -1854,6 +1909,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var dup = false;
       for (var j=0;j<st.players.length;j++) if (st.players[j].id === op.id) dup = true;
       if (!dup) st.players.push({ id: op.id, name: op.name, pin: null, since: op.since || "" });
+    } else if (op.t === "archivePlayer" || op.t === "unarchivePlayer") {
+      for (var ai=0;ai<st.players.length;ai++) if (st.players[ai].id === op.id) {
+        st.players[ai].left = op.t === "archivePlayer" ? op.d : "";
+        if (op.t === "archivePlayer") st.players[ai].pin = null;
+      }
     } else if (op.t === "delPlayer") {
       st.players = st.players.filter(function(p){ return p.id !== op.id; });
       Object.keys(st.att).forEach(function(sid){ delete st.att[sid][op.id]; });
@@ -1933,6 +1993,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     notesVal = {};
     if (NOTES_REF) { safe(function(){ NOTES_REF.off(); }); NOTES_REF = null; }
     FB = firebase.database().ref("teams/" + key);
+    bindPlanRefs(key);
     var asPlayer = pendingMe && pendingMe.role === "player" ? pendingMe.id : (me && me.role === "player" ? me.id : null);
     NOTES_REF = firebase.database().ref("notes/" + key + (asPlayer ? "/" + asPlayer : ""));
     NOTES_REF.on("value", function(snap){
@@ -2053,6 +2114,14 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var prec = { name: String(op.name).slice(0, 60) };
       if (op.since) prec.since = op.since;
       fbDo(FB.child("players/" + op.id).set(prec));
+    } else if (op.t === "archivePlayer") {
+      var aup = {};
+      aup["teams/" + activeTeamKey + "/players/" + op.id + "/left"] = op.d;
+      aup["teams/" + activeTeamKey + "/players/" + op.id + "/login"] = null;
+      aup["push/" + activeTeamKey + "/" + op.id] = null;
+      fbDo(db().ref().update(aup));
+    } else if (op.t === "unarchivePlayer") {
+      fbDo(FB.child("players/" + op.id + "/left").remove());
     } else if (op.t === "delPlayer") {
       fbDo(FB.child("players/" + op.id).remove());
       safe(function(){ firebase.database().ref("push/" + activeTeamKey + "/" + op.id).remove(); });
@@ -2993,7 +3062,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   /* ---------- Navigation ---------- */
   function navKeys(){
-    return isTrainer() ? ["heute","termine","kalender","team","trainer"] : ["heute","termine","kalender","team","ich"];
+    return isTrainer() ? (mode === "fb" ? ["heute","termine","kalender","team","planung","trainer"] : ["heute","termine","kalender","team","trainer"])
+                       : ["heute","termine","kalender","team","ich"];
   }
   function openCount(){
     if (!me) return 0;
@@ -3049,7 +3119,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       tabs.appendChild(t);
     });
 
-    ["heute","termine","kalender","team","ich","trainer"].forEach(function(k){
+    ["heute","termine","kalender","team","ich","planung","trainer"].forEach(function(k){
       var v = $("view-" + k);
       if (v) v.hidden = (k !== route);
     });
@@ -3540,6 +3610,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     renderIch();
     renderPush();
     if (isTrainer()) renderAdmin();
+    if (route === "planung") renderPlan();
 
     headInfo();
     paintInfo();
@@ -4776,11 +4847,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         chip.appendChild(rp);
       }
       var isArmed = !!armed && armed.k === "p" && armed.id === p.id;
-      var x = el("button", isArmed ? "confirm" : null, isArmed ? "wirklich löschen?" : "×");
+      var x = el("button", isArmed ? "confirm" : null, isArmed ? "wirklich entfernen?" : "×");
       x.type = "button";
-      x.title = p.name + " aus dem Kader entfernen";
+      x.title = p.name + " aus dem Kader entfernen (bleibt als ehemalig erhalten)";
       x.addEventListener("click", function(){
-        if (isArmed) { armed = null; mutate({ t:"delPlayer", id: p.id }); }
+        if (isArmed) { armed = null; mutate({ t:"archivePlayer", id: p.id, d: todayISO() }); }
         else { armed = { k:"p", id: p.id }; renderAdmin(); }
       });
       chip.appendChild(x);
@@ -4788,9 +4859,29 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     });
     if (!kader().length) r.appendChild(el("span","hint","Noch niemand im Kader."));
     var former = state.players.filter(function(p){ return p.left; });
-    if (former.length) r.appendChild(el("p","hint", "Ehemalige: " + former.map(function(p){
-      return p.name + " (gewechselt am " + fmtShort(p.left) + ")"; }).join(", ")
-      + ". Ihre alten Einträge zählen weiter in den vergangenen Team-Zahlen."));
+    if (former.length) {
+      var fw = el("div","former");
+      fw.appendChild(el("p","hint", "Ehemalige: nicht mehr im Kader, ihre alten Einträge zählen weiter in den vergangenen Team-Zahlen."));
+      former.forEach(function(p){
+        var fc = el("span","rchip ns");
+        fc.appendChild(document.createTextNode(p.name));
+        fc.appendChild(el("span","pinless", "seit " + fmtShort(p.left)));
+        var back = el("button", null, "wieder aufnehmen"); back.type = "button";
+        back.title = p.name + " wieder in den Kader nehmen. Für die Anmeldung legt " + p.name + " eine neue PIN fest.";
+        back.addEventListener("click", function(){ mutate({ t:"unarchivePlayer", id: p.id }); });
+        fc.appendChild(back);
+        var arm2 = !!armed && armed.k === "pdel" && armed.id === p.id;
+        var del = el("button", arm2 ? "confirm" : null, arm2 ? "mit allen Einträgen löschen?" : "endgültig löschen"); del.type = "button";
+        del.title = "Löscht " + p.name + " samt allen Einträgen. Alte Team-Zahlen ändern sich dadurch.";
+        del.addEventListener("click", function(){
+          if (arm2) { armed = null; mutate({ t:"delPlayer", id: p.id }); }
+          else { armed = { k:"pdel", id: p.id }; renderAdmin(); }
+        });
+        fc.appendChild(del);
+        fw.appendChild(fc);
+      });
+      r.appendChild(fw);
+    }
     if (moveDlg && moveDlg.pid && !player(moveDlg.pid)) moveDlg = null;
     if (moveDlg) r.appendChild(moveBox());
 
@@ -5667,6 +5758,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     $("noTeamLogout").addEventListener("click", logout);
     $("switchTeamBtn").addEventListener("click", function(){ gateStep = "teamswitch"; render(); });
     $("previewBtn").addEventListener("click", enterPreview);
+    $("planBox").addEventListener("focusout", function(){ setTimeout(function(){ if (planDirty && !planTyping()) renderPlan(); }, 0); });
     $("previewEnd").addEventListener("click", exitPreview);
 
     $("addTeam").addEventListener("click", function(){
@@ -5943,6 +6035,806 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     window.addEventListener("scroll", placePop, true);
   }
 
+  /* ---------- Planung für Trainer (seit Version 16) ----------
+     Übungsbibliothek, Einheitenpläne je Termin, Leistung je Spieler (Tests, Ziele,
+     Beobachtungen). Datenbank: plan/<team> = { ex:{<id>}, ses:{<sid>} } und
+     perf/<team> = { tests, res/<pid>, goals/<pid>, obs/<pid> }, lesen und schreiben nur
+     Trainer des Teams. Veröffentlichte Übungen und Pläne stehen zusätzlich als Kopie unter
+     pub/<team>/ex|ses/<id> (lesbar für alle Trainer), Kommentare unter pubc/<team>/<item>/<id>.
+     Leistungsdaten sehen nur die Trainer des eigenen Teams. */
+  var PLAN = { ex:{}, ses:{} }, PERF = { tests:{}, res:{}, goals:{}, obs:{} }, PUB = {}, PUBC = {};
+  var PLAN_REF = null, PERF_REF = null, PUB_REF = null, PUBC_REF = null, planKey = null;
+  var planMsgOk = false, planTab = "einheiten", planEdit = null, exEdit = null, perfPid = "", planMsg = "", exFilter = { cat:"", q:"" };
+  var copyPick = {};   /* Ziel-Termin je fremdem Plan beim Kopieren */
+  var EX_CATS = ["Aufwärmen","Paddeltechnik","Bootsbeherrschung","Ballhandling","Passen","Torwurf","Taktik","Torwart","Kondition","Spielform","Sonstiges"];
+  var PARTS = ["Aufwärmen","Hauptteil","Abschluss"];
+  var TEST_IDEAS = [
+    { name:"200 m Sprint", unit:"s", dir:"low" },
+    { name:"Kenterrollen in 1 Minute", unit:"Anzahl", dir:"high" },
+    { name:"Torwürfe aus 6 m, Treffer von 10", unit:"Treffer", dir:"high" },
+    { name:"Pässe an die Wand in 1 Minute", unit:"Anzahl", dir:"high" }
+  ];
+  function planOn(){ return mode === "fb" && isTrainer() && !preview; }
+  function planObj(v, keys){ var o = (v && typeof v === "object") ? v : {}; keys.forEach(function(k){ if (!o[k] || typeof o[k] !== "object") o[k] = {}; }); return o; }
+  function bindPlanRefs(key){
+    if (PLAN_REF) { safe(function(){ PLAN_REF.off(); }); PLAN_REF = null; }
+    if (PERF_REF) { safe(function(){ PERF_REF.off(); }); PERF_REF = null; }
+    PLAN = { ex:{}, ses:{} }; PERF = { tests:{}, res:{}, goals:{}, obs:{} }; planKey = key;
+    planEdit = null; exEdit = null; perfPid = "";
+    if (mode !== "fb" || !key || !isTrainer()) return;
+    PLAN_REF = db().ref("plan/" + key);
+    PLAN_REF.on("value", function(s){ PLAN = planObj(s.val(), ["ex","ses"]); if (route === "planung") renderPlan(); }, function(){});
+    PERF_REF = db().ref("perf/" + key);
+    PERF_REF.on("value", function(s){ PERF = planObj(s.val(), ["tests","res","goals","obs"]); if (route === "planung") renderPlan(); }, function(){});
+    if (!PUB_REF) {
+      PUB_REF = db().ref("pub");
+      PUB_REF.on("value", function(s){ PUB = s.val() || {}; if (route === "planung") renderPlan(); }, function(){});
+      PUBC_REF = db().ref("pubc");
+      PUBC_REF.on("value", function(s){ PUBC = s.val() || {}; if (route === "planung") renderPlan(); }, function(){});
+    }
+  }
+  function detachPlan(){
+    [PLAN_REF, PERF_REF, PUB_REF, PUBC_REF].forEach(function(r){ if (r) safe(function(){ r.off(); }); });
+    PLAN_REF = PERF_REF = PUB_REF = PUBC_REF = null; planKey = null;
+    PLAN = { ex:{}, ses:{} }; PERF = { tests:{}, res:{}, goals:{}, obs:{} }; PUB = {}; PUBC = {};
+  }
+  function myTrainerName(){ return (me && trainerAcct(me.id) && trainerAcct(me.id).name) || "Trainer"; }
+  function pWrite(path, val){
+    if (readOnly || !planOn()) return Promise.reject(new Error("readonly"));
+    return db().ref(path).set(val).then(null, function(e){ planMsgOk = false; planMsg = "Speichern hat nicht geklappt. Bitte Verbindung prüfen."; renderPlan(); throw e; });
+  }
+  function clip(s, n){ return String(s == null ? "" : s).trim().slice(0, n); }
+  function minOf(s){ /* Länge eines Termins in Minuten, wenn Ende bekannt */
+    if (!s || !s.time || !s.end) return null;
+    var a = s.time.split(":"), b = s.end.split(":");
+    var m = (+b[0]*60 + +b[1]) - (+a[0]*60 + +a[1]);
+    return m > 0 ? m : null;
+  }
+  function exById(id){ return PLAN.ex[id] || null; }
+  function blocksOf(p){ return (p && Array.isArray(p.b)) ? p.b : (p && p.b && typeof p.b === "object" ? Object.keys(p.b).sort(function(a,b){ return a - b; }).map(function(k){ return p.b[k]; }) : []); }
+  function sumMin(blocks){ var n = 0; blocks.forEach(function(b){ n += +b.m || 0; }); return n; }
+  function commentsOf(k, item){ var c = (PUBC[k] && PUBC[k][item]) || {}; return Object.keys(c).map(function(id){ var x = c[id]; x.id = id; return x; }).sort(function(a,b){ return a.ts - b.ts; }); }
+
+  /* Kommentare an veröffentlichten Inhalten */
+  function commentBox(k, item){
+    var wrap = el("div","pcomments");
+    var list = commentsOf(k, item);
+    wrap.appendChild(el("p","eyebrow", list.length ? "Kommentare (" + list.length + ")" : "Kommentare"));
+    list.forEach(function(c){
+      var row = el("div","pcomment");
+      row.appendChild(el("b", null, (c.n || "Trainer") + " "));
+      row.appendChild(el("span","hint", new Date(c.ts).toLocaleDateString("de-DE") + " "));
+      row.appendChild(el("div", null, c.x));
+      if (c.t === me.id || k === activeTeamKey) {
+        var d = el("button","btn quiet small","löschen"); d.type = "button";
+        d.addEventListener("click", function(){ db().ref("pubc/" + k + "/" + item + "/" + c.id).remove(); });
+        row.appendChild(d);
+      }
+      wrap.appendChild(row);
+    });
+    var r = el("div","row");
+    var inp = el("input"); inp.type = "text"; inp.maxLength = 500; inp.placeholder = "Kommentar für die anderen Trainer";
+    inp.style.flex = "1"; inp.style.minWidth = "180px"; inp.setAttribute("aria-label","Kommentar");
+    var go = el("button","btn","senden"); go.type = "button";
+    var send = function(){
+      var x = clip(inp.value, 500); if (!x) return;
+      var id = uid("c");
+      db().ref("pubc/" + k + "/" + item + "/" + id).set({ t: me.id, n: myTrainerName(), x: x, ts: Date.now() }).then(function(){ inp.value = ""; });
+    };
+    go.addEventListener("click", send);
+    inp.addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); send(); } });
+    r.appendChild(inp); r.appendChild(go);
+    wrap.appendChild(r);
+    return wrap;
+  }
+
+  var planDirty = false;
+  function planTyping(){
+    var a = document.activeElement, box = $("planBox");
+    return !!(a && box && box.contains(a) && (a.tagName === "TEXTAREA" || (a.tagName === "INPUT" && /^(text|number|date|search|url)$/.test(a.type))));
+  }
+  function renderPlan(force){
+    var box = $("planBox");
+    if (!box) return;
+    if (!force && planTyping()) { planDirty = true; return; }
+    planDirty = false;
+    box.innerHTML = "";
+    if (!isTrainer()) return;
+    if (mode !== "fb") { box.appendChild(el("p","hint","Die Planung gibt es nur mit der Datenbank.")); return; }
+    var seg = el("div","seg");
+    seg.setAttribute("role","group"); seg.setAttribute("aria-label","Planung");
+    [["einheiten","Einheiten"],["uebungen","Übungen"],["leistung","Leistung"],["verein","Verein"]].forEach(function(t){
+      var b = el("button", null, t[1]); b.type = "button";
+      b.setAttribute("aria-pressed", planTab === t[0] ? "true" : "false");
+      b.addEventListener("click", function(){ planTab = t[0]; planMsg = ""; renderPlan(); });
+      seg.appendChild(b);
+    });
+    box.appendChild(seg);
+    if (planMsg) box.appendChild(el("p", planMsgOk ? "msg ok" : "msg", planMsg));
+    var body = el("div","planbody");
+    box.appendChild(body);
+    if (planTab === "einheiten") renderPlanSessions(body);
+    else if (planTab === "uebungen") renderExercises(body);
+    else if (planTab === "leistung") renderPerf(body);
+    else renderClub(body);
+    paintIcons();
+  }
+
+  /* ---------- Einheiten ---------- */
+  function planSessions(){
+    var t = todayISO();
+    var past = byDate(state.sessions).filter(function(s){ return s.date < t; }).slice(-8);
+    var next = byDate(state.sessions).filter(function(s){ return s.date >= t; }).slice(0, 20);
+    return { past: past, next: next };
+  }
+  function renderPlanSessions(body){
+    var L = planSessions();
+    body.appendChild(el("p","hint","Plane jede Einheit mit Ziel und Ablauf. Nach dem Training kannst du festhalten, wie es lief. Mit dem Haken bei veröffentlichen sehen Trainer der anderen Teams den Plan und können ihn kopieren und kommentieren."));
+    [["Kommende Einheiten", L.next], ["Zuletzt", L.past.slice().reverse()]].forEach(function(grp){
+      body.appendChild(el("h2", null, grp[0]));
+      var card = el("div","card");
+      if (!grp[1].length) card.appendChild(el("div","empty", grp[0] === "Zuletzt" ? "Noch keine vergangenen Termine." : "Keine kommenden Termine im Plan."));
+      grp[1].forEach(function(s){
+        var p = PLAN.ses[s.id];
+        var row = el("div","prow");
+        var what = el("div","pwhat");
+        what.appendChild(el("b", null, fmtShort(s.date) + (s.time ? ", " + s.time + " Uhr" : "") + "  " + (s.label || "Training")));
+        var tags = el("div","ptags");
+        if (s.cancelled) tags.appendChild(el("span","sptag","abgesagt"));
+        if (p) {
+          var bl = blocksOf(p);
+          tags.appendChild(el("span","chip yes", "geplant · " + sumMin(bl) + " Min"));
+          if (p.g) tags.appendChild(el("span","hint", p.g));
+          if (p.pub) tags.appendChild(el("span","sptag","veröffentlicht"));
+          var cc = commentsOf(activeTeamKey, "ses_" + s.id).length;
+          if (cc) tags.appendChild(el("span","sptag", cc + (cc === 1 ? " Kommentar" : " Kommentare")));
+          if (p.r) tags.appendChild(el("span","sptag","Rückblick"));
+        } else tags.appendChild(el("span","hint","noch kein Plan"));
+        what.appendChild(tags);
+        row.appendChild(what);
+        var b = el("button","btn", planEdit && planEdit.sid === s.id ? "schließen" : (p ? "bearbeiten" : "planen"));
+        b.type = "button";
+        b.addEventListener("click", function(){
+          if (planEdit && planEdit.sid === s.id) planEdit = null;
+          else planEdit = { sid: s.id, d: JSON.parse(JSON.stringify(p ? { g: p.g || "", mat: p.mat || "", r: p.r || "", pub: !!p.pub, b: blocksOf(p) } : { g:"", mat:"", r:"", pub:false, b:[] })) };
+          renderPlan();
+        });
+        row.appendChild(b);
+        card.appendChild(row);
+        if (planEdit && planEdit.sid === s.id) card.appendChild(planEditor(s));
+      });
+      body.appendChild(card);
+    });
+  }
+  function planEditor(s){
+    var d = planEdit.d;
+    var ed = el("div","peditor");
+    var r1 = el("div","row");
+    var gl = el("label", null, "Ziel der Einheit");
+    var gi = el("input"); gi.type = "text"; gi.maxLength = 200; gi.value = d.g;
+    gi.placeholder = "zum Beispiel sauberes Passen unter Druck";
+    gi.addEventListener("input", function(){ d.g = gi.value; });
+    gl.appendChild(gi); r1.appendChild(gl); ed.appendChild(r1);
+    gl.style.display = "flex"; gl.style.flexDirection = "column"; gl.style.gap = "4px"; gl.style.flex = "1";
+
+    ed.appendChild(el("p","eyebrow","Ablauf"));
+    var list = el("div","pblocks");
+    var exIds = Object.keys(PLAN.ex).sort(function(a,b){ return String(PLAN.ex[a].n).localeCompare(String(PLAN.ex[b].n), "de"); });
+    d.b.forEach(function(bk, i){
+      var r = el("div","pblock");
+      var ps = el("select"); ps.setAttribute("aria-label","Teil");
+      PARTS.forEach(function(nm){ var o = el("option", null, nm); o.value = nm; ps.appendChild(o); });
+      ps.value = bk.p || "Hauptteil";
+      ps.addEventListener("change", function(){ bk.p = ps.value; });
+      var es = el("select"); es.setAttribute("aria-label","Übung");
+      var o0 = el("option", null, "eigener Punkt"); o0.value = ""; es.appendChild(o0);
+      exIds.forEach(function(id){ var o = el("option", null, PLAN.ex[id].n); o.value = id; es.appendChild(o); });
+      es.value = bk.e && PLAN.ex[bk.e] ? bk.e : "";
+      var ti = el("input"); ti.type = "text"; ti.maxLength = 120; ti.placeholder = "Titel"; ti.value = bk.t || "";
+      ti.setAttribute("aria-label","Titel");
+      if (es.value) { ti.style.visibility = "hidden"; ti.tabIndex = -1; }
+      es.addEventListener("change", function(){
+        bk.e = es.value || null;
+        if (bk.e) { var x = PLAN.ex[bk.e]; if (x && x.m && !bk.m) bk.m = x.m; }
+        renderPlan();
+      });
+      ti.addEventListener("input", function(){ bk.t = ti.value; });
+      var mi = el("input"); mi.type = "number"; mi.min = "0"; mi.max = "300"; mi.step = "5"; mi.value = bk.m || "";
+      mi.placeholder = "Min"; mi.style.width = "84px"; mi.setAttribute("aria-label","Minuten");
+      mi.addEventListener("input", function(){ bk.m = parseInt(mi.value, 10) || 0; sumEl.textContent = sumText(); });
+      var ni = el("input","pnote"); ni.type = "text"; ni.maxLength = 300; ni.placeholder = "Notiz (Gruppen, Schwerpunkt …)"; ni.value = bk.x || "";
+      ni.setAttribute("aria-label","Notiz");
+      ni.addEventListener("input", function(){ bk.x = ni.value; });
+      var tools = el("div","ptools");
+      [["↑","nach oben", -1],["↓","nach unten", 1]].forEach(function(t){
+        var mb = el("button","btn quiet small", t[0]); mb.type = "button"; mb.title = t[1]; mb.setAttribute("aria-label", t[1]);
+        mb.disabled = (t[2] < 0 && i === 0) || (t[2] > 0 && i === d.b.length - 1);
+        mb.addEventListener("click", function(){ var j = i + t[2]; var tmp = d.b[i]; d.b[i] = d.b[j]; d.b[j] = tmp; renderPlan(); });
+        tools.appendChild(mb);
+      });
+      var xb = el("button","btn quiet small","entfernen"); xb.type = "button";
+      xb.addEventListener("click", function(){ d.b.splice(i, 1); renderPlan(); });
+      tools.appendChild(xb);
+      [ps, es, ti, mi, ni, tools].forEach(function(n){ r.appendChild(n); });
+      if (bk.e && PLAN.ex[bk.e] && PLAN.ex[bk.e].d) r.appendChild(el("p","hint pexd", PLAN.ex[bk.e].d));
+      list.appendChild(r);
+    });
+    if (!d.b.length) list.appendChild(el("p","hint","Noch kein Punkt im Ablauf."));
+    ed.appendChild(list);
+    var add = el("button","btn","+ Punkt"); add.type = "button";
+    add.addEventListener("click", function(){
+      var last = d.b.length ? d.b[d.b.length-1].p : "Aufwärmen";
+      d.b.push({ p: d.b.length ? (last === "Aufwärmen" ? "Hauptteil" : last) : "Aufwärmen", e:null, t:"", m:0, x:"" });
+      renderPlan();
+    });
+    var len = minOf(s);
+    function sumText(){ var n = sumMin(d.b); return "Summe " + n + " Min" + (len ? " von " + len + " Min Trainingszeit" + (n > len ? ", " + (n - len) + " Min zu viel" : "") : ""); }
+    var sumEl = el("span","hint", sumText());
+    var ra = el("div","row"); ra.appendChild(add); ra.appendChild(sumEl); ed.appendChild(ra);
+
+    var r2 = el("div","row");
+    var ml = el("label", null, "Material");
+    var mt = el("input"); mt.type = "text"; mt.maxLength = 200; mt.value = d.mat; mt.placeholder = "zum Beispiel 2 Bälle je Boot, Hütchen, Leibchen";
+    mt.addEventListener("input", function(){ d.mat = mt.value; });
+    ml.style.display = "flex"; ml.style.flexDirection = "column"; ml.style.gap = "4px"; ml.style.flex = "1";
+    ml.appendChild(mt); r2.appendChild(ml); ed.appendChild(r2);
+
+    var started2 = started(s);
+    var rl = el("label", null, started2 ? "Rückblick: wie lief es?" : "Rückblick (nach dem Training)");
+    var rt = el("textarea","csvbox"); rt.maxLength = 1500; rt.value = d.r; rt.style.minHeight = "70px"; rt.style.fontFamily = "var(--font-sans)"; rt.style.fontSize = "14px";
+    rt.placeholder = "Was hat geklappt, was nehmt ihr mit?";
+    rt.addEventListener("input", function(){ d.r = rt.value; });
+    rl.style.display = "flex"; rl.style.flexDirection = "column"; rl.style.gap = "4px"; rl.style.marginTop = "10px";
+    rl.appendChild(rt); ed.appendChild(rl);
+
+    var pubL = el("label","check");
+    var pc = el("input"); pc.type = "checkbox"; pc.checked = !!d.pub;
+    pc.addEventListener("change", function(){ d.pub = pc.checked; });
+    pubL.appendChild(pc); pubL.appendChild(el("span", null, "für Trainer anderer Teams sichtbar (veröffentlichen)"));
+    pubL.style.marginTop = "10px"; pubL.style.display = "flex"; pubL.style.gap = "8px"; pubL.style.alignItems = "center";
+    ed.appendChild(pubL);
+
+    var r3 = el("div","row");
+    var sv = el("button","btn primary","speichern"); sv.type = "button";
+    sv.addEventListener("click", function(){ savePlan(s, d); });
+    var cn = el("button","btn quiet","abbrechen"); cn.type = "button";
+    cn.addEventListener("click", function(){ planEdit = null; renderPlan(); });
+    r3.appendChild(sv); r3.appendChild(cn);
+    if (PLAN.ses[s.id]) {
+      var armedP = !!armed && armed.k === "plan" && armed.id === s.id;
+      var del = el("button", "btn quiet" + (armedP ? " confirm" : ""), armedP ? "Plan wirklich löschen?" : "Plan löschen"); del.type = "button";
+      del.addEventListener("click", function(){
+        if (!armedP) { armed = { k:"plan", id:s.id }; renderPlan(); return; }
+        armed = null;
+        var up = {}; up["plan/" + activeTeamKey + "/ses/" + s.id] = null; up["pub/" + activeTeamKey + "/ses/" + s.id] = null;
+        db().ref().update(up).then(function(){ planEdit = null; renderPlan(); });
+      });
+      r3.appendChild(del);
+    }
+    ed.appendChild(r3);
+    if (PLAN.ses[s.id] && PLAN.ses[s.id].pub) ed.appendChild(commentBox(activeTeamKey, "ses_" + s.id));
+    return ed;
+  }
+  function cleanBlocks(list){
+    return list.map(function(b){
+      var o = { p: PARTS.indexOf(b.p) >= 0 ? b.p : "Hauptteil", m: Math.max(0, Math.min(300, parseInt(b.m, 10) || 0)) };
+      if (b.e && PLAN.ex[b.e]) o.e = b.e; else o.t = clip(b.t, 120) || "ohne Titel";
+      if (clip(b.x, 300)) o.x = clip(b.x, 300);
+      return o;
+    });
+  }
+  function pubPlanRec(s, rec){
+    return { d: s.date, tm: s.time || "", en: s.end || "", l: s.label || "Training", g: rec.g || "", mat: rec.mat || "",
+             b: rec.b.map(function(b){
+               var x = b.e ? PLAN.ex[b.e] : null;
+               var o = { p: b.p, m: b.m, t: x ? x.n : b.t };
+               if (b.x) o.x = b.x;
+               if (x && x.d) o.d = clip(x.d, 1500);
+               if (x && x.c) o.c = x.c;
+               return o; }),
+             tn: state.team || "", by: myTrainerName(), ts: Date.now() };
+  }
+  function savePlan(s, d){
+    var rec = { g: clip(d.g, 200), mat: clip(d.mat, 200), r: clip(d.r, 1500), pub: !!d.pub, b: cleanBlocks(d.b), ts: Date.now(), by: me.id };
+    var up = {};
+    up["plan/" + activeTeamKey + "/ses/" + s.id] = rec;
+    up["pub/" + activeTeamKey + "/ses/" + s.id] = rec.pub ? pubPlanRec(s, rec) : null;
+    db().ref().update(up).then(function(){ planEdit = null; planMsg = ""; renderPlan(); },
+      function(){ planMsgOk = false; planMsg = "Speichern hat nicht geklappt. Bitte Verbindung prüfen."; renderPlan(); });
+  }
+
+  /* ---------- Übungen ---------- */
+  function renderExercises(body){
+    body.appendChild(el("p","hint","Deine Übungsbibliothek. Übungen kannst du in jede Einheit einbauen. Veröffentlichte Übungen stehen bei den anderen Trainern unter Verein."));
+    var r = el("div","row");
+    var cs = el("select"); cs.setAttribute("aria-label","Kategorie");
+    var o0 = el("option", null, "alle Kategorien"); o0.value = ""; cs.appendChild(o0);
+    EX_CATS.forEach(function(c){ var o = el("option", null, c); o.value = c; cs.appendChild(o); });
+    cs.value = exFilter.cat;
+    cs.addEventListener("change", function(){ exFilter.cat = cs.value; renderPlan(); });
+    var qi = el("input"); qi.type = "text"; qi.placeholder = "suchen"; qi.value = exFilter.q; qi.setAttribute("aria-label","Übung suchen");
+    qi.style.flex = "1"; qi.style.minWidth = "140px";
+    qi.addEventListener("change", function(){ exFilter.q = qi.value; renderPlan(); });
+    var nb = el("button","btn primary","+ Neue Übung"); nb.type = "button";
+    nb.addEventListener("click", function(){ exEdit = { id: null, d: { n:"", c:"Paddeltechnik", m:10, sp:"", mat:"", d:"", u:"", pub:false } }; renderPlan(); });
+    r.appendChild(cs); r.appendChild(qi); r.appendChild(nb);
+    body.appendChild(r);
+    if (exEdit && !exEdit.id) body.appendChild(exEditor());
+    var q = exFilter.q.trim().toLowerCase();
+    var ids = Object.keys(PLAN.ex).filter(function(id){
+      var x = PLAN.ex[id];
+      if (exFilter.cat && x.c !== exFilter.cat) return false;
+      if (q && (String(x.n) + " " + String(x.d || "")).toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    }).sort(function(a,b){ return String(PLAN.ex[a].n).localeCompare(String(PLAN.ex[b].n), "de"); });
+    var card = el("div","card");
+    if (!ids.length) card.appendChild(el("div","empty", Object.keys(PLAN.ex).length ? "Keine Übung passt zum Filter." : "Noch keine Übung angelegt. Unter Verein findest du veröffentlichte Übungen der anderen Teams zum Kopieren."));
+    ids.forEach(function(id){
+      var x = PLAN.ex[id];
+      var row = el("div","prow");
+      var what = el("div","pwhat");
+      what.appendChild(el("b", null, x.n));
+      var tags = el("div","ptags");
+      tags.appendChild(el("span","sptag", x.c || "Sonstiges"));
+      if (x.m) tags.appendChild(el("span","hint", x.m + " Min"));
+      if (x.pub) tags.appendChild(el("span","sptag","veröffentlicht"));
+      if (x.src && x.src.tn) tags.appendChild(el("span","hint","von " + x.src.tn));
+      var cc = commentsOf(activeTeamKey, "ex_" + id).length;
+      if (cc) tags.appendChild(el("span","sptag", cc + (cc === 1 ? " Kommentar" : " Kommentare")));
+      what.appendChild(tags);
+      if (x.d && !(exEdit && exEdit.id === id)) what.appendChild(el("p","hint pexd", x.d.length > 180 ? x.d.slice(0,180) + " …" : x.d));
+      row.appendChild(what);
+      var b = el("button","btn", exEdit && exEdit.id === id ? "schließen" : "bearbeiten"); b.type = "button";
+      b.addEventListener("click", function(){
+        exEdit = exEdit && exEdit.id === id ? null : { id: id, d: { n:x.n || "", c:x.c || "Sonstiges", m:x.m || 0, sp:x.sp || "", mat:x.mat || "", d:x.d || "", u:x.u || "", pub:!!x.pub } };
+        renderPlan();
+      });
+      row.appendChild(b);
+      card.appendChild(row);
+      if (exEdit && exEdit.id === id) card.appendChild(exEditor());
+    });
+    body.appendChild(card);
+  }
+  function lbl(text, input){
+    var l = el("label", null, text);
+    l.style.display = "flex"; l.style.flexDirection = "column"; l.style.gap = "4px";
+    l.appendChild(input);
+    return l;
+  }
+  function exEditor(){
+    var d = exEdit.d, id = exEdit.id;
+    var ed = el("div","peditor");
+    var g = el("div","pgrid");
+    var ni = el("input"); ni.type = "text"; ni.maxLength = 120; ni.value = d.n; ni.placeholder = "zum Beispiel Passen im Dreieck";
+    ni.addEventListener("input", function(){ d.n = ni.value; });
+    var cs = el("select");
+    EX_CATS.forEach(function(c){ var o = el("option", null, c); o.value = c; cs.appendChild(o); });
+    cs.value = EX_CATS.indexOf(d.c) >= 0 ? d.c : "Sonstiges";
+    cs.addEventListener("change", function(){ d.c = cs.value; });
+    var mi = el("input"); mi.type = "number"; mi.min = "0"; mi.max = "300"; mi.step = "5"; mi.value = d.m || "";
+    mi.addEventListener("input", function(){ d.m = parseInt(mi.value, 10) || 0; });
+    var si = el("input"); si.type = "text"; si.maxLength = 60; si.value = d.sp; si.placeholder = "zum Beispiel ab 4, in Dreiergruppen";
+    si.addEventListener("input", function(){ d.sp = si.value; });
+    var mt = el("input"); mt.type = "text"; mt.maxLength = 200; mt.value = d.mat; mt.placeholder = "Bälle, Hütchen, Tore";
+    mt.addEventListener("input", function(){ d.mat = mt.value; });
+    var ui = el("input"); ui.type = "text"; ui.maxLength = 300; ui.value = d.u; ui.placeholder = "https://… (Video oder Skizze)";
+    ui.addEventListener("input", function(){ d.u = ui.value; });
+    g.appendChild(lbl("Titel", ni)); g.appendChild(lbl("Kategorie", cs)); g.appendChild(lbl("Dauer in Minuten", mi));
+    g.appendChild(lbl("Spieler", si)); g.appendChild(lbl("Material", mt)); g.appendChild(lbl("Link", ui));
+    ed.appendChild(g);
+    var dt = el("textarea","csvbox"); dt.maxLength = 1500; dt.value = d.d; dt.style.minHeight = "90px"; dt.style.fontFamily = "var(--font-sans)"; dt.style.fontSize = "14px";
+    dt.placeholder = "Ablauf, Aufbau, Coaching-Punkte, Varianten";
+    dt.addEventListener("input", function(){ d.d = dt.value; });
+    var dl = lbl("Beschreibung", dt); dl.style.marginTop = "10px"; ed.appendChild(dl);
+    var pubL = el("label","check");
+    var pc = el("input"); pc.type = "checkbox"; pc.checked = !!d.pub;
+    pc.addEventListener("change", function(){ d.pub = pc.checked; });
+    pubL.appendChild(pc); pubL.appendChild(el("span", null, "für Trainer anderer Teams sichtbar (veröffentlichen)"));
+    pubL.style.marginTop = "10px"; pubL.style.display = "flex"; pubL.style.gap = "8px"; pubL.style.alignItems = "center";
+    ed.appendChild(pubL);
+    var r3 = el("div","row");
+    var sv = el("button","btn primary","speichern"); sv.type = "button";
+    sv.addEventListener("click", function(){
+      var n = clip(d.n, 120);
+      if (!n) { planMsgOk = false; planMsg = "Bitte einen Titel eingeben."; renderPlan(); return; }
+      var key = id || uid("x");
+      var old = PLAN.ex[key] || {};
+      var u = clip(d.u, 300);
+      if (u && !/^https:\/\//i.test(u)) u = "";
+      var rec = { n: n, c: EX_CATS.indexOf(d.c) >= 0 ? d.c : "Sonstiges", m: Math.max(0, Math.min(300, d.m || 0)), sp: clip(d.sp, 60),
+                  mat: clip(d.mat, 200), d: clip(d.d, 1500), u: u, pub: !!d.pub, ts: Date.now(), by: me.id };
+      if (old.src) rec.src = old.src;
+      var up = {};
+      up["plan/" + activeTeamKey + "/ex/" + key] = rec;
+      up["pub/" + activeTeamKey + "/ex/" + key] = rec.pub ? { n: rec.n, c: rec.c, m: rec.m, sp: rec.sp, mat: rec.mat, d: rec.d, u: rec.u,
+                                                              tn: state.team || "", by: myTrainerName(), ts: rec.ts } : null;
+      db().ref().update(up).then(function(){ exEdit = null; planMsg = ""; renderPlan(); },
+        function(){ planMsgOk = false; planMsg = "Speichern hat nicht geklappt. Bitte Verbindung prüfen."; renderPlan(); });
+    });
+    var cn = el("button","btn quiet","abbrechen"); cn.type = "button";
+    cn.addEventListener("click", function(){ exEdit = null; renderPlan(); });
+    r3.appendChild(sv); r3.appendChild(cn);
+    if (id) {
+      var armedX = !!armed && armed.k === "ex" && armed.id === id;
+      var del = el("button","btn quiet" + (armedX ? " confirm" : ""), armedX ? "Übung wirklich löschen?" : "Übung löschen"); del.type = "button";
+      del.addEventListener("click", function(){
+        if (!armedX) { armed = { k:"ex", id:id }; renderPlan(); return; }
+        armed = null;
+        var up = {}; up["plan/" + activeTeamKey + "/ex/" + id] = null; up["pub/" + activeTeamKey + "/ex/" + id] = null;
+        db().ref().update(up).then(function(){ exEdit = null; renderPlan(); });
+      });
+      r3.appendChild(del);
+    }
+    ed.appendChild(r3);
+    if (id && PLAN.ex[id] && PLAN.ex[id].pub) ed.appendChild(commentBox(activeTeamKey, "ex_" + id));
+    return ed;
+  }
+
+  /* ---------- Leistung ---------- */
+  function testsList(){ return Object.keys(PERF.tests).map(function(id){ var t = PERF.tests[id]; t.id = id; return t; })
+    .sort(function(a,b){ return String(a.name).localeCompare(String(b.name), "de"); }); }
+  function resultsOf(pid, tid){
+    var m = PERF.res[pid] || {};
+    return Object.keys(m).map(function(id){ var r = m[id]; r.id = id; return r; })
+      .filter(function(r){ return r.t === tid && typeof r.v === "number"; })
+      .sort(function(a,b){ return a.d < b.d ? -1 : a.d > b.d ? 1 : (a.ts || 0) - (b.ts || 0); });
+  }
+  function fmtNum(v){ return String(Math.round(v * 100) / 100).replace(".", ","); }
+  function bestOf(list, dir){ if (!list.length) return null; return list.reduce(function(a, r){ return a === null ? r.v : (dir === "low" ? Math.min(a, r.v) : Math.max(a, r.v)); }, null); }
+  function spark(list, dir){
+    var W = 120, H = 32;
+    var svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("viewBox","0 0 " + W + " " + H); svg.setAttribute("width", W); svg.setAttribute("height", H);
+    svg.setAttribute("class","spark"); svg.setAttribute("aria-hidden","true");
+    if (list.length < 2) return svg;
+    var vs = list.map(function(r){ return r.v; });
+    var lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs), span = hi - lo || 1;
+    var pts = list.map(function(r, i){
+      var x = 4 + i * (W - 8) / (list.length - 1);
+      var y = dir === "low" ? 4 + (r.v - lo) / span * (H - 8) : H - 4 - (r.v - lo) / span * (H - 8);
+      return [x, y];
+    });
+    var pl = document.createElementNS("http://www.w3.org/2000/svg","polyline");
+    pl.setAttribute("points", pts.map(function(p){ return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" "));
+    svg.appendChild(pl);
+    var last = pts[pts.length-1];
+    var c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx", last[0]); c.setAttribute("cy", last[1]); c.setAttribute("r", "3");
+    svg.appendChild(c);
+    return svg;
+  }
+  function renderPerf(body){
+    body.appendChild(el("p","hint","Tests, Ziele und Beobachtungen je Spieler. Das sehen nur die Trainer dieses Teams, die Spieler selbst nicht."));
+    var r = el("div","row");
+    var ps = el("select"); ps.setAttribute("aria-label","Spieler");
+    var o0 = el("option", null, "Übersicht aller Spieler"); o0.value = ""; ps.appendChild(o0);
+    kader().slice().sort(function(a,b){ return a.name.localeCompare(b.name, "de"); }).forEach(function(p){
+      var o = el("option", null, p.name); o.value = p.id; ps.appendChild(o);
+    });
+    if (perfPid && !player(perfPid)) perfPid = "";
+    ps.value = perfPid;
+    ps.addEventListener("change", function(){ perfPid = ps.value; renderPlan(); });
+    r.appendChild(ps);
+    body.appendChild(r);
+    var tests = testsList();
+    if (!perfPid) { perfOverview(body, tests); return; }
+    var pid = perfPid, p = player(pid);
+
+    /* Tests */
+    body.appendChild(el("h2", null, "Tests"));
+    var tc = el("div","card pad");
+    if (!tests.length) tc.appendChild(el("p","hint","Noch keine Tests angelegt. Das geht unten in der Übersicht aller Spieler."));
+    tests.forEach(function(t){
+      var list = resultsOf(pid, t.id);
+      var row = el("div","ptest");
+      var head = el("div","pwhat");
+      head.appendChild(el("b", null, t.name));
+      var last = list.length ? list[list.length-1] : null, best = bestOf(list, t.dir);
+      head.appendChild(el("span","hint", list.length
+        ? "zuletzt " + fmtNum(last.v) + " " + (t.unit || "") + " am " + fmtShort(last.d) + " · Bestwert " + fmtNum(best) + " · " + list.length + (list.length === 1 ? " Messung" : " Messungen")
+        : "noch keine Messung · " + (t.dir === "low" ? "weniger ist besser" : "mehr ist besser")));
+      row.appendChild(head);
+      row.appendChild(spark(list, t.dir));
+      var f = el("div","row");
+      var vi = el("input"); vi.type = "text"; vi.inputMode = "decimal"; vi.maxLength = 12; vi.style.textAlign = "right"; vi.placeholder = t.unit || "Wert"; vi.style.width = "110px"; vi.setAttribute("aria-label", t.name + " Wert");
+      var di = el("input"); di.type = "date"; di.value = todayISO(); di.setAttribute("aria-label","Datum");
+      var go = el("button","btn","eintragen"); go.type = "button";
+      go.addEventListener("click", function(){
+        var v = parseFloat(String(vi.value).replace(",", "."));
+        if (isNaN(v)) { planMsgOk = false; planMsg = "Bitte einen Wert eintragen."; renderPlan(); return; }
+        pWrite("perf/" + activeTeamKey + "/res/" + pid + "/" + uid("r"), { t: t.id, d: di.value || todayISO(), v: v, ts: Date.now() }).then(function(){ planMsg = ""; });
+      });
+      f.appendChild(vi); f.appendChild(di); f.appendChild(go);
+      row.appendChild(f);
+      if (list.length) {
+        var det = el("details","rules");
+        det.appendChild(el("summary", null, "Alle Messungen"));
+        var ul = el("ul","pplist");
+        list.slice().reverse().forEach(function(m){
+          var li = el("li", null, fmtShort(m.d) + ": " + fmtNum(m.v) + " " + (t.unit || "") + " ");
+          var x = el("button","btn quiet small","löschen"); x.type = "button";
+          x.addEventListener("click", function(){ db().ref("perf/" + activeTeamKey + "/res/" + pid + "/" + m.id).remove(); });
+          li.appendChild(x); ul.appendChild(li);
+        });
+        det.appendChild(ul);
+        row.appendChild(det);
+      }
+      tc.appendChild(row);
+    });
+    body.appendChild(tc);
+
+    /* Ziele */
+    body.appendChild(el("h2", null, "Ziele"));
+    var gc = el("div","card pad");
+    var gm = PERF.goals[pid] || {};
+    var gids = Object.keys(gm).sort(function(a,b){
+      var A = gm[a], B = gm[b], o = { open:0, done:1, drop:2 };
+      return (o[A.st] || 0) - (o[B.st] || 0) || String(A.due || "9").localeCompare(String(B.due || "9"));
+    });
+    if (!gids.length) gc.appendChild(el("p","hint","Noch keine Ziele für " + p.name + "."));
+    gids.forEach(function(id){
+      var g = gm[id];
+      var row = el("div","prow");
+      var what = el("div","pwhat");
+      what.appendChild(el("b", null, g.x));
+      var dueTxt = g.due ? "bis " + fmtShort(g.due) + (g.st === "open" && g.due < todayISO() ? " (überfällig)" : "") : "ohne Datum";
+      what.appendChild(el("span","hint", dueTxt));
+      row.appendChild(what);
+      var st = el("select"); st.setAttribute("aria-label","Status");
+      [["open","offen"],["done","erreicht"],["drop","verworfen"]].forEach(function(o){ var op = el("option", null, o[1]); op.value = o[0]; st.appendChild(op); });
+      st.value = g.st || "open";
+      st.addEventListener("change", function(){ db().ref("perf/" + activeTeamKey + "/goals/" + pid + "/" + id + "/st").set(st.value); });
+      row.appendChild(st);
+      var x = el("button","btn quiet small","löschen"); x.type = "button";
+      x.addEventListener("click", function(){ db().ref("perf/" + activeTeamKey + "/goals/" + pid + "/" + id).remove(); });
+      row.appendChild(x);
+      gc.appendChild(row);
+    });
+    var gf = el("div","row");
+    var gx = el("input"); gx.type = "text"; gx.maxLength = 200; gx.placeholder = "zum Beispiel sichere Kenterrolle links"; gx.style.flex = "1"; gx.style.minWidth = "200px";
+    gx.setAttribute("aria-label","neues Ziel");
+    var gd = el("input"); gd.type = "date"; gd.setAttribute("aria-label","Zieldatum");
+    var ga = el("button","btn","Ziel hinzufügen"); ga.type = "button";
+    ga.addEventListener("click", function(){
+      var x2 = clip(gx.value, 200); if (!x2) return;
+      var rec = { x: x2, st: "open", ts: Date.now() }; if (gd.value) rec.due = gd.value;
+      pWrite("perf/" + activeTeamKey + "/goals/" + pid + "/" + uid("g"), rec);
+    });
+    gf.appendChild(gx); gf.appendChild(gd); gf.appendChild(ga);
+    gc.appendChild(gf);
+    body.appendChild(gc);
+
+    /* Beobachtungen */
+    body.appendChild(el("h2", null, "Beobachtungen"));
+    var oc = el("div","card pad");
+    var of = el("div","row");
+    var od = el("input"); od.type = "date"; od.value = todayISO(); od.setAttribute("aria-label","Datum");
+    var osel = el("select"); osel.setAttribute("aria-label","Termin");
+    var oo = el("option", null, "ohne Termin"); oo.value = ""; osel.appendChild(oo);
+    planSessions().past.slice().reverse().forEach(function(s){ var o = el("option", null, fmtShort(s.date) + " " + (s.label || "Training")); o.value = s.id; osel.appendChild(o); });
+    osel.addEventListener("change", function(){ var s = sessById(osel.value); if (s) od.value = s.date; });
+    var ox = el("textarea","csvbox"); ox.maxLength = 1000; ox.style.minHeight = "60px"; ox.style.fontFamily = "var(--font-sans)"; ox.style.fontSize = "14px";
+    ox.placeholder = "Was ist dir aufgefallen?"; ox.setAttribute("aria-label","Beobachtung");
+    var oa = el("button","btn","festhalten"); oa.type = "button";
+    oa.addEventListener("click", function(){
+      var x3 = clip(ox.value, 1000); if (!x3) return;
+      var rec = { d: od.value || todayISO(), x: x3, ts: Date.now() }; if (osel.value) rec.sid = osel.value;
+      pWrite("perf/" + activeTeamKey + "/obs/" + pid + "/" + uid("o"), rec);
+    });
+    of.appendChild(od); of.appendChild(osel); of.appendChild(oa);
+    oc.appendChild(ox); oc.appendChild(of);
+    var om = PERF.obs[pid] || {};
+    var oids = Object.keys(om).sort(function(a,b){ return String(om[b].d).localeCompare(String(om[a].d)) || (om[b].ts || 0) - (om[a].ts || 0); });
+    oids.forEach(function(id){
+      var o = om[id], s = o.sid ? sessById(o.sid) : null;
+      var row = el("div","pobs");
+      row.appendChild(el("b", null, fmtShort(o.d) + (s ? " · " + (s.label || "Training") : "")));
+      row.appendChild(el("div", null, o.x));
+      var x = el("button","btn quiet small","löschen"); x.type = "button";
+      x.addEventListener("click", function(){ db().ref("perf/" + activeTeamKey + "/obs/" + pid + "/" + id).remove(); });
+      row.appendChild(x);
+      oc.appendChild(row);
+    });
+    body.appendChild(oc);
+  }
+  function perfOverview(body, tests){
+    body.appendChild(el("h2", null, "Letzte Werte"));
+    var card = el("div","card scroll");
+    var ps = kader().slice().sort(function(a,b){ return a.name.localeCompare(b.name, "de"); });
+    if (!tests.length || !ps.length) card.appendChild(el("div","empty", !ps.length ? "Noch niemand im Kader." : "Lege unten einen Test an, dann stehen hier die letzten Werte aller Spieler."));
+    else {
+      var t = el("table","ptable");
+      var hr = el("tr"); hr.appendChild(el("th", null, "Spieler"));
+      tests.forEach(function(x){ hr.appendChild(el("th", null, x.name + (x.unit ? " (" + x.unit + ")" : ""))); });
+      hr.appendChild(el("th", null, "Ziele offen"));
+      var th = el("thead"); th.appendChild(hr); t.appendChild(th);
+      var tb = el("tbody");
+      ps.forEach(function(p){
+        var tr = el("tr");
+        var nb = el("button","linkbtn", p.name); nb.type = "button";
+        nb.addEventListener("click", function(){ perfPid = p.id; renderPlan(); });
+        var td0 = el("td"); td0.appendChild(nb); tr.appendChild(td0);
+        tests.forEach(function(x){
+          var list = resultsOf(p.id, x.id);
+          var td = el("td", null, list.length ? fmtNum(list[list.length-1].v) : "–");
+          if (list.length > 1) {
+            var a = list[list.length-2].v, b = list[list.length-1].v;
+            var better = x.dir === "low" ? b < a : b > a;
+            if (a !== b) td.appendChild(el("span", better ? "up" : "down", better ? " ▲" : " ▼"));
+          }
+          tr.appendChild(td);
+        });
+        var gm = PERF.goals[p.id] || {};
+        tr.appendChild(el("td", null, String(Object.keys(gm).filter(function(id){ return (gm[id].st || "open") === "open"; }).length)));
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb); card.appendChild(t);
+    }
+    body.appendChild(card);
+    body.appendChild(el("p","hint","▲ besser als die Messung davor, ▼ schlechter. Name antippen für Details."));
+
+    body.appendChild(el("h2", null, "Tests im Team"));
+    var tc = el("div","card pad");
+    tests.forEach(function(x){
+      var row = el("div","prow");
+      var what = el("div","pwhat");
+      what.appendChild(el("b", null, x.name));
+      what.appendChild(el("span","hint", (x.unit || "ohne Einheit") + " · " + (x.dir === "low" ? "weniger ist besser" : "mehr ist besser")));
+      row.appendChild(what);
+      var armedT = !!armed && armed.k === "test" && armed.id === x.id;
+      var del = el("button","btn quiet small" + (armedT ? " confirm" : ""), armedT ? "mit allen Messungen löschen?" : "löschen"); del.type = "button";
+      del.addEventListener("click", function(){
+        if (!armedT) { armed = { k:"test", id:x.id }; renderPlan(); return; }
+        armed = null;
+        var up = {}; up["perf/" + activeTeamKey + "/tests/" + x.id] = null;
+        Object.keys(PERF.res).forEach(function(pid){
+          Object.keys(PERF.res[pid] || {}).forEach(function(rid){ if (PERF.res[pid][rid].t === x.id) up["perf/" + activeTeamKey + "/res/" + pid + "/" + rid] = null; });
+        });
+        db().ref().update(up);
+      });
+      row.appendChild(del);
+      tc.appendChild(row);
+    });
+    var f = el("div","row");
+    var ni = el("input"); ni.type = "text"; ni.maxLength = 80; ni.placeholder = "Name des Tests"; ni.style.flex = "1"; ni.style.minWidth = "180px"; ni.setAttribute("aria-label","Name des Tests");
+    var ui = el("input"); ui.type = "text"; ui.maxLength = 20; ui.placeholder = "Einheit, z. B. s"; ui.style.width = "130px"; ui.setAttribute("aria-label","Einheit");
+    var di = el("select"); di.setAttribute("aria-label","Was ist besser");
+    [["high","mehr ist besser"],["low","weniger ist besser"]].forEach(function(o){ var op = el("option", null, o[1]); op.value = o[0]; di.appendChild(op); });
+    var go = el("button","btn","Test anlegen"); go.type = "button";
+    var addTest = function(name, unit, dir){
+      if (!clip(name, 80)) return;
+      pWrite("perf/" + activeTeamKey + "/tests/" + uid("t"), { name: clip(name, 80), unit: clip(unit, 20), dir: dir === "low" ? "low" : "high", ts: Date.now() });
+    };
+    go.addEventListener("click", function(){ addTest(ni.value, ui.value, di.value); });
+    f.appendChild(ni); f.appendChild(ui); f.appendChild(di); f.appendChild(go);
+    tc.appendChild(f);
+    var have = tests.map(function(x){ return x.name; });
+    var ideas = TEST_IDEAS.filter(function(x){ return have.indexOf(x.name) === -1; });
+    if (ideas.length) {
+      var ir = el("div","row");
+      ir.appendChild(el("span","hint","Vorschläge:"));
+      ideas.forEach(function(x){
+        var b = el("button","btn quiet small", "+ " + x.name); b.type = "button";
+        b.addEventListener("click", function(){ addTest(x.name, x.unit, x.dir); });
+        ir.appendChild(b);
+      });
+      tc.appendChild(ir);
+    }
+    body.appendChild(tc);
+  }
+
+  /* ---------- Verein: Veröffentlichtes der anderen Teams ---------- */
+  function renderClub(body){
+    body.appendChild(el("p","hint","Was die Trainer der anderen Teams veröffentlicht haben. Du kannst es in dein Team kopieren und kommentieren, das Original bleibt unverändert."));
+    var others = Object.keys(PUB).filter(function(k){ return k !== activeTeamKey; });
+    var plans = [], exs = [];
+    others.forEach(function(k){
+      var v = PUB[k] || {};
+      Object.keys(v.ses || {}).forEach(function(id){ plans.push({ k:k, id:id, x:v.ses[id] }); });
+      Object.keys(v.ex || {}).forEach(function(id){ exs.push({ k:k, id:id, x:v.ex[id] }); });
+    });
+    var t = todayISO();
+    plans.sort(function(a,b){
+      var fa = a.x.d >= t, fb = b.x.d >= t;
+      if (fa !== fb) return fa ? -1 : 1;
+      return fa ? String(a.x.d).localeCompare(String(b.x.d)) : String(b.x.d).localeCompare(String(a.x.d));
+    });
+    body.appendChild(el("h2", null, "Einheitenpläne"));
+    var pc = el("div","card");
+    if (!plans.length) pc.appendChild(el("div","empty","Noch keine veröffentlichten Pläne aus anderen Teams."));
+    plans.forEach(function(it){
+      var x = it.x, bl = blocksOf(x);
+      var wrap = el("div","pclub");
+      var head = el("div","pwhat");
+      head.appendChild(el("b", null, (x.tn || teamDisplayName(it.k)) + " · " + fmtShort(x.d) + (x.tm ? ", " + x.tm + " Uhr" : "") + "  " + (x.l || "Training")));
+      head.appendChild(el("span","hint", (x.g ? "Ziel: " + x.g + " · " : "") + sumMin(bl) + " Min · von " + (x.by || "Trainer")));
+      wrap.appendChild(head);
+      var ol = el("ol","pplist");
+      bl.forEach(function(b){
+        var li = el("li");
+        li.appendChild(el("b", null, (b.p || "") + ": " + (b.t || "") + (b.m ? " (" + b.m + " Min)" : "")));
+        if (b.x) li.appendChild(el("span","hint"," " + b.x));
+        if (b.d) li.appendChild(el("p","hint pexd", b.d));
+        ol.appendChild(li);
+      });
+      wrap.appendChild(ol);
+      if (x.mat) wrap.appendChild(el("p","hint","Material: " + x.mat));
+      var cr = el("div","row");
+      var sel = el("select"); sel.setAttribute("aria-label","in welchen Termin kopieren");
+      var o0 = el("option", null, "in welchen Termin kopieren?"); o0.value = ""; sel.appendChild(o0);
+      planSessions().next.forEach(function(s){
+        var o = el("option", null, fmtShort(s.date) + " " + (s.label || "Training") + (PLAN.ses[s.id] ? " (hat schon einen Plan)" : ""));
+        o.value = s.id; sel.appendChild(o);
+      });
+      var key = it.k + "/" + it.id;
+      sel.value = copyPick[key] || "";
+      sel.addEventListener("change", function(){ copyPick[key] = sel.value; });
+      var armC = !!armed && armed.k === "cp" && armed.id === key;
+      var cb = el("button","btn" + (armC ? " confirm" : ""), armC ? "vorhandenen Plan ersetzen?" : "kopieren"); cb.type = "button";
+      cb.addEventListener("click", function(){
+        var s = sessById(sel.value);
+        if (!s) { planMsgOk = false; planMsg = "Bitte zuerst einen eigenen Termin wählen."; renderPlan(); return; }
+        if (PLAN.ses[s.id] && !armC) { armed = { k:"cp", id:key }; renderPlan(); return; }
+        armed = null;
+        var blocks = bl.map(function(b){
+          var o = { p: PARTS.indexOf(b.p) >= 0 ? b.p : "Hauptteil", m: +b.m || 0, t: clip(b.t, 120) || "ohne Titel" };
+          var note = [b.x, b.d].filter(Boolean).join(" · ");
+          if (note) o.x = clip(note, 300);
+          return o;
+        });
+        var rec = { g: clip(x.g, 200), mat: clip(x.mat, 200), r: "", pub: false, b: blocks, ts: Date.now(), by: me.id,
+                    src: { k: it.k, id: it.id, tn: clip(x.tn, 80) } };
+        pWrite("plan/" + activeTeamKey + "/ses/" + s.id, rec).then(function(){
+          planMsg = "Plan in deinen Termin am " + fmtShort(s.date) + " kopiert. Du findest ihn unter Einheiten."; planMsgOk = true;
+          renderPlan();
+        });
+      });
+      cr.appendChild(sel); cr.appendChild(cb);
+      wrap.appendChild(cr);
+      wrap.appendChild(commentBox(it.k, "ses_" + it.id));
+      pc.appendChild(wrap);
+    });
+    body.appendChild(pc);
+
+    body.appendChild(el("h2", null, "Übungen"));
+    var ec = el("div","card");
+    exs.sort(function(a,b){ return String(a.x.n).localeCompare(String(b.x.n), "de"); });
+    if (!exs.length) ec.appendChild(el("div","empty","Noch keine veröffentlichten Übungen aus anderen Teams."));
+    exs.forEach(function(it){
+      var x = it.x;
+      var wrap = el("div","pclub");
+      var head = el("div","pwhat");
+      head.appendChild(el("b", null, x.n));
+      var tags = el("div","ptags");
+      tags.appendChild(el("span","sptag", x.c || "Sonstiges"));
+      if (x.m) tags.appendChild(el("span","hint", x.m + " Min"));
+      tags.appendChild(el("span","hint", "von " + (x.tn || teamDisplayName(it.k)) + ", " + (x.by || "Trainer")));
+      head.appendChild(tags);
+      wrap.appendChild(head);
+      if (x.d) wrap.appendChild(el("p","hint pexd", x.d));
+      if (x.sp || x.mat) wrap.appendChild(el("p","hint", [x.sp ? "Spieler: " + x.sp : "", x.mat ? "Material: " + x.mat : ""].filter(Boolean).join(" · ")));
+      if (x.u && /^https:\/\//i.test(x.u)) {
+        var a = el("a", null, "Link öffnen"); a.href = x.u; a.target = "_blank"; a.rel = "noopener noreferrer";
+        wrap.appendChild(a);
+      }
+      var have = Object.keys(PLAN.ex).some(function(id){ var s = PLAN.ex[id].src; return s && s.k === it.k && s.id === it.id; });
+      var cb = el("button","btn", have ? "schon kopiert" : "in meine Übungen kopieren"); cb.type = "button";
+      cb.disabled = have;
+      cb.addEventListener("click", function(){
+        var u = /^https:\/\//i.test(x.u || "") ? clip(x.u, 300) : "";
+        pWrite("plan/" + activeTeamKey + "/ex/" + uid("x"), { n: clip(x.n, 120) || "Übung", c: EX_CATS.indexOf(x.c) >= 0 ? x.c : "Sonstiges",
+          m: Math.max(0, Math.min(300, +x.m || 0)), sp: clip(x.sp, 60), mat: clip(x.mat, 200), d: clip(x.d, 1500), u: u,
+          pub: false, ts: Date.now(), by: me.id, src: { k: it.k, id: it.id, tn: clip(x.tn, 80) } }).then(function(){
+          planMsg = "„" + x.n + "“ steht jetzt in deinen Übungen."; planMsgOk = true; renderPlan();
+        });
+      });
+      var cr = el("div","row"); cr.appendChild(cb); wrap.appendChild(cr);
+      wrap.appendChild(commentBox(it.k, "ex_" + it.id));
+      ec.appendChild(wrap);
+    });
+    body.appendChild(ec);
+  }
+
   /* ---------- Spieleransicht für Trainer (seit Version 15) ----------
      Zeigt die App so, wie ein Spieler sie sieht, mit Beispieldaten und den Einstellungen
      des aktiven Teams. Nur ansehen: readOnly, keine Schreibzugriffe, Live-Daten des Teams
@@ -6185,6 +7077,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   }
   function detachAll(){
     detachPre();
+    detachPlan();
     if (FB) { safe(function(){ FB.off(); }); FB = null; }
     if (NOTES_REF) { safe(function(){ NOTES_REF.off(); }); NOTES_REF = null; }
     if (CATALOG_REF) { safe(function(){ CATALOG_REF.off(); }); CATALOG_REF = null; }
