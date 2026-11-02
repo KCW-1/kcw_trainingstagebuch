@@ -238,7 +238,7 @@ async function main() {
       const gone = !teamsCat[k];
       if (!gone && !teams[k]) continue;                       // Team nicht gelesen: nichts anfassen
       for (const [pid, rec] of Object.entries(byPid || {})) {
-        if (!gone && teams[k].players[pid]) continue;
+        if (!gone && teams[k].players[pid] && !teams[k].players[pid].left) continue;
         try {
           if (rec && rec.g && !DRY) {
             try { await gh("DELETE", "/gists/" + rec.g); } catch (e) { if (e.status !== 404) throw e; }

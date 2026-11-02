@@ -216,7 +216,7 @@ async function notifyChanges(key, team, subsAll, snapRec, stats) {
       if (o && n && JSON.stringify(o) === JSON.stringify(n)) continue;
       if (o && !n && sessions[sid]) continue;             // nur aus dem Merkzettel gefallen (vorbei)
       for (const pid of Object.keys(players)) {
-        if (!subsAll[pid]) continue;
+        if (!subsAll[pid] || (players[pid] && players[pid].left)) continue;
         const ev = eventsFor(sid, o, n, pid);
         if (ev) { ev.sid = sid; (byPid[pid] = byPid[pid] || []).push(ev); }
       }
@@ -259,6 +259,7 @@ async function runTeam(key, stats) {
     const who = s.who && typeof s.who === "object" && Object.keys(s.who).length ? s.who : null;
     for (const pid of Object.keys(players)) {
       if (who && !who[pid]) continue;                   // Termin gilt nur für ausgewählte Spieler
+      if (players[pid] && players[pid].left && s.date >= players[pid].left) continue;   // ins andere Team gewechselt
       const cur = att[sid] && att[sid][pid];
       if (cur && cur.v !== "maybe") continue;           // hat schon fest zu- oder abgesagt
       const maybe = !!cur;

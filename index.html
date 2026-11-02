@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-tMALpKuBf5f6icIEOztb5/nJ0ks9OTJM7LFES9eJXt4=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-GROYM4Zvd3YUkycTV7q0m3wmypWwe8eaZjXTSW+rowI=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Trainingsbeteiligung</title>
@@ -441,7 +441,10 @@ window.TB_ICONS = {
     background:var(--surface-sunken);color:var(--text-faint,var(--ink-400));}
   .badge.got{border-color:var(--green-300);background:var(--surface-brand-soft);}
   .badge.got .pin{background:var(--surface-brand);color:var(--text-on-brand);}
-  .badge .bt{min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .badge .bt{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px;}
+  .badge .bbar{height:6px;margin-top:6px;border-radius:var(--radius-pill);background:var(--surface-sunken);overflow:hidden;}
+  .badge .bbar i{display:block;height:100%;border-radius:var(--radius-pill);background:var(--surface-brand);}
+  .badge.t1 .bbar i{background:#9C6B3F;} .badge.t2 .bbar i{background:#8E968F;} .badge.t3 .bbar i{background:var(--sand-500);}
   .badge .bt b{font:700 14.5px/1.2 var(--font-sans);color:var(--text-strong);}
   .badge .bt em{font-style:normal;font-size:12.5px;color:var(--text-muted);}
   .badge .bt .bp{font:600 11.5px/1.2 var(--font-narrow);letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);
@@ -889,6 +892,7 @@ window.TB_ICONS = {
       <span class="spacer"></span>
       <span class="who">Angemeldet als <b id="whoName">&nbsp;</b><span class="tag" id="whoTag" hidden>Trainer</span></span>
       <span class="save" id="saveStatus"><i class="led"></i><span id="saveText">bereit</span></span>
+      <button class="btn quiet" id="previewBtn" type="button" hidden>Spieleransicht</button>
       <button class="btn quiet" id="switchTeamBtn" type="button" hidden>Team wechseln</button>
       <button class="btn quiet" id="logoutBtn" type="button">Abmelden</button>
     </header>
@@ -899,6 +903,10 @@ window.TB_ICONS = {
         <span>Noch keine Datenbank hinterlegt. Einträge bleiben nur in diesem Browser. Trage oben in der Datei index.html die Firebase-Daten ein, dann teilen sich alle Geräte denselben Stand.</span>
       </div>
 
+      <div id="previewBanner" hidden class="banner">
+        <span>Spieleransicht mit Beispieldaten: So sieht ein Spieler die App, mit euren Einstellungen (Punkte, Fristen, Stufen, Abzeichen, Joker). Hier wird nichts gespeichert.</span>
+        <button class="btn" id="previewEnd" type="button">Spieleransicht beenden</button>
+      </div>
       <div id="demoBanner" hidden class="banner">
         <span>Beispieldaten zum Ausprobieren. Der Button entfernt nur die Beispiele, deine eigenen Einträge bleiben.</span>
         <button class="btn" id="clearDemo" type="button">Beispieldaten entfernen</button>
@@ -1112,6 +1120,11 @@ Bei 0 Stunden liegt die Absagefrist genau beim Trainingsbeginn." data-title="Fri
             </div>
             <p class="hint" id="excPreview"></p>
             <div class="row">
+              <label for="excPtsInput">Punkte für rechtzeitige Absage</label>
+              <input type="number" id="excPtsInput" min="0" max="20" step="1" style="width:96px">
+              <span class="hint" data-info="So viele Punkte bekommt, wer bis zur Absagefrist mit Grund absagt. Anwesend bringt 10, dazu kommt bei beiden der Bonus. Gilt sofort für alle Termine, auch rückwirkend." data-title="Absagepunkte">anwesend bringt 10</span>
+            </div>
+            <div class="row">
               <label for="bonusInput">Bonuspunkte bis</label>
               <input type="number" id="bonusInput" min="0" max="336" step="1" style="width:96px">
               <span class="hint">Stunden vor Trainingsbeginn</span>
@@ -1151,7 +1164,7 @@ Schaltest du sie wieder aus, bleiben gesetzte Einträge erhalten und zählen so 
             <div class="row">
               <label for="latePtsInput">Punkte für zu spät</label>
               <input type="number" id="latePtsInput" min="0" max="20" step="1" style="width:96px">
-              <span class="hint">anwesend 10, rechtzeitige Absage 3</span>
+              <span class="hint" id="latePtsHint">anwesend 10</span>
             </div>
             <p class="hint" id="latePreview"></p>
           </div>
@@ -1234,8 +1247,10 @@ Der Code muss mindestens 6 Zeichen haben und darf keinem anderen Team gehören. 
         <div class="adminblock">
           <h3 data-info="Wer hier steht, kann sich anmelden und sich selbst eintragen. Ohne PIN heißt: hat sich noch nie angemeldet, die PIN legt jeder bei der ersten Anmeldung selbst fest.
 Einen Spieler zu löschen entfernt auch alle seine Einträge. Die Seite fragt vorher nach.
-Aus Wertung nimmt einen Spieler ab heute aus den Team-Zahlen: Team-Quote, Mannschaftsziel, Team-Serie, Podium und Duell. Seine eigenen Punkte, Serie und Abzeichen laufen weiter, eintragen kann er sich wie bisher. Wieder werten gilt ab heute, vergangene Termine bleiben so gewertet wie vorher.">Kader</h3>
+Aus Wertung nimmt einen Spieler ab heute aus den Team-Zahlen: Team-Quote, Mannschaftsziel, Team-Serie, Podium und Duell. Seine eigenen Punkte, Serie und Abzeichen laufen weiter, eintragen kann er sich wie bisher. Wieder werten gilt ab heute, vergangene Termine bleiben so gewertet wie vorher.
+Team wechseln verschiebt einen Spieler in ein anderes Team, bei dem du auch etwas ändern darfst. Seine persönliche Wertung (Punkte, Serie, Quote, Abzeichen, Rekorde, Joker) nimmt er mit, Konto und PIN bleiben gleich. Hier bleibt er als ehemalig stehen, die alten Team-Zahlen ändern sich dadurch nicht.">Kader</h3>
           <div class="roster" id="rosterList"></div>
+          <p class="msg ok" id="rosterMsg"></p>
           <div class="row">
             <input type="text" id="newPlayer" placeholder="Name" style="flex:1;min-width:200px">
             <button class="btn primary" id="addPlayer" type="button">Spieler hinzufügen</button>
@@ -1444,14 +1459,31 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     { k:"early",    name:"Frühmelder",         unit:"Rückmeldungen",      def:[10,25,50], max:500,
       desc:"Rückmeldungen vor der Bonusfrist." },
     { k:"punctual", name:"Pünktlich in Folge", unit:"in Folge",           def:[5,12,25],  max:500,
-      desc:"Rückmeldungen in Folge vor der Bonusfrist." }
+      desc:"Rückmeldungen in Folge vor der Bonusfrist." },
+    { k:"points",   name:"Punktesammler",      unit:"Punkte",             def:[250,750,1500], max:20000,
+      desc:"Deine Punkte insgesamt." },
+    { k:"perfmonth", name:"Perfekter Monat",   unit:"Monate",             def:[1,3,6],    max:120,
+      desc:"Abgeschlossene Monate, in denen du bei jedem Training da warst (mindestens drei Einheiten)." },
+    { k:"special",  name:"Sondertermine",      unit:"Teilnahmen",         def:[3,10,25],  max:500,
+      desc:"Dabei bei Turnieren, Fahrten, Trainingslagern und anderen Sonderterminen." }
   ];
   var SINGLE_DEFS = [
     { k:"first",    name:"Erste Einheit" },
     { k:"comeback", name:"Comeback" },
     { k:"winter",   name:"Wintertraining" },
-    { k:"newyear",  name:"Jahreswechsel" }
+    { k:"newyear",  name:"Jahreswechsel" },
+    { k:"jubilee",  name:"Jubiläum" },
+    { k:"seasonstart", name:"Saisonstart" }
   ];
+  /* Erklärungen der einmaligen Abzeichen, für Spieler und Trainer gleich */
+  var SINGLE_DESC = {
+    first:"Einmal anwesend gewesen.",
+    comeback:"Nach vier Wochen Pause wieder dreimal in Folge dabei.",
+    winter:"Alle Einheiten im Winter (Dezember bis Februar, mindestens fünf) mitgemacht oder rechtzeitig abgesagt.",
+    newyear:"Zwischen dem 27. Dezember und dem 6. Januar auf dem Wasser.",
+    jubilee:"Deine 100. Einheit.",
+    seasonstart:"Bei der ersten Einheit der Saison dabei. Ohne Saison-Stichtag zählt die erste Einheit eines Jahres."
+  };
   var DEFAULT_GOAL = 85;
   var DEFAULT_EXC = 0;      /* Stunden vor Beginn, bis wann eine Absage Punkte gibt */
   var DEFAULT_BONUS = 24;   /* Stunden vor Beginn, bis wann es Bonuspunkte gibt */
@@ -1520,7 +1552,16 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     return Object.keys(o).length ? o : null;
   }
   function hasWho(s){ return !!s && !!s.who && typeof s.who === "object" && Object.keys(s.who).length > 0; }
-  function invited(s, pid){ return !hasWho(s) || !!s.who[pid]; }
+  function invited(s, pid){
+    if (s && s.hist) return true;
+    if (hasWho(s) && !s.who[pid]) return false;
+    var p = player(pid);
+    return !(p && p.left && s && s.date >= p.left);
+  }
+  /* Ehemalige (ins andere Team gewechselt) bleiben für alte Team-Zahlen im Datensatz,
+     stehen aber nicht mehr im Kader, in Listen und im Podium. */
+  function isCurrent(p){ return !!p && !p.left; }
+  function kader(){ return state.players.filter(isCurrent); }
   function seesSess(s){ return !me || isTrainer() || invited(s, me.id); }
   function sessPlayers(s){ return state.players.filter(function(p){ return invited(s, p.id); }); }
   /* Spieler außer Team-Wertung: noScore = { <pid>: { <vonISO>: <bisISO> | true } }.
@@ -1567,7 +1608,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function safe(fn, fb){ try { return fn(); } catch(e){ return fb; } }
   function byDate(list){ return list.slice().sort(function(a,b){ return (a.date+a.time) < (b.date+b.time) ? -1 : 1; }); }
   function player(id){ for (var i=0;i<state.players.length;i++) if (state.players[i].id===id) return state.players[i]; return null; }
-  function entry(sid,pid){ var m = state.att[sid]; return (m && m[pid]) || null; }
+  function entry(sid,pid){
+    if (typeof sid === "string" && sid.indexOf("h:") === 0) {
+      var hp = player(pid), h = hp && hp.hist && hp.hist.s[sid.slice(2)];
+      return (h && h.v) ? { v:h.v, n:"", by:h.by || "", ts:h.ts || 0, r: !!h.r } : null;
+    }
+    var m = state.att[sid]; return (m && m[pid]) || null;
+  }
   function sessById(id){ for (var i=0;i<state.sessions.length;i++) if (state.sessions[i].id===id) return state.sessions[i]; return null; }
   function isTrainer(){ return !!me && me.role === "trainer"; }
   function trainerAcct(id){ return (catalog.trainers && catalog.trainers[id]) || null; }
@@ -1830,6 +1877,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       st.remindHours = op.st.remindHours;
       st.lateOn = op.st.lateOn;
       st.latePts = op.st.latePts;
+      st.excPts = op.st.excPts;
       st.lvGold = op.st.lvGold;
       st.lvSilver = op.st.lvSilver;
       st.lvBronze = op.st.lvBronze;
@@ -1890,25 +1938,26 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     NOTES_REF.on("value", function(snap){
       var v = snap.val() || {};
       if (asPlayer) { notesVal = {}; notesVal[asPlayer] = v; } else notesVal = v;
-      if (rawTeam) { state = fromDb(rawTeam, notesVal); render(); }
+      if (rawTeam) { if (preview) preview.state = fromDb(rawTeam, notesVal); else { state = fromDb(rawTeam, notesVal); render(); } }
     }, function(){ notesVal = {}; });
     FB.on("value", function(snap){
       bindTeamRef.tries = 0;
       rawTeam = snap.val() || {};
       rawPlayers = rawTeam.players || {};
+      if (preview && !first) { preview.state = fromDb(rawTeam, notesVal); return; }
       state = fromDb(rawTeam, notesVal);
       if (first) {
         first = false;
         if (pendingMe) {
           var pp = rawPlayers[pendingMe.id];
           if (pp && pp.login && authUser && pp.login.uid === authUser.uid) { me = pendingMe; route = route || "heute"; }
-          else { pendingMe = null; signOutWhy("spieler-konto passt nicht"); return; }
+          else { pendingMe = null; moveOrOut("spieler-konto passt nicht"); return; }
           pendingMe = null;
         }
       }
       if (me && me.role === "player") {
         var p2 = rawPlayers[me.id];
-        if (!p2 || !p2.login || !authUser || p2.login.uid !== authUser.uid) { signOutWhy("spieler entfernt oder zurückgesetzt"); return; }
+        if (!p2 || !p2.login || !authUser || p2.login.uid !== authUser.uid) { safe(function(){ FB.off(); }); moveOrOut("spieler entfernt oder zurückgesetzt"); return; }
       }
       if (isTrainer()) migrateTeam(key);
       if (!fbPending) setSave("ok","gespeichert");
@@ -1923,7 +1972,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       }
       bindTeamRef.tries = 0;
       setSave("bad","kein Zugriff auf dieses Team");
-      if (authUser && !authUser.isAnonymous) signOutWhy("team nicht lesbar");
+      if (authUser && !authUser.isAnonymous) {
+        if ((me && me.role === "player") || asPlayer) moveOrOut("team nicht lesbar");
+        else signOutWhy("team nicht lesbar");
+      }
     });
     render();
   }
@@ -2026,7 +2078,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     } else if (op.t === "restore") {
       var payload = { team: op.st.team, goal: op.st.goal, excHours: op.st.excHours, bonusHours: op.st.bonusHours,
         remindOn: op.st.remindOn !== false, remindHours: op.st.remindHours,
-        lateOn: !!op.st.lateOn, latePts: op.st.latePts,
+        lateOn: !!op.st.lateOn, latePts: op.st.latePts, excPts: op.st.excPts,
         lvGold: op.st.lvGold, lvSilver: op.st.lvSilver, lvBronze: op.st.lvBronze,
         levelMin: op.st.levelMin, badges: op.st.badges || {},
         jokers: op.st.jokers, jokerFrom: op.st.jokerFrom || "", seasonFrom: op.st.seasonFrom || "",
@@ -2039,7 +2091,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         var rec = { name: String(p.name).slice(0, 60) };
         if (p.since) rec.since = p.since;
         var old = rawPlayers[p.id];
-        if (old && old.login) rec.login = old.login;   /* bestehende Konten bleiben verknüpft */
+        if (old && old.login && !p.left) rec.login = old.login;   /* bestehende Konten bleiben verknüpft */
+        if (p.left) rec.left = p.left;
+        var hist = p.hist || (old && cleanHist(old.hist));
+        if (hist) rec.hist = hist;
         payload.players[p.id] = rec;
       });
       op.st.sessions.forEach(function(s){ payload.sessions[s.id] = sessRec(s); });
@@ -2066,7 +2121,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     Object.keys(v.players || {}).forEach(function(id){
       var p = v.players[id] || {};
       /* pin steht hier nur noch als Merker "hat ein Konto" für die Oberfläche */
-      players.push({ id: id, name: p.name || "?", pin: p.login ? "konto" : null, since: typeof p.since === "string" ? p.since : "" });
+      players.push({ id: id, name: p.name || "?", pin: p.login ? "konto" : null, since: typeof p.since === "string" ? p.since : "",
+                     left: typeof p.left === "string" ? p.left : "", hist: cleanHist(p.hist) });
     });
     var att = {};
     Object.keys(v.att || {}).forEach(function(sid){
@@ -2085,7 +2141,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     });
     return normalize({ demo:false, team: v.team, goal: v.goal, excHours: v.excHours, bonusHours: v.bonusHours,
       remindOn: v.remindOn, remindHours: v.remindHours,
-      lateOn: v.lateOn, latePts: v.latePts,
+      lateOn: v.lateOn, latePts: v.latePts, excPts: v.excPts,
       lvGold: v.lvGold, lvSilver: v.lvSilver, lvBronze: v.lvBronze,
       levelMin: v.levelMin, badges: v.badges,
       jokers: v.jokers, jokerFrom: v.jokerFrom, seasonFrom: v.seasonFrom, teamCode: v.teamCode,
@@ -2097,6 +2153,18 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     if (readOnly) return;
     armed = null;
     if (op.t === "att" && op.v !== null && op.ts === undefined) { op.ts = Date.now(); op.newTs = true; }
+    /* Trainer-Eintrag: Der Zeitpunkt der eigenen Rückmeldung des Spielers (und damit Bonus und
+       rechtzeitige Absage) bleibt nur, wenn der Trainer passend zu seiner festen Antwort korrigiert:
+       bin da zu anwesend oder zu spät, Absage bleibt Absage. Alles andere (vielleicht, bin da zu
+       entschuldigt, Absage zu anwesend) zählt wie ohne eigene Rückmeldung: t0, kein Bonus. */
+    if (op.t === "att" && op.v !== null && (op.by === "t" || op.by === "t0")) {
+      var prevE = entry(op.sid, op.pid);
+      var keepTs = !!prevE && !!prevE.ts && prevE.by !== "t0" &&
+        (((prevE.v === "yes" || prevE.v === "late") && (op.v === "yes" || op.v === "late")) ||
+         (prevE.v === "exc" && op.v === "exc"));
+      if (!keepTs) op.ts = 0;
+      if (!op.ts) op.by = "t0";
+    }
     applyOp(state, op);
     if (mode === "fb") { render(); fbApply(op); return; }
     queue.push(op);
@@ -2155,6 +2223,43 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var t = todayISO(), from = seasonFrom();
     return byDate(state.sessions).filter(function(s){ return !s.cancelled && !s.sp && s.date <= t && s.date >= from; });
   }
+  /* Mitgebrachte Termine aus früheren Teams (players/<pid>/hist), als Pseudo-Termine mit
+     der Kennung "h:<sid>". Sie zählen nur für die persönlichen Werte (Punkte, Serie, Quote,
+     Stufe, Abzeichen, Rekorde, Joker), nie für Team-Zahlen. */
+  function cleanHist(h){
+    if (!h || typeof h !== "object" || !h.s || typeof h.s !== "object") return null;
+    var out = { from: typeof h.from === "string" ? h.from : "", s: {} };
+    Object.keys(h.s).forEach(function(k){
+      var x = h.s[k];
+      if (x && typeof x.d === "string") out.s[k] = x;
+    });
+    return Object.keys(out.s).length ? out : null;
+  }
+  function histAll(pid){
+    var p = player(pid);
+    if (!p || !p.hist) return [];
+    return Object.keys(p.hist.s).map(function(k){
+      var x = p.hist.s[k];
+      return { id:"h:" + k, date:x.d, time:x.t || "", end:x.e || "", sp: !!x.sp, allDay: !!x.a,
+               label: x.l || "Training", place:"", cancelled:false, reason:"", hist:true, from: p.hist.from };
+    });
+  }
+  /* Gewertete Termine für die persönliche Wertung: eigenes Team plus Mitgebrachtes */
+  function myHeld(pid){
+    var p = player(pid), h = histAll(pid);
+    /* Termine vor dem Eintritt ins Team ohne eigenen Eintrag gehören nicht zur eigenen Wertung */
+    var own = heldSessions().filter(function(s){ return !(p && p.since && s.date < p.since && !entry(s.id, pid)); });
+    if (!h.length) return own;
+    var t = todayISO(), from = seasonFrom();
+    return byDate(own.concat(h.filter(function(s){ return !s.sp && s.date <= t && s.date >= from; })));
+  }
+  /* Teilgenommene Sondertermine (für das Abzeichen), auch mitgebrachte */
+  function mySpecials(pid){
+    var t = todayISO();
+    return byDate(state.sessions.concat(histAll(pid))).filter(function(s){
+      return s.sp && !s.cancelled && s.date <= t && invited(s, pid) && present(entry(s.id, pid));
+    });
+  }
   /* Für die Anzeige: alle begonnenen Termine inklusive Sondertermine */
   function pastSessions(){
     var t = todayISO(), from = seasonFrom();
@@ -2185,7 +2290,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   }
   function quota(pid){
     var y = 0, tot = 0;
-    heldSessions().forEach(function(s){
+    myHeld(pid).forEach(function(s){
       var v = effV(entry(s.id, pid), s, pid);
       if (!v || v === "maybe") return;
       tot++;
@@ -2290,6 +2395,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   function lateOn(){ return !!state.lateOn; }
   function latePts(){ return typeof state.latePts === "number" ? state.latePts : DEFAULT_LATE; }
+  function excPts(){ return typeof state.excPts === "number" ? state.excPts : PTS.exc; }
   function cycleVals(){ return lateOn() ? [null,"yes","late","maybe","exc","no"] : [null,"yes","maybe","exc","no"]; }
   /* Spieler: Bin da, Vielleicht, Bin nicht da (mit Grund). Unentschuldigt können sie nicht wählen,
      das vergibt die Seite nach der Absagefrist von selbst. Der Trainer hat alle Werte. */
@@ -2307,16 +2413,22 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   /* Einträge ohne Zeitstempel sind Altbestand oder vom Trainer gesetzt: sie gelten als rechtzeitig. */
   function beforeDeadline(e, s, hours){
     if (!e) return false;
-    if (!e.ts) return true;
+    if (!e.ts) return e.by !== "t0";   /* t0: vom Trainer gesetzt, ohne eigene Rückmeldung (seit Version 15) */
     return e.ts <= deadlineMs(s, hours);
   }
   /* Joker */
   function jokerBudget(){ return typeof state.jokers === "number" ? state.jokers : DEFAULT_JOKERS; }
   function jokerFrom(){ return typeof state.jokerFrom === "string" ? state.jokerFrom : ""; }
-  function hasJoker(sid, pid){ var m = state.joker[sid]; return !!(m && m[pid]); }
+  function hasJoker(sid, pid){
+    if (typeof sid === "string" && sid.indexOf("h:") === 0) {
+      var hp = player(pid), h = hp && hp.hist && hp.hist.s[sid.slice(2)];
+      return !!(h && h.j);
+    }
+    var m = state.joker[sid]; return !!(m && m[pid]);
+  }
   function jokersUsed(pid){
     var n = 0, from = jokerFrom();
-    state.sessions.forEach(function(s){ if (hasJoker(s.id, pid) && s.date >= from) n++; });
+    state.sessions.concat(histAll(pid)).forEach(function(s){ if (hasJoker(s.id, pid) && s.date >= from) n++; });
     return n;
   }
   function jokersLeft(pid){ return Math.max(0, jokerBudget() - jokersUsed(pid)); }
@@ -2329,7 +2441,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   /* Keine Rückmeldung bis zur Absagefrist: automatisch unentschuldigt (ab AUTO_FROM,
      und nur für Termine ab dem Tag, an dem der Spieler in den Kader kam). */
   function autoNo(s, pid){
-    if (!s || !pid || s.cancelled || !closed(s) || s.date < AUTO_FROM || !invited(s, pid)) return false;
+    if (!s || !pid || s.hist || s.cancelled || !closed(s) || s.date < AUTO_FROM || !invited(s, pid)) return false;
     var p = player(pid);
     return !(p && p.since && s.date < p.since);
   }
@@ -2376,7 +2488,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var bonus = bonusOnTime(e, s) ? BONUS : 0;
     if (v === "yes") return PTS.yes + bonus;
     if (v === "late") return latePts() + bonus;
-    if (v === "exc") return excOnTime(e, s) ? PTS.exc + bonus : 0;
+    if (v === "exc") return excOnTime(e, s) ? excPts() + bonus : 0;
     return 0;
   }
 
@@ -2404,16 +2516,16 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     list.forEach(function(s){ sum += pointsFor(entry(s.id, pid), s); });
     return sum;
   }
-  function points(pid){ return scoreIn(pid, heldSessions()); }
-  function monthSessions(){
+  function points(pid){ return scoreIn(pid, myHeld(pid)); }
+  function monthSessions(list){
     var now = new Date(), y = now.getFullYear(), m = now.getMonth();
-    return heldSessions().filter(function(s){ var d = parseISO(s.date); return d.getFullYear() === y && d.getMonth() === m; });
+    return (list || heldSessions()).filter(function(s){ var d = parseISO(s.date); return d.getFullYear() === y && d.getMonth() === m; });
   }
-  function monthPoints(pid){ return scoreIn(pid, monthSessions()); }
+  function monthPoints(pid){ return scoreIn(pid, monthSessions(myHeld(pid))); }
 
   function streakOf(pid){
     var cur = 0, best = 0;
-    heldSessions().forEach(function(s){
+    myHeld(pid).forEach(function(s){
       var e = entry(s.id, pid), v = effV(e, s, pid);
       if (v === "maybe" || (!v && !closed(s))) return;   /* noch offen, die Frist läuft */
       if (v === "yes" || v === "late") { cur++; if (cur > best) best = cur; }
@@ -2444,7 +2556,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var level = 0;
     for (var i=0;i<targets.length;i++) if (cur >= targets[i]) level = i + 1;
     var next = level < targets.length ? targets[level] : null;
-    return { name:name, desc:desc, unit:unit, cur:cur, level:level, next:next,
+    return { name:name, desc:desc, unit:unit, cur:cur, level:level, next:next, targets:targets,
              tierName: level ? TIERS[level-1] : null, nextName: next ? TIERS[level] : null, icon:icon };
   }
   function single(name, desc, got, icon, locked, note){
@@ -2453,7 +2565,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   }
 
   function badgesOf(pid){
-    var held = heldSessions();
+    var held = myHeld(pid);
     var yes = 0, early = 0;
     held.forEach(function(s){
       var e = entry(s.id, pid);
@@ -2516,18 +2628,43 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       return (m === 12 && d >= 27) || (m === 1 && d <= 6);
     });
 
-    var cur = { units:yes, streak:st.best, reliable:cleanMonths, early:early, punctual:pcBest };
-    var ICON = { units:"waves", streak:"chart-column", reliable:"bell", early:"clock", punctual:"check" };
+    /* Perfekter Monat: abgeschlossene Monate mit mindestens drei Einheiten, überall anwesend */
+    var thisMonth = todayISO().slice(0,7), perfMonths = 0, pm = {};
+    held.forEach(function(s){
+      var key = s.date.slice(0,7);
+      if (key >= thisMonth) return;
+      if (!pm[key]) pm[key] = { tot:0, yes:0 };
+      pm[key].tot++;
+      if (present(entry(s.id, pid))) pm[key].yes++;
+    });
+    Object.keys(pm).forEach(function(k){ if (pm[k].tot >= 3 && pm[k].yes === pm[k].tot) perfMonths++; });
+
+    /* Saisonstart: erste gewertete Einheit der Saison, ohne Stichtag die erste jedes Jahres */
+    var firsts = {};
+    held.forEach(function(s){ var y = seasonFrom() ? "s" : s.date.slice(0,4); if (!firsts[y]) firsts[y] = s; });
+    var seasonStart = Object.keys(firsts).some(function(y){ return present(entry(firsts[y].id, pid)); });
+
+    var cur = { units:yes, streak:st.best, reliable:cleanMonths, early:early, punctual:pcBest,
+                points: scoreIn(pid, held), perfmonth: perfMonths, special: mySpecials(pid).length };
+    var ICON = { units:"waves", streak:"chart-column", reliable:"bell", early:"clock", punctual:"check",
+                 points:"star", perfmonth:"calendar-check", special:"flag" };
     var out = [];
     BADGE_DEFS.forEach(function(d){
       if (!badgeOn(d.k)) return;
       out.push(tiered(d.name, d.desc, d.unit, cur[d.k], badgeT(d.k), ICON[d.k]));
     });
-    if (badgeOn("first")) out.push(single("Erste Einheit", "Einmal anwesend gewesen.", yes >= 1, "check"));
-    if (badgeOn("comeback")) out.push(single("Comeback", "Nach vier Wochen Pause wieder dreimal in Folge dabei.", comeback, "chart-column"));
+    if (badgeOn("first")) out.push(single("Erste Einheit", SINGLE_DESC.first, yes >= 1, "check"));
+    if (badgeOn("comeback")) out.push(single("Comeback", SINGLE_DESC.comeback, comeback, "chart-column"));
     if (badgeOn("winter")) out.push(single("Wintertraining", "Alle Einheiten im Winter mitgemacht oder rechtzeitig abgesagt.",
       win >= 5 && winBad === 0, "waves", win < 5, win ? win + " von 5 Wintereinheiten im Plan" : "noch keine Wintereinheit im Plan"));
-    if (badgeOn("newyear")) out.push(single("Jahreswechsel", "Zwischen dem 27. Dezember und dem 6. Januar auf dem Wasser.", turn, "trophy"));
+    if (badgeOn("newyear")) out.push(single("Jahreswechsel", SINGLE_DESC.newyear, turn, "trophy"));
+    if (badgeOn("jubilee")) {
+      var jb = single("Jubiläum", SINGLE_DESC.jubilee, yes >= 100, "trophy");
+      if (yes < 100) { jb.prog = { cur: yes, next: 100 }; }
+      out.push(jb);
+    }
+    if (badgeOn("seasonstart")) out.push(single("Saisonstart", seasonFrom()
+      ? "Bei der ersten Einheit der Saison dabei." : "Bei der ersten Einheit eines Jahres dabei.", seasonStart, "flag"));
     return out;
   }
 
@@ -2612,6 +2749,26 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       sg.appendChild(l);
     });
     box.appendChild(sg);
+
+    /* Erklärung für den Trainer: was jedes Abzeichen zählt */
+    var ex = el("details","rules");
+    ex.style.marginTop = "14px";
+    ex.appendChild(el("summary", null, "Was die Abzeichen bedeuten"));
+    var exb = el("div","rbody"), ul = el("ul");
+    BADGE_DEFS.forEach(function(d){
+      var t = badgeT(d.k);
+      ul.appendChild(el("li", null, d.name + ": " + d.desc + " Bronze ab " + t[0] + ", Silber ab " + t[1] + ", Gold ab " + t[2] + " " + d.unit
+        + "." + (badgeOn(d.k) ? "" : " Gerade ausgeschaltet.")));
+    });
+    SINGLE_DEFS.forEach(function(d){
+      ul.appendChild(el("li", null, d.name + " (einmalig): " + (SINGLE_DESC[d.k] || "") + (badgeOn(d.k) ? "" : " Gerade ausgeschaltet.")));
+    });
+    ul.appendChild(el("li", null, "Gezählt werden nur gewertete Einheiten ab dem Saison-Stichtag, Sondertermine nur beim Abzeichen Sondertermine. "
+      + "Spieler, die aus einem anderen Team gewechselt sind, bringen ihre Einheiten von dort mit. "
+      + "Die Spieler sehen unter Ich bei jedem gestuften Abzeichen einen Balken bis zur nächsten Stufe."));
+    exb.appendChild(ul);
+    ex.appendChild(exb);
+    box.appendChild(ex);
   }
 
   /* ---------- Reglement ---------- */
@@ -2637,7 +2794,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
     var punkte = ["Anwesend: " + PTS.yes + " Punkte."];
     if (lateOn()) punkte.push("Zu spät gekommen: " + lp + (lp === 1 ? " Punkt" : " Punkte") + ".");
-    punkte.push("Entschuldigt (bin nicht da mit Grund): " + PTS.exc + " Punkte.");
+    punkte.push("Entschuldigt (bin nicht da mit Grund), bis zur Absagefrist: " + excPts() + (excPts() === 1 ? " Punkt." : " Punkte."));
+    punkte.push("Korrigiert der Trainer deinen Eintrag, bleiben Bonus und rechtzeitige Absage nur, wenn es zu deiner festen Antwort passt: bin da wird zu anwesend oder zu spät, eine Absage bleibt eine Absage.");
+    punkte.push("In allen anderen Fällen gibt es keinen Bonus, und eine vom Trainer eingetragene Absage zählt als zu spät. Das gilt auch, wenn du gar nichts eingetragen hattest, auf vielleicht standest oder bin da gesagt hast und dann nicht gekommen bist.");
     punkte.push("Unentschuldigt, also keine Rückmeldung, vielleicht nicht festgelegt oder vom Trainer so gesetzt: 0 Punkte.");
     punkte.push("Bonus: " + BONUS + " Punkte zusätzlich für jede feste Rückmeldung (bin da oder bin nicht da), die bis zur Bonusfrist steht. Vielleicht bringt keinen Bonus.");
     punkte.push("Sondertermine bringen keine Punkte.");
@@ -2684,10 +2843,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     BADGE_DEFS.forEach(function(d){
       if (!badgeOn(d.k)) return;
       var t = badgeT(d.k);
-      stufen.push(d.name + ": Bronze ab " + t[0] + ", Silber ab " + t[1] + ", Gold ab " + t[2] + " " + d.unit + ".");
+      stufen.push(d.name + ": " + d.desc + " Bronze ab " + t[0] + ", Silber ab " + t[1] + ", Gold ab " + t[2] + " " + d.unit + ".");
     });
-    var einzeln = SINGLE_DEFS.filter(function(d){ return badgeOn(d.k); }).map(function(d){ return d.name; });
-    if (einzeln.length) stufen.push("Ohne Stufen, einmalig: " + einzeln.join(", ") + ".");
+    SINGLE_DEFS.filter(function(d){ return badgeOn(d.k); }).forEach(function(d){
+      stufen.push(d.name + " (einmalig): " + (SINGLE_DESC[d.k] || ""));
+    });
     if (!stufen.length) stufen.push("Abzeichen sind bei euch abgeschaltet.");
 
     var extra = stufen.concat([
@@ -2740,7 +2900,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   /* persönliche Rekorde */
   function recordsOf(pid){
-    var held = heldSessions();
+    var held = myHeld(pid);
     var byMonth = {}, byWeek = {};
     held.forEach(function(s){
       var e = entry(s.id, pid);
@@ -2775,7 +2935,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   function ranking(){
     var ms = monthSessions();
-    return state.players.filter(function(p){ return !nsNow(p.id); }).map(function(p){
+    return kader().filter(function(p){ return !nsNow(p.id); }).map(function(p){
       return { p:p, pts: scoreIn(p.id, ms.filter(function(s){ return teamScored(p.id, s.date); })) }; })
       .sort(function(a,b){
         if (b.pts !== a.pts) return b.pts - a.pts;
@@ -2901,10 +3061,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var sel = $("loginWho");
     var keep = sel.value;
     sel.innerHTML = "";
-    var o0 = el("option", null, state.players.length ? "bitte auswählen" : "noch kein Kader angelegt");
+    var o0 = el("option", null, kader().length ? "bitte auswählen" : "noch kein Kader angelegt");
     o0.value = "";
     sel.appendChild(o0);
-    state.players.forEach(function(p){
+    kader().forEach(function(p){
       var o = el("option", null, p.name + (p.pin ? "" : " (noch keine PIN)"));
       o.value = p.id;
       sel.appendChild(o);
@@ -3337,7 +3497,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     showOnly("shell");
 
     var switchAllowed = isTrainer() ? allowedTeamsFor(me.id) : [];
-    $("switchTeamBtn").hidden = switchAllowed.length < 2;
+    $("switchTeamBtn").hidden = !!preview || switchAllowed.length < 2;
+    $("previewBtn").hidden = !isTrainer() || !!preview;
+    $("previewBanner").hidden = !preview;
+    $("logoutBtn").hidden = !!preview;
 
     $("whoName").textContent = isTrainer() ? ((trainerAcct(me.id) || {}).name || "Trainer") : ((player(me.id) || {}).name || "unbekannt");
     $("whoTag").hidden = !isTrainer();
@@ -3441,7 +3604,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       sub.textContent = "Überblick über Kader und Rückmeldungen.";
       var tq = teamQuota();
       tile(box, "Teamquote", tq.pct === null ? "–" : tq.pct + " %", null, held.length + (held.length === 1 ? " Einheit gewertet" : " Einheiten gewertet"), true);
-      tile(box, "Kader", String(state.players.length), null, "im Team");
+      tile(box, "Kader", String(kader().length), null, "im Team");
       var w = weekStats();
       tile(box, "Diese Woche", w.held ? w.yes + " von " + w.poss : "–", null, w.held ? "Teilnahmen" : "noch keine Einheit");
       var open = openCount();
@@ -3456,6 +3619,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var t1 = tile(box, "Serie", String(st.cur), st.cur === 1 ? "Einheit" : "Einheiten",
       st.best > st.cur ? "beste Serie: " + st.best : "in Folge anwesend", true);
     var trail = el("div","streakline");
+    held = myHeld(me.id);
     held.slice(-10).forEach(function(s){
       var e = entry(s.id, me.id), ev = effV(e, s, me.id);
       var d = el("i","sdot" + (ev ? " " + ev : ""));
@@ -3554,7 +3718,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var op = { t:"att", sid: sid, pid: pid, v:"exc", n: v,
                  by: pend ? (byTrainer ? "t" : "") : (cur.by || "") };
       if (!pend) op.ts = cur.ts || 0;
-      else if (byTrainer) op.ts = 0;
+      else if (byTrainer) op.ts = (cur && cur.ts) || 0;
       mutate(op);
     };
     inp.addEventListener("change", commit);
@@ -3787,7 +3951,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     tile(box, "Teamquote", tq.pct === null ? "–" : tq.pct + " %", null, "Ziel " + goalPct() + " Prozent", true);
     tile(box, "Diese Woche", w.held ? w.yes + " von " + w.poss : "–", null,
       w.sessions ? w.sessions + (w.sessions === 1 ? " Einheit angesetzt" : " Einheiten angesetzt") : "keine Einheit angesetzt");
-    tile(box, "Kader", String(state.players.length), null, "im Team");
+    tile(box, "Kader", String(kader().length), null, "im Team");
     tile(box, "Einheiten", String(held.length), null, "gewertet");
     var ts = teamStreak();
     tile(box, "Team-Serie", String(ts.cur), ts.cur === 1 ? "Woche" : "Wochen",
@@ -3923,6 +4087,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var tr = el("tr");
       var nameCell = el("td","name", p.name);
       if (me && p.id === me.id) nameCell.style.fontWeight = "700";
+      if (p.left) {
+        var ft = el("span","sptag","ehemalig");
+        ft.title = "Seit " + fmtShort(p.left) + " in einem anderen Team";
+        nameCell.appendChild(ft);
+      }
       if (isTrainer() && nsNow(p.id)) {
         var nst = el("span","sptag","außer Team-Wertung");
         nst.title = "Zählt nicht in Team-Quote, Mannschaftsziel, Team-Serie, Podium und Duell";
@@ -3949,7 +4118,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         var v = effV(e, s, p.id);
         var auto = isAuto(e, s, p.id);
         var pend = !!pendingExc && pendingExc.sid === s.id && pendingExc.pid === p.id;
-        var mark = el("i","mark" + (pend ? " exc" : (v ? " " + v : "")) + (auto ? " auto" : "") + (e && e.by === "t" ? " byt" : ""));
+        var mark = el("i","mark" + (pend ? " exc" : (v ? " " + v : "")) + (auto ? " auto" : "") + (e && /^t/.test(e.by || "") ? " byt" : ""));
         var title = p.name + " · " + fmtShort(s.date) + " · " + (v ? WORD[v] : "nichts eingetragen");
         if (auto) title += e ? " (war vielleicht, nicht festgelegt)" : " (keine Rückmeldung)";
         if (noReason(e)) title += " (entschuldigt ohne Grund, zählt als unentschuldigt)";
@@ -4047,7 +4216,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     /* Saisonkalender */
     var cc = $("calCard");
     cc.innerHTML = "";
-    var held = heldSessions();
+    var held = myHeld(me.id);
     if (!held.length) {
       cc.appendChild(el("p","hint","Sobald die erste Einheit vorbei ist, steht hier deine Saison."));
     } else {
@@ -4070,7 +4239,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
           d.title = fmtShort(s.date) + ": " + (v ? WORD[v] + (noReason(e) ? " (entschuldigt ohne Grund)" : "")
               + (isAuto(e, s, me.id) ? " (keine feste Rückmeldung)" : "")
               + (lateExc(e, s) ? " (zu spät abgesagt)" : "") : "nichts eingetragen")
-            + (j ? " · Joker" : "") + " · " + pointsFor(e, s) + " Punkte";
+            + (j ? " · Joker" : "") + " · " + pointsFor(e, s) + " Punkte"
+            + (s.hist ? " · aus " + (s.from || "deinem früheren Team") : "");
           g.appendChild(d);
         });
         col.appendChild(g);
@@ -4122,7 +4292,26 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       else if (b.single) note = b.got ? "erreicht" : "noch offen";
       else if (b.next) note = b.cur + " von " + b.next + " " + (b.unit || "") + " bis " + b.nextName;
       else note = "höchste Stufe · " + b.cur + " " + (b.unit || "");
+      if (b.single && b.prog && !b.got) note = b.prog.cur + " von " + b.prog.next;
       bt.appendChild(el("span","bp", note));
+      /* Fortschritt bis zur nächsten Stufe: ab der erreichten Schwelle gerechnet */
+      var bar = null;
+      if (!b.single && b.next) {
+        var T = b.targets || [], prev = b.level ? T[b.level-1] : 0;
+        var span = Math.max(1, b.next - prev);
+        bar = Math.round(Math.max(0, Math.min(1, (b.cur - prev) / span)) * 100);
+      } else if (b.single && b.prog && !b.got) {
+        bar = Math.round(Math.max(0, Math.min(1, b.prog.cur / b.prog.next)) * 100);
+      }
+      if (bar !== null) {
+        var bb2 = el("div","bbar");
+        bb2.setAttribute("role","progressbar");
+        bb2.setAttribute("aria-valuemin","0"); bb2.setAttribute("aria-valuemax","100"); bb2.setAttribute("aria-valuenow", String(bar));
+        bb2.setAttribute("aria-label", "Fortschritt " + b.name);
+        var bi = el("i"); bi.style.width = bar + "%";
+        bb2.appendChild(bi);
+        bt.appendChild(bb2);
+      }
       c.appendChild(bt);
       bb.appendChild(c);
     });
@@ -4148,6 +4337,121 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       row.appendChild(document.createTextNode(teamDisplayName(k)));
       box.appendChild(row);
     });
+  }
+
+  /* ---------- Spieler in ein anderes Team verschieben (seit Version 15) ----------
+     Nur Trainer, die bei beiden Teams etwas ändern dürfen. Der Spieler nimmt seine
+     persönliche Wertung mit: alle begonnenen Termine, zu denen er eingeladen war, landen
+     samt seiner Rückmeldung und Joker unter players/<pid>/hist im neuen Team. Im alten
+     Team bleibt er als ehemalig stehen (left), damit vergangene Team-Zahlen gleich bleiben.
+     Konto, Push-Abos und ein Umzugsvermerk moved/<uid> gehen mit, damit sein Gerät beim
+     nächsten Öffnen von selbst ins neue Team wechselt. */
+  var moveDlg = null;   /* { pid, k, msg, busy } */
+  function moveTargets(){
+    if (!isTrainer()) return [];
+    return allowedTeamsFor(me.id).filter(function(k){ return k !== activeTeamKey; });
+  }
+  function moveBox(){
+    var p = player(moveDlg.pid);
+    var box = el("div","card pad");
+    box.style.flexBasis = "100%"; box.style.marginTop = "8px";
+    box.appendChild(el("b", null, p.name + " in ein anderes Team verschieben"));
+    box.appendChild(el("p","hint", "Punkte, Serie, Quote, Stufe, Abzeichen, Rekorde und eingesetzte Joker nimmt "
+      + p.name + " mit. Konto, PIN und Erinnerungen bleiben erhalten, das Gerät wechselt beim nächsten Öffnen von selbst ins neue Team. "
+      + "Hier bleibt " + p.name + " als ehemalig stehen, damit die alten Team-Zahlen gleich bleiben."));
+    var row = el("div","row");
+    var sel = el("select");
+    sel.setAttribute("aria-label", "Neues Team");
+    var o0 = el("option", null, "neues Team wählen"); o0.value = ""; sel.appendChild(o0);
+    moveTargets().forEach(function(k){ var o = el("option", null, teamDisplayName(k)); o.value = k; sel.appendChild(o); });
+    sel.value = moveDlg.k || "";
+    var go = el("button","btn primary", moveDlg.busy ? "wird verschoben …" : "verschieben");
+    go.type = "button";
+    go.disabled = !!moveDlg.busy || !sel.value;
+    sel.addEventListener("change", function(){ moveDlg.k = sel.value; go.disabled = !!moveDlg.busy || !sel.value; });
+    var no = el("button","btn quiet","abbrechen"); no.type = "button";
+    no.addEventListener("click", function(){ moveDlg = null; renderAdmin(); });
+    go.addEventListener("click", function(){
+      if (!sel.value || moveDlg.busy) return;
+      var k2 = sel.value, name = p.name;
+      moveDlg.busy = true; moveDlg.msg = ""; renderAdmin();
+      movePlayer(p.id, k2).then(function(){
+        moveDlg = null;
+        $("rosterMsg") && ($("rosterMsg").textContent = name + " ist jetzt im Team " + teamDisplayName(k2) + ".");
+        render();
+      }, function(){
+        moveDlg.busy = false;
+        moveDlg.msg = "Das hat nicht geklappt. Bitte Verbindung prüfen und noch einmal versuchen.";
+        renderAdmin();
+      });
+    });
+    row.appendChild(sel); row.appendChild(go); row.appendChild(no);
+    box.appendChild(row);
+    if (moveDlg.msg) box.appendChild(el("p","msg", moveDlg.msg));
+    return box;
+  }
+  /* Persönliche Geschichte im aktuellen Team als hist-Datensatz */
+  function buildHist(pid){
+    var p = player(pid), out = { from: state.team || "", s: {} };
+    if (p.hist) Object.keys(p.hist.s).forEach(function(k){ out.s[k] = p.hist.s[k]; });
+    state.sessions.forEach(function(s){
+      if (s.cancelled || !started(s) || !invited(s, pid)) return;
+      if (p.since && s.date < p.since) return;
+      var e = entry(s.id, pid), x = { d: s.date };
+      if (s.time) x.t = s.time;
+      if (s.end) x.e = s.end;
+      if (s.sp) x.sp = 1;
+      if (s.allDay) x.a = 1;
+      if (s.label && s.label !== "Training") x.l = String(s.label).slice(0, 60);
+      if (e && e.v) {
+        x.v = e.v;
+        if (e.ts) x.ts = e.ts;
+        if (e.by) x.by = e.by;
+        if (hasReason(e)) x.r = 1;
+      } else if (autoNo(s, pid)) { x.v = "no"; x.by = "auto"; }
+      if (hasJoker(s.id, pid)) x.j = 1;
+      out.s[activeTeamKey + "_" + s.id] = x;
+    });
+    return out;
+  }
+  function movePlayer(pid, k2){
+    var p = player(pid), raw = rawPlayers[pid] || {}, k1 = activeTeamKey, t = todayISO();
+    var hist = buildHist(pid);
+    var nid = pid;
+    return db().ref("teams/" + k2 + "/players/" + pid).once("value").then(function(sn){
+      if (sn.exists()) nid = uid("p");
+      return db().ref("push/" + k1 + "/" + pid).once("value");
+    }).then(function(ps){
+      var up = {}, rec = { name: String(p.name).slice(0, 60), since: t };
+      if (Object.keys(hist.s).length) rec.hist = hist;
+      if (raw.login) rec.login = raw.login;
+      up["teams/" + k2 + "/players/" + nid] = rec;
+      up["teams/" + k1 + "/players/" + pid + "/left"] = t;
+      up["teams/" + k1 + "/players/" + pid + "/login"] = null;
+      if (ps.val()) { up["push/" + k2 + "/" + nid] = ps.val(); up["push/" + k1 + "/" + pid] = null; }
+      if (raw.login && raw.login.uid) up["moved/" + raw.login.uid] = { k: k2, p: nid };
+      return db().ref().update(up);
+    });
+  }
+  /* Spielerseite: Umzugsvermerk lesen und ins neue Team wechseln */
+  function followMove(u){
+    if (!u || u.isAnonymous) return Promise.resolve(false);
+    return db().ref("moved/" + u.uid).once("value").then(function(snap){
+      var m = snap.val();
+      if (!m || typeof m.k !== "string" || typeof m.p !== "string") return false;
+      return db().ref("users/" + u.uid).set({ k: m.k, p: m.p }).then(function(){
+        return db().ref("moved/" + u.uid).remove().catch(function(){});
+      }).then(function(){
+        if (!authUser || authUser.uid !== u.uid) return true;
+        me = null;
+        startPlayer(m.k, m.p);
+        return true;
+      });
+    }, function(){ return false; });
+  }
+  function moveOrOut(why){
+    var u = authUser;
+    followMove(u).then(function(ok){ if (!ok) signOutWhy(why); }, function(){ signOutWhy(why); });
   }
 
   /* Nur für Admins: ein Team endgültig entfernen. Löscht Team-Daten, Notizen, Push-Abos,
@@ -4345,9 +4649,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     $("teamInput").value = state.team || "";
     $("goalInput").value = goalPct();
     $("excInput").value = excHours();
+    $("excPtsInput").value = excPts();
     $("bonusInput").value = bonusHours();
     $("lateOnInput").checked = lateOn();
     $("latePtsInput").value = latePts();
+    $("latePtsHint").textContent = "anwesend 10, rechtzeitige Absage " + excPts();
     $("latePtsInput").disabled = !lateOn();
     $("latePreview").textContent = lateOn()
       ? "Zu spät ist an und bringt " + latePts() + (latePts() === 1 ? " Punkt" : " Punkte")
@@ -4367,7 +4673,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var onCount = BADGE_DEFS.concat(SINGLE_DEFS).filter(function(d){ return badgeOn(d.k); }).length;
     var sums = {
       sumTeam:  state.team + ", Ziel " + goalPct() + " Prozent",
-      sumFrist: "Absage " + (excHours() ? excHours() + " h" : "bis Beginn") + ", Bonus "
+      sumFrist: "Absage " + (excHours() ? excHours() + " h" : "bis Beginn") + " (" + excPts() + " P.), Bonus "
                 + (bonusHours() ? bonusHours() + " h" : "bis Beginn")
                 + (remindOn() ? ", Erinnerung " + remindHours() + " h davor" : ""),
       sumLate:  lateOn() ? "an, " + latePts() + " Punkte" : "aus",
@@ -4412,11 +4718,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     if (!jokerBudget()) {
       $("jokerPreview").textContent = "Joker sind abgeschaltet. Eingesetzte Joker bleiben gespeichert und wirken wieder, sobald du hier eine Zahl über 0 einträgst.";
     } else {
-      var used = state.players.map(function(p){ return jokersUsed(p.id); });
+      var used = kader().map(function(p){ return jokersUsed(p.id); });
       var sum = used.reduce(function(a,b){ return a+b; }, 0);
       $("jokerPreview").textContent = "Gezählt werden Joker auf Termine ab "
         + (jokerFrom() ? fmtLong(jokerFrom()) : "dem ersten Termin") + ". "
-        + "Aktuell eingesetzt: " + sum + " von " + (jokerBudget() * state.players.length) + " im Kader.";
+        + "Aktuell eingesetzt: " + sum + " von " + (jokerBudget() * kader().length) + " im Kader.";
     }
 
     $("seasonInput").value = seasonFrom();
@@ -4443,7 +4749,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
     var r = $("rosterList");
     r.innerHTML = "";
-    state.players.forEach(function(p){
+    kader().forEach(function(p){
       var chip = el("span","rchip");
       chip.appendChild(document.createTextNode(p.name));
       if (!p.pin) chip.appendChild(el("span","pinless","ohne PIN"));
@@ -4455,6 +4761,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
                     : p.name + " ab heute aus der Team-Wertung nehmen (Team-Quote, Ziel, Team-Serie, Podium, Duell)";
       nb.addEventListener("click", function(){ setNoScore(p.id, !ns); });
       chip.appendChild(nb);
+      if (mode === "fb" && moveTargets().length) {
+        var mv = el("button", null, "Team wechseln");
+        mv.type = "button";
+        mv.title = p.name + " in ein anderes Team verschieben";
+        mv.addEventListener("click", function(){ moveDlg = { pid: p.id, k: "", msg: "" }; renderAdmin(); });
+        chip.appendChild(mv);
+      }
       if (p.pin) {
         var rp = el("button", null, "PIN zurücksetzen");
         rp.type = "button";
@@ -4473,7 +4786,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       chip.appendChild(x);
       r.appendChild(chip);
     });
-    if (!state.players.length) r.appendChild(el("span","hint","Noch niemand im Kader."));
+    if (!kader().length) r.appendChild(el("span","hint","Noch niemand im Kader."));
+    var former = state.players.filter(function(p){ return p.left; });
+    if (former.length) r.appendChild(el("p","hint", "Ehemalige: " + former.map(function(p){
+      return p.name + " (gewechselt am " + fmtShort(p.left) + ")"; }).join(", ")
+      + ". Ihre alten Einträge zählen weiter in den vergangenen Team-Zahlen."));
+    if (moveDlg && moveDlg.pid && !player(moveDlg.pid)) moveDlg = null;
+    if (moveDlg) r.appendChild(moveBox());
 
     var list = $("adminSessions");
     list.innerHTML = "";
@@ -4585,7 +4904,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     allL.appendChild(all); allL.appendChild(document.createTextNode(" für das ganze Team"));
     wrap.appendChild(allL);
     var list = el("div","wholist");
-    state.players.slice().sort(function(a,b){ return a.name.localeCompare(b.name, "de"); }).forEach(function(p){
+    kader().sort(function(a,b){ return a.name.localeCompare(b.name, "de"); }).forEach(function(p){
       var l = el("label","check"), c = el("input");
       c.type = "checkbox"; c.checked = !!ws.sel[p.id];
       c.addEventListener("change", function(){ if (c.checked) ws.sel[p.id] = true; else delete ws.sel[p.id]; });
@@ -4732,7 +5051,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function renderPush(){
     var sec = $("pushSection"), card = $("pushCard"), nudge = $("pushNudge");
     if (!sec || !card) return;
-    if (!me || isTrainer() || mode !== "fb") { sec.hidden = true; nudge.hidden = true; return; }
+    if (!me || isTrainer() || mode !== "fb" || preview) { sec.hidden = true; nudge.hidden = true; return; }
     pushCheck();
     sec.hidden = false;
     card.innerHTML = "";
@@ -4793,9 +5112,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       }, function(){ c.loading = false; });
     }
     if (c.key !== activeTeamKey || !c.data) { box.textContent = ""; return; }
-    var withPush = state.players.filter(function(p){ return c.data[p.id] && Object.keys(c.data[p.id]).length; });
-    var without = state.players.filter(function(p){ return withPush.indexOf(p) === -1; });
-    box.textContent = withPush.length + " von " + state.players.length + " Spielern haben Erinnerungen eingeschaltet."
+    var withPush = kader().filter(function(p){ return c.data[p.id] && Object.keys(c.data[p.id]).length; });
+    var without = kader().filter(function(p){ return withPush.indexOf(p) === -1; });
+    box.textContent = withPush.length + " von " + kader().length + " Spielern haben Erinnerungen eingeschaltet."
       + (without.length && without.length <= 12 ? " Noch ohne: " + without.map(function(p){ return p.name; }).join(", ") + "." : "");
   }
 
@@ -4805,7 +5124,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var t = todayISO();
     var limit = isoOf(new Date(Date.now() + 8 * 86400000));
     var soon = upcoming().filter(function(s){ return !s.cancelled && !closed(s) && s.date <= limit; });
-    if (!soon.length || !state.players.length) { box.hidden = true; return; }
+    if (!soon.length || !kader().length) { box.hidden = true; return; }
 
     if (isTrainer()) {
       var offen = soon.map(function(s){
@@ -4856,7 +5175,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var row = el("div","prow");
       var e = entry(pickSid, p.id);
       var name = el("span","pn", p.name);
-      if (e && e.by === "t") name.title = "zuletzt vom Trainer gesetzt";
+      if (e && /^t/.test(e.by || "")) name.title = e.by === "t0" ? "vom Trainer gesetzt, ohne eigene Rückmeldung" : "zuletzt vom Trainer gesetzt";
       row.appendChild(name);
       row.appendChild(pickButtons(pickSid, p.id, false));
       var rr = reasonRow(pickSid, p.id);
@@ -4948,14 +5267,18 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
   /* ---------- Sicherung ---------- */
   function backupJson(){
-    return JSON.stringify({ v:12, team: state.team, goal: goalPct(), excHours: excHours(), bonusHours: bonusHours(),
+    return JSON.stringify({ v:15, team: state.team, goal: goalPct(), excHours: excHours(), bonusHours: bonusHours(),
       remindOn: remindOn(), remindHours: remindHours(),
-      lateOn: lateOn(), latePts: latePts(),
+      lateOn: lateOn(), latePts: latePts(), excPts: excPts(),
       lvGold: levelDefs()[0].min, lvSilver: levelDefs()[1].min, lvBronze: levelDefs()[2].min,
       levelMin: levelMin(), badges: badgeCfg(),
       jokers: jokerBudget(), jokerFrom: jokerFrom(), seasonFrom: seasonFrom(), teamCode: state.teamCode || "",
       trainerPin: mode === "fb" ? null : state.trainerPin,
-      players: mode === "fb" ? state.players.map(function(p){ return { id: p.id, name: p.name, since: p.since || "" }; }) : state.players,
+      players: mode === "fb" ? state.players.map(function(p){
+        var o = { id: p.id, name: p.name, since: p.since || "" };
+        if (p.left) o.left = p.left;
+        if (p.hist) o.hist = p.hist;
+        return o; }) : state.players,
       sessions: state.sessions, att: state.att, joker: state.joker, noScore: nsMap() }, null, 2);
   }
 
@@ -4965,7 +5288,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     try { raw = JSON.parse(text); } catch (e) { msg.className = "msg"; msg.textContent = "Das ist keine gültige Sicherungsdatei."; return; }
     var st = normalize({ demo:false, team: raw.team, goal: raw.goal, excHours: raw.excHours, bonusHours: raw.bonusHours,
       remindOn: raw.remindOn, remindHours: raw.remindHours,
-      lateOn: raw.lateOn, latePts: raw.latePts,
+      lateOn: raw.lateOn, latePts: raw.latePts, excPts: raw.excPts,
       lvGold: raw.lvGold, lvSilver: raw.lvSilver, lvBronze: raw.lvBronze,
       levelMin: raw.levelMin, badges: raw.badges,
       jokers: raw.jokers, jokerFrom: raw.jokerFrom, seasonFrom: raw.seasonFrom, teamCode: raw.teamCode,
@@ -5257,8 +5580,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function renderCalSub(){
     var box = $("calSubBox"), sec = $("calSubSec");
     if (!box || !sec) return;
-    sec.hidden = mode !== "fb";
-    if (mode !== "fb") return;
+    sec.hidden = mode !== "fb" || !!preview;
+    if (mode !== "fb" || preview) return;
     loadCalSub(false);
     box.innerHTML = "";
     if (calSub.st === "loading" || calSub.st === "idle") { box.appendChild(el("p","hint","Lädt …")); return; }
@@ -5343,6 +5666,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     $("teamSwitchLogout").addEventListener("click", logout);
     $("noTeamLogout").addEventListener("click", logout);
     $("switchTeamBtn").addEventListener("click", function(){ gateStep = "teamswitch"; render(); });
+    $("previewBtn").addEventListener("click", enterPreview);
+    $("previewEnd").addEventListener("click", exitPreview);
 
     $("addTeam").addEventListener("click", function(){
       var name = $("newTeamName").value.trim();
@@ -5401,6 +5726,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     });
     numberCfg("jokerInput", "jokers", 0, 20, jokerBudget);
     numberCfg("latePtsInput", "latePts", 0, LATE_MAX, latePts);
+    numberCfg("excPtsInput", "excPts", 0, LATE_MAX, excPts);
     numberCfg("lvBronzeInput", "lvBronze", 0, 100, function(){ return levelDefs()[2].min; });
     numberCfg("lvSilverInput", "lvSilver", 0, 100, function(){ return levelDefs()[1].min; });
     numberCfg("lvGoldInput", "lvGold", 0, 100, function(){ return levelDefs()[0].min; });
@@ -5617,6 +5943,42 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     window.addEventListener("scroll", placePop, true);
   }
 
+  /* ---------- Spieleransicht für Trainer (seit Version 15) ----------
+     Zeigt die App so, wie ein Spieler sie sieht, mit Beispieldaten und den Einstellungen
+     des aktiven Teams. Nur ansehen: readOnly, keine Schreibzugriffe, Live-Daten des Teams
+     laufen im Hintergrund in preview.state weiter. */
+  var preview = null;   /* { state, me, route, ro } */
+  function previewState(){
+    var d = normalize(demoSeed());
+    ["team","goal","excHours","bonusHours","remindOn","remindHours","lateOn","latePts","excPts",
+     "lvGold","lvSilver","lvBronze","levelMin","badges","jokers"].forEach(function(k){
+      if (state[k] !== undefined) d[k] = JSON.parse(JSON.stringify(state[k]));
+    });
+    d.demo = false;
+    /* ein vergangener Sondertermin, damit auch das zu sehen ist */
+    var past = new Date(); past.setHours(0,0,0,0); past = new Date(past.getTime() - 12 * 86400000);
+    d.sessions.push(sessOf("demo-sp", { date: isoOf(past), time:"09:00", end:"16:00", label:"Turnier", place:"", sp:true, cancelled:false, reason:"" }));
+    d.att["demo-sp"] = { "demo-p0": { v:"yes", n:"", by:"", ts:0 } };
+    return d;
+  }
+  function enterPreview(){
+    if (!isTrainer() || preview) return;
+    closePop();
+    preview = { state: state, me: me, route: route, ro: readOnly };
+    state = previewState();
+    me = { role:"player", id:"demo-p0" };
+    readOnly = true;
+    go("heute");
+  }
+  function exitPreview(){
+    if (!preview) return;
+    closePop();
+    state = preview.state; me = preview.me; readOnly = preview.ro;
+    var r = preview.route;
+    preview = null;
+    go(r || "trainer");
+  }
+
   /* ---------- Start ---------- */
   function demoSeed(){
     var base = new Date(); base.setHours(0,0,0,0);
@@ -5688,6 +6050,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       remindHours: num(st.remindHours, DEFAULT_REMIND, 1, 168),
       lateOn: !!st.lateOn,
       latePts: isNaN(lp) ? DEFAULT_LATE : Math.max(0, Math.min(LATE_MAX, lp)),
+      excPts: num(st.excPts, PTS.exc, 0, LATE_MAX),
       lvGold: num(st.lvGold, DEF_LEVELS.gold, 0, 100),
       lvSilver: num(st.lvSilver, DEF_LEVELS.silver, 0, 100),
       lvBronze: num(st.lvBronze, DEF_LEVELS.bronze, 0, 100),
@@ -5702,7 +6065,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       noScore: st.noScore && typeof st.noScore === "object" ? st.noScore : {},
       players: Array.isArray(st.players) ? st.players.filter(function(p){ return p && p.id; }).map(function(p){
         return { id:p.id, name:String(p.name || "?"), pin: typeof p.pin === "string" ? p.pin : null,
-                 since: typeof p.since === "string" ? p.since : "" }; }) : [],
+                 since: typeof p.since === "string" ? p.since : "",
+                 left: typeof p.left === "string" ? p.left : "", hist: cleanHist(p.hist) }; }) : [],
       sessions: Array.isArray(st.sessions) ? st.sessions.filter(function(s){ return s && s.id && s.date; }).map(function(s){
         return sessOf(s.id, s); }) : [],
       att: st.att && typeof st.att === "object" ? st.att : {},
@@ -5718,6 +6082,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       seeded.remindHours = out.remindHours;
       seeded.lateOn = out.lateOn;
       seeded.latePts = out.latePts;
+      seeded.excPts = out.excPts;
       seeded.lvGold = out.lvGold;
       seeded.lvSilver = out.lvSilver;
       seeded.lvBronze = out.lvBronze;
@@ -5862,7 +6227,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       if (!authUser || authUser.uid !== u.uid) return;
       var v = snap.val() || {};
       if (v.t) startTrainer(v.t);
-      else if (v.k && v.p) startPlayer(v.k, v.p);
+      else if (v.k && v.p) followMove(u).then(function(ok){ if (!ok) startPlayer(v.k, v.p); }, function(){ startPlayer(v.k, v.p); });
       else signOutWhy("kein users-Eintrag");
     }, function(){ if (authUser && authUser.uid === u.uid) signOutWhy("users nicht lesbar"); });
   }
