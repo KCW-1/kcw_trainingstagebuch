@@ -59,6 +59,12 @@ async function put(path, v) {
   if (!r.ok) throw new Error(`PUT ${path}: ${r.status}`);
 }
 
+async function del(path) {
+  if (DRY) return;
+  const r = await fetch(`${DB}/${path}.json${q()}`, { method: "DELETE" });
+  if (!r.ok) throw new Error(`DELETE ${path}: ${r.status}`);
+}
+
 // ---------- GitHub Gist ----------
 async function gh(method, path, body) {
   const r = await fetch(GH_API + path, { method,
@@ -66,6 +72,7 @@ async function gh(method, path, body) {
                "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "kcw-trainingstagebuch" },
     body: body ? JSON.stringify(body) : undefined });
   if (!r.ok) { const e = new Error(`${method} ${path}: ${r.status} ${await r.text()}`); e.status = r.status; throw e; }
+  if (r.status === 204) return null;
   return r.json();
 }
 const rawUrl = (g) => `https://gist.githubusercontent.com/${g.owner.login}/${g.id}/raw/${FILE}`;
@@ -200,7 +207,7 @@ async function main() {
       .map(([id, s]) => ({ ...s, id }));
     teams[k] = { name, exc, sessions, players: t.players || {} };
   }
-  const stats = { same: 0, changed: 0, created: 0, failed: 0 };
+  const stats = { same: 0, changed: 0, created: 0, removed: 0, failed: 0 };
 
   // Spieler: nur Termine, zu denen sie eingeladen sind
   for (const [k, t] of Object.entries(teams)) {
@@ -224,7 +231,27 @@ async function main() {
     catch (e) { stats.failed++; console.error(`Trainer ${tid}: ${e.message}`); }
   }
 
-  console.log(`Kalender: ${stats.created} neu, ${stats.changed} aktualisiert, ${stats.same} unverändert, ${stats.failed} Fehler.`);
+  // Aufräumen: Abos von entfernten Teams und gelöschten Spielern (Gist und Eintrag löschen).
+  // Nur wenn der Katalog sicher gelesen wurde, damit eine Störung nicht alles löscht.
+  if (keys.length) {
+    for (const [k, byPid] of Object.entries(calP || {})) {
+      const gone = !teamsCat[k];
+      if (!gone && !teams[k]) continue;                       // Team nicht gelesen: nichts anfassen
+      for (const [pid, rec] of Object.entries(byPid || {})) {
+        if (!gone && teams[k].players[pid]) continue;
+        try {
+          if (rec && rec.g && !DRY) {
+            try { await gh("DELETE", "/gists/" + rec.g); } catch (e) { if (e.status !== 404) throw e; }
+          }
+          await del(`calP/${k}/${pid}`);
+          stats.removed++;
+          console.log(`Kalender entfernt: ${k}/${pid}` + (gone ? " (Team entfernt)" : " (Spieler gelöscht)"));
+        } catch (e) { stats.failed++; console.error(`Aufräumen ${k}/${pid}: ${e.message}`); }
+      }
+    }
+  }
+
+  console.log(`Kalender: ${stats.created} neu, ${stats.changed} aktualisiert, ${stats.same} unverändert, ${stats.removed} entfernt, ${stats.failed} Fehler.`);
   if (stats.failed) process.exitCode = 1;
 }
 

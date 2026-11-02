@@ -1,4 +1,7 @@
 // Push-Erinnerungen der Trainingsbeteiligung.
+// Seit Version 14 zusätzlich: Nachrichten bei Änderungen am Plan (Termin fällt aus, findet doch
+// statt, neue Zeit oder neuer Ort, neuer Termin) für Termine in den nächsten 14 Tagen.
+// Dafür merkt sich das Skript unter pushSnap/<team> den zuletzt gesehenen Stand je Termin.
 // Läuft als GitHub-Workflow etwa alle 15 Minuten (.github/workflows/remind.yml).
 // Liest die Firebase-Datenbank über REST, sucht Spieler ohne Rückmeldung,
 // deren Erinnerungszeitpunkt erreicht ist, und schickt ihnen eine Web-Push-Nachricht.
@@ -96,11 +99,149 @@ function dayWord(s) {
   if (s.date === tomorrow) return "morgen";
   return "am " + fmtShort(s.date);
 }
+const CHG_DAYS = 14;   // Änderungen an Terminen in diesen Tagen werden gemeldet
 const num = (v, d, lo, hi) => { const x = parseInt(v, 10); return isNaN(x) ? d : Math.max(lo, Math.min(hi, x)); };
 
+// Schickt eine Nachricht an alle Geräte eines Spielers. Gibt die Zahl der Zustellungen zurück.
+async function sendTo(key, pid, subs, payload, ttlMs, stats, what) {
+  let delivered = 0;
+  for (const [subKey, rec] of Object.entries(subs || {})) {
+    if (!rec || !rec.endpoint || !rec.keys) continue;
+    if (DRY) { console.log(`[dry] ${what} ${key}/${pid} (${subKey}): ${payload}`); delivered++; continue; }
+    try {
+      await webpush.sendNotification({ endpoint: rec.endpoint, keys: rec.keys }, payload,
+        { TTL: Math.max(60, Math.min(28 * 86400, Math.round(ttlMs / 1000))), urgency: "high" });
+      delivered++;
+    } catch (e) {
+      if (e.statusCode === 404 || e.statusCode === 410) {
+        await del(`push/${key}/${pid}/${subKey}`);   // Abo gibt es nicht mehr
+        stats.removed++;
+      } else {
+        console.error(`Fehler ${key}/${pid}/${subKey}: ${e.statusCode || ""} ${e.body || e.message}`);
+        stats.failed++;
+      }
+    }
+  }
+  return delivered;
+}
+
+// ---------- Änderungen am Plan ----------
+// Fingerabdruck eines Termins, so wie er in pushSnap gespeichert wird
+function snapOf(s) {
+  const who = s.who && typeof s.who === "object" ? Object.keys(s.who).filter((p) => s.who[p]).sort().join(",") : "";
+  return { d: s.date || "", t: s.time || "", e: s.end || "", p: s.place || "", l: s.label || "Training",
+           r: s.reason || "", a: !!s.allDay, c: !!s.cancelled, w: who };
+}
+const asSess = (f) => ({ date: f.d, time: f.t, end: f.e, place: f.p, label: f.l, allDay: f.a });
+const sees = (f, pid) => !f.w || f.w.split(",").indexOf(pid) !== -1;
+function clockOf(f) {
+  if (f.a) return f.t ? `Treffen ${f.t} Uhr` : "ganztägig";
+  return f.e ? `${f.t} bis ${f.e} Uhr` : `${f.t} Uhr`;
+}
+const whenOf = (f) => `${fmtShort(f.d)}, ${clockOf(f)}` + (f.p ? `, ${f.p}` : "");
+const moved = (o, n) => o.d !== n.d || o.t !== n.t || o.e !== n.e || o.p !== n.p || o.a !== n.a;
+function inWindow(f) {
+  if (!f || !f.d) return false;
+  const st = startMs(asSess(f));
+  // Ganztägige Termine ohne Uhrzeit gelten bis zum Ende des Tages als anstehend
+  const end = (f.a && !f.t) ? st + 86400000 : st;
+  return end >= NOW && st <= NOW + CHG_DAYS * 86400000;
+}
+// Ein Ereignis je Spieler und Termin: { kind, o, n }
+function eventsFor(sid, o, n, pid) {
+  if (!o && n) return (sees(n, pid) && !n.c && inWindow(n)) ? { kind: "new", n } : null;
+  if (o && !n) return (sees(o, pid) && !o.c && inWindow(o)) ? { kind: "gone", o } : null;
+  if (!inWindow(o) && !inWindow(n)) return null;
+  const was = sees(o, pid), is = sees(n, pid);
+  if (!is) return null;                                   // nicht (mehr) eingeladen: keine Nachricht
+  if (!was) return (!n.c && inWindow(n)) ? { kind: "new", n } : null;
+  if (!o.c && n.c) return inWindow(n) ? { kind: "cancel", o, n } : null;
+  if (o.c && !n.c) return inWindow(n) ? { kind: "back", n } : null;
+  if (!n.c && moved(o, n)) return { kind: "moved", o, n };
+  return null;
+}
+function lineOf(ev) {
+  const f = ev.n || ev.o;
+  const head = `${f.l} ${fmtShort(f.d)}`;
+  if (ev.kind === "new") return `Neu: ${f.l} ${whenOf(f)}`;
+  if (ev.kind === "gone") return `${head} ${f.t ? f.t + " Uhr " : ""}fällt aus`;
+  if (ev.kind === "cancel") return `${head} ${f.t ? f.t + " Uhr " : ""}fällt aus` + (ev.n.r ? ` (${ev.n.r})` : "");
+  if (ev.kind === "back") return `${head} findet doch statt: ${clockOf(f)}`;
+  const now = ev.o.d === ev.n.d ? clockOf(ev.n) + (ev.n.p ? `, ${ev.n.p}` : "") : whenOf(ev.n);
+  return `${ev.o.l} ${fmtShort(ev.o.d)}: jetzt ${now}`;
+}
+function payloadOf(key, list) {
+  if (list.length === 1) {
+    const ev = list[0], f = ev.n || ev.o, day = dayWord(asSess(f));
+    let title, body;
+    if (ev.kind === "new") { title = `Neuer Termin: ${f.l} ${day}`; body = `${whenOf(f)}. Bitte trag dich ein.`; }
+    else if (ev.kind === "gone") { title = `${f.l} ${day} fällt aus`; body = `Der Termin (${whenOf(f)}) wurde aus dem Plan genommen.`; }
+    else if (ev.kind === "cancel") { title = `${f.l} ${day} fällt aus`; body = ev.n.r ? `Grund: ${ev.n.r}` : `Der Termin (${whenOf(f)}) ist abgesagt.`; }
+    else if (ev.kind === "back") { title = `${f.l} ${day} findet doch statt`; body = `${whenOf(f)}. Bitte trag dich ein.`; }
+    else {
+      const parts = [];
+      if (ev.o.d !== ev.n.d) parts.push("Tag");
+      if (ev.o.t !== ev.n.t || ev.o.e !== ev.n.e || ev.o.a !== ev.n.a) parts.push("Uhrzeit");
+      if (ev.o.p !== ev.n.p) parts.push("Ort");
+      title = `${ev.o.l} ${dayWord(asSess(ev.o))}: neue${parts.length === 1 && parts[0] === "Uhrzeit" ? "" : "r"} ${parts.join(" und ")}`;
+      if (parts.length > 1) title = `${ev.o.l} ${dayWord(asSess(ev.o))} geändert`;
+      body = `Jetzt: ${whenOf(ev.n)}. Vorher: ${whenOf(ev.o)}.`;
+    }
+    return { title, body, tag: `tb-chg-${key}-${ev.sid}` };
+  }
+  const allNew = list.every((ev) => ev.kind === "new");
+  return {
+    title: allNew ? `${list.length} neue Termine` : `${list.length} Änderungen im Trainingsplan`,
+    body: list.map(lineOf).join("\n"),
+    tag: `tb-chg-${key}-${NOW}`,
+  };
+}
+
+async function notifyChanges(key, team, subsAll, snapRec, stats) {
+  const sessions = team.sessions || {};
+  const next = {};
+  for (const [sid, s] of Object.entries(sessions)) {
+    if (!s || !s.date) continue;
+    const f = snapOf(s);
+    if (startMs(asSess(f)) < NOW - 2 * 86400000) continue;   // Vergangenes muss nicht gemerkt werden
+    next[sid] = f;
+  }
+  const first = !snapRec || !snapRec.init;
+  const old = (snapRec && snapRec.s) || {};
+  if (!first && team.remindOn !== false) {
+    const players = team.players || {};
+    const byPid = {};
+    for (const sid of new Set([...Object.keys(old), ...Object.keys(next)])) {
+      const o = old[sid] || null, n = next[sid] || null;
+      if (o && n && JSON.stringify(o) === JSON.stringify(n)) continue;
+      if (o && !n && sessions[sid]) continue;             // nur aus dem Merkzettel gefallen (vorbei)
+      for (const pid of Object.keys(players)) {
+        if (!subsAll[pid]) continue;
+        const ev = eventsFor(sid, o, n, pid);
+        if (ev) { ev.sid = sid; (byPid[pid] = byPid[pid] || []).push(ev); }
+      }
+    }
+    for (const [pid, list] of Object.entries(byPid)) {
+      list.sort((a, b) => startMs(asSess(a.n || a.o)) - startMs(asSess(b.n || b.o)));
+      const p = payloadOf(key, list);
+      const last = Math.max(...list.map((ev) => startMs(asSess(ev.n || ev.o))));
+      const payload = JSON.stringify({ ...p, url: PAGE + "#/termine" });
+      if (await sendTo(key, pid, subsAll[pid], payload, last - NOW, stats, "Änderung")) {
+        stats.changes++;
+        console.log(`Änderung gemeldet: ${key} / ${players[pid].name || pid} / ${list.map(lineOf).join(" | ")}`);
+      }
+    }
+  }
+  if (first || JSON.stringify(old) !== JSON.stringify(next)) {
+    await put(`pushSnap/${key}`, { init: (snapRec && snapRec.init) || NOW, s: next });
+  }
+}
+
 async function runTeam(key, stats) {
-  const [team, subsAll, sentAll] = await Promise.all([get(`teams/${key}`), get(`push/${key}`), get(`pushSent/${key}`)]);
-  if (!team || team.remindOn === false || !subsAll) return;
+  const [team, subsAll, sentAll, snapRec] = await Promise.all([get(`teams/${key}`), get(`push/${key}`), get(`pushSent/${key}`), get(`pushSnap/${key}`)]);
+  if (!team) return;
+  await notifyChanges(key, team, subsAll || {}, snapRec, stats);
+  if (team.remindOn === false || !subsAll) return;
   const exc = num(team.excHours, DEFAULT_EXC, 0, 336);
   const rem = num(team.remindHours, DEFAULT_REMIND, 1, 168);
   const players = team.players || {};
@@ -133,23 +274,7 @@ async function runTeam(key, stats) {
         url: PAGE + "#/heute",
       });
 
-      let delivered = 0;
-      for (const [subKey, rec] of Object.entries(subs)) {
-        if (!rec || !rec.endpoint || !rec.keys) continue;
-        if (DRY) { console.log(`[dry] ${key}/${players[pid].name || pid} -> ${sid} (${subKey})`); delivered++; continue; }
-        try {
-          await webpush.sendNotification({ endpoint: rec.endpoint, keys: rec.keys }, payload, { TTL: Math.max(60, Math.round((deadline - NOW) / 1000)), urgency: "high" });
-          delivered++;
-        } catch (e) {
-          if (e.statusCode === 404 || e.statusCode === 410) {
-            await del(`push/${key}/${pid}/${subKey}`);   // Abo gibt es nicht mehr
-            stats.removed++;
-          } else {
-            console.error(`Fehler ${key}/${pid}/${subKey}: ${e.statusCode || ""} ${e.body || e.message}`);
-            stats.failed++;
-          }
-        }
-      }
+      const delivered = await sendTo(key, pid, subs, payload, deadline - NOW, stats, "Erinnerung " + sid);
       if (delivered) {
         await put(`pushSent/${key}/${sid}/${pid}`, NOW);
         stats.sent++;
@@ -165,7 +290,7 @@ async function runTeam(key, stats) {
   }
 }
 
-const stats = { sent: 0, removed: 0, failed: 0 };
+const stats = { sent: 0, changes: 0, removed: 0, failed: 0 };
 await login();
 let catalog;
 try { catalog = await get("catalog/teams"); }
@@ -181,4 +306,16 @@ for (const key of keys) {
   try { await runTeam(key, stats); }
   catch (e) { console.error(`Team ${key}: ${e.message}`); stats.failed++; }
 }
-console.log(`Fertig: ${stats.sent} erinnert, ${stats.removed} alte Abos entfernt, ${stats.failed} Fehler.`);
+// Aufräumen: Versandmarken und Merkzettel von Teams, die ein Admin entfernt hat
+if (catalog && keys.length) {
+  for (const root of ["pushSent", "pushSnap"]) {
+    try {
+      const r = await fetch(`${DB}/${root}.json${q()}${TOKEN ? "&" : "?"}shallow=true`);
+      if (!r.ok) throw new Error(`GET ${root}: ${r.status}`);
+      for (const k of Object.keys((await r.json()) || {})) {
+        if (!catalog[k]) { await del(`${root}/${k}`); console.log(`Aufgeräumt: ${root}/${k} (Team entfernt)`); }
+      }
+    } catch (e) { console.error(`Aufräumen ${root}: ${e.message}`); stats.failed++; }
+  }
+}
+console.log(`Fertig: ${stats.sent} erinnert, ${stats.changes} Änderungen gemeldet, ${stats.removed} alte Abos entfernt, ${stats.failed} Fehler.`);

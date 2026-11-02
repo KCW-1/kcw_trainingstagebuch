@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-T5B7UYDkOpKmxEK3iViKdkkRT57uHy+r7Vm1wQ2peyw=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-tMALpKuBf5f6icIEOztb5/nJ0ks9OTJM7LFES9eJXt4=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Trainingsbeteiligung</title>
@@ -1058,6 +1058,7 @@ Das ist ein einmaliger Stand, kein Abo: Kommen neue Termine dazu oder ändert si
 
         <section id="pushSection">
           <h2 id="pushHead" data-info="Dein Handy meldet sich vor dem Training, falls du dich noch nicht eingetragen hast. Die Erinnerung kommt nur, wenn noch keine Rückmeldung von dir da ist, und höchstens einmal pro Termin.
+Außerdem kommt eine Nachricht, wenn sich in den nächsten 14 Tagen etwas am Plan ändert: ein Training fällt aus, findet doch statt, hat eine neue Zeit oder einen neuen Ort, oder ein neuer Termin kommt dazu.
 Eingeschaltet wird je Gerät. Hast du die Seite auf Handy und Laptop, entscheidest du auf beiden getrennt.
 Auf dem iPhone geht das nur, wenn die Seite als App auf dem Home-Bildschirm liegt und du sie von dort öffnest." data-title="Erinnerungen">Erinnerungen</h2>
           <div class="card pad" id="pushCard"></div>
@@ -1122,7 +1123,8 @@ Bei 0 Stunden liegt die Absagefrist genau beim Trainingsbeginn." data-title="Fri
                 <span data-info="Wer bis dahin noch keine Rückmeldung gegeben hat, bekommt eine Push-Nachricht aufs Handy. Das gilt nur für Spieler, die unter Mein Profil Erinnerungen auf ihrem Gerät eingeschaltet haben.
 Verschickt wird automatisch über GitHub, etwa alle 15 Minuten. Die Nachricht kann deshalb ein paar Minuten später ankommen als eingestellt.
 Wer auf vielleicht steht, wird ebenfalls erinnert, weil vielleicht mit der Absagefrist zu unentschuldigt wird.
-Jeder bekommt pro Termin höchstens eine Erinnerung." data-title="Erinnerung">Push-Erinnerung an Spieler ohne feste Rückmeldung</span>
+Jeder bekommt pro Termin höchstens eine Erinnerung.
+Mit eingeschaltet gehen auch Nachrichten bei Änderungen am Plan raus, für Termine in den nächsten 14 Tagen: abgesagt oder gelöscht, Absage zurückgenommen, neue Zeit oder neuer Ort, neuer Termin. Mehrere Änderungen auf einmal (etwa ein neuer Wochenrhythmus) kommen gesammelt in einer Nachricht. Ausgeschaltet geht beides nicht raus." data-title="Erinnerung">Push-Erinnerung an Spieler ohne feste Rückmeldung</span>
               </label>
             </div>
             <div class="row">
@@ -1462,6 +1464,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   /* Ab diesem Termin wird eine fehlende Rückmeldung (oder ein offenes Vielleicht) mit Ablauf
      der Absagefrist automatisch als unentschuldigt gewertet. Ältere Termine bleiben wie sie sind. */
   var AUTO_FROM = "2026-09-29";
+  /* Ab diesem Termin setzt auch eine rechtzeitige Absage die Serie zurück (ein Joker kann sie
+     retten). Ältere rechtzeitige Absagen pausieren die Serie weiterhin, wie bisher. */
+  var EXC_RESET_FROM = "2026-11-02";
 
   var NAV = [
     { k:"heute",   label:"Heute",   icon:"calendar-check" },
@@ -2349,10 +2354,12 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function firm(e){ return !!e && e.v !== "maybe"; }
   /* Rückmeldung nach der Bonusfrist eingegangen oder geändert: der Bonus ist weg */
   function bonusLost(e, s){ return !!e && !!e.ts && bonusHours() > 0 && !bonusOnTime(e, s); }
+  /* Rechtzeitige Absage vor EXC_RESET_FROM: pausiert die Serie (Altbestand) */
+  function excPauses(e, s, v){ return v === "exc" && excOnTime(e, s) && s.date < EXC_RESET_FROM; }
   function wouldBreak(s, pid){
     var e = entry(s.id, pid), v = effV(e, s, pid);
     if (v === "yes" || v === "late") return false;
-    if (v === "exc" && excOnTime(e, s)) return false;
+    if (excPauses(e, s, v)) return false;
     return true;
   }
   function jokerOffered(s, pid){
@@ -2410,7 +2417,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var e = entry(s.id, pid), v = effV(e, s, pid);
       if (v === "maybe" || (!v && !closed(s))) return;   /* noch offen, die Frist läuft */
       if (v === "yes" || v === "late") { cur++; if (cur > best) best = cur; }
-      else if (v === "exc" && excOnTime(e, s)) { /* rechtzeitige Absage pausiert die Serie */ }
+      else if (excPauses(e, s, v)) { /* alte rechtzeitige Absage pausiert die Serie */ }
       else if (hasJoker(s.id, pid)) { /* Joker rettet die Serie */ }
       else cur = 0;
     });
@@ -2646,12 +2653,12 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       "Ältere Einträge ohne Zeitstempel und Korrekturen des Trainers gelten als rechtzeitig."
     ];
     if (remindOn()) fristen.push("Erinnerung: " + remindHours() + (remindHours() === 1 ? " Stunde" : " Stunden")
-      + " vor der Absagefrist bekommt jeder ohne Rückmeldung oder mit vielleicht eine Push-Nachricht, sofern er Erinnerungen unter Mein Profil eingeschaltet hat."
+      + " vor der Absagefrist bekommt jeder ohne Rückmeldung oder mit vielleicht eine Push-Nachricht, sofern er Erinnerungen unter Mein Profil eingeschaltet hat. Ebenso kommt eine Nachricht, wenn sich in den nächsten 14 Tagen ein Termin ändert, ausfällt oder neu dazukommt."
       + ((ref && !ref.cancelled) ? " Beim nächsten Termin ist das " + fmtDeadline(ref, remindLead()) + "." : ""));
 
     var serie = [
       "Die Serie zählt Einheiten in Folge, bei denen du dabei warst.",
-      "Eine rechtzeitige Absage pausiert die Serie, sie setzt sie nicht zurück.",
+      "Jede Einheit, bei der du nicht da warst, setzt die Serie zurück, auch eine rechtzeitige Absage. Mit einem Joker kannst du sie retten.",
       "Unentschuldigt reißt die Serie, auch wenn es automatisch vergeben wurde.",
       "Sondertermine zählen für die Serie nicht, weder dafür noch dagegen."
     ];
@@ -4143,6 +4150,71 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     });
   }
 
+  /* Nur für Admins: ein Team endgültig entfernen. Löscht Team-Daten, Notizen, Push-Abos,
+     Teamcode und die Team-Häkchen der Trainer in einem Schritt. Versandmarken und
+     Kalender-Abos räumen remind.mjs und calendar.mjs beim nächsten Durchlauf auf. */
+  var teamDel = null;   /* { k, msg, busy } */
+  function teamDelBox(k){
+    var name = teamDisplayName(k);
+    var box = el("div","card pad");
+    box.style.flexBasis = "100%"; box.style.marginTop = "8px";
+    box.style.borderColor = "var(--status-absent)";
+    box.appendChild(el("b", null, "Team „" + name + "“ endgültig entfernen?"));
+    box.appendChild(el("p","hint", "Gelöscht werden alle Spieler, Termine, Rückmeldungen, Joker, Notizen, "
+      + "Push-Erinnerungen, Kalender-Abos und der Teamcode. Das lässt sich nicht rückgängig machen. "
+      + "Wer die Daten behalten will, wechselt vorher in das Team und lädt hier unter Sicherung eine Datei herunter."));
+    var row = el("div","row");
+    var inp = el("input"); inp.type = "text"; inp.placeholder = "zur Bestätigung „" + name + "“ eintippen";
+    inp.style.flex = "1"; inp.style.minWidth = "200px";
+    inp.setAttribute("aria-label", "Teamnamen zur Bestätigung eintippen");
+    var go = el("button","btn", teamDel.busy ? "wird gelöscht …" : "endgültig löschen");
+    go.type = "button";
+    inp.value = teamDel.txt || "";
+    go.disabled = !!teamDel.busy || inp.value.trim() !== name;
+    go.style.borderColor = "var(--status-absent)"; go.style.color = "var(--status-absent)";
+    inp.addEventListener("input", function(){ teamDel.txt = inp.value; go.disabled = teamDel.busy || inp.value.trim() !== name; });
+    inp.addEventListener("keydown", function(e){ if (e.key === "Enter" && !go.disabled) { e.preventDefault(); go.click(); } });
+    var no = el("button","btn quiet","abbrechen"); no.type = "button";
+    no.addEventListener("click", function(){ teamDel = null; render(); });
+    go.addEventListener("click", function(){
+      if (inp.value.trim() !== name || teamDel.busy) return;
+      teamDel.busy = true; teamDel.msg = ""; render();
+      deleteTeam(k).then(function(){
+        teamDel = null;
+        delete teamNames[k];
+        catalogApplyLocal("teams/" + k, null);
+        Object.keys(catalog.trainers || {}).forEach(function(id){
+          if (catalog.trainers[id].teams) delete catalog.trainers[id].teams[k];
+        });
+        $("teamAddMsg").textContent = "Team „" + name + "“ entfernt.";
+        render();
+      }, function(){
+        teamDel.busy = false;
+        teamDel.msg = "Das hat nicht geklappt. Bitte Verbindung prüfen und noch einmal versuchen.";
+        render();
+      });
+    });
+    row.appendChild(inp); row.appendChild(go); row.appendChild(no);
+    box.appendChild(row);
+    if (teamDel.msg) box.appendChild(el("p","msg",teamDel.msg));
+    return box;
+  }
+  function deleteTeam(k){
+    return db().ref("teams/" + k + "/teamCode").once("value").then(function(snap){
+      var up = {}, code = snap.val();
+      if (typeof code === "string" && /^[0-9a-f]{64}$/.test(code)) up["gate/" + code] = null;
+      Object.keys(catalog.trainers || {}).forEach(function(id){
+        var t = catalog.trainers[id];
+        if (t && t.teams && t.teams[k]) up["catalog/trainers/" + id + "/teams/" + k] = null;
+      });
+      up["teams/" + k] = null;
+      up["notes/" + k] = null;
+      up["push/" + k] = null;
+      up["catalog/teams/" + k] = null;
+      return db().ref().update(up);
+    });
+  }
+
   /* Nur für Admins: Teams anlegen, Trainer anlegen, Admin-Rechte und
      Team-Zugriff je Trainer vergeben. Schreibt direkt in den Katalog. */
   function renderCatalogAdmin(){
@@ -4156,10 +4228,18 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         go.type = "button";
         go.addEventListener("click", function(){ bindTeamRef(k); render(); });
         chip.appendChild(go);
+        if (mode === "fb") {
+          var rm = el("button", null, "entfernen");
+          rm.type = "button";
+          rm.addEventListener("click", function(){ teamDel = { k:k, msg:"" }; render(); });
+          chip.appendChild(rm);
+        }
       }
       tl.appendChild(chip);
     });
     if (!Object.keys(catalog.teams || {}).length) tl.appendChild(el("span","hint","Noch keine Teams."));
+    if (teamDel && (!catalog.teams || !catalog.teams[teamDel.k] || teamDel.k === activeTeamKey)) teamDel = null;
+    if (teamDel) tl.appendChild(teamDelBox(teamDel.k));
 
     var box = $("adminTrainerList");
     box.innerHTML = "";
@@ -4675,9 +4755,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     } else {
       card.appendChild(el("p","hint", pushInfo.on
         ? (next ? "Für " + fmtShort(next.date) + " kommt eine Erinnerung um " + fmtDeadline(next, remindLead())
-            + ", falls du dich bis dahin nicht eingetragen hast." : "Du bekommst eine Nachricht, wenn für einen Termin deine Rückmeldung fehlt.")
+            + ", falls du dich bis dahin nicht eingetragen hast. Ändert sich etwas am Plan, bekommst du ebenfalls Bescheid."
+            : "Du bekommst eine Nachricht, wenn für einen Termin deine Rückmeldung fehlt oder sich etwas am Plan ändert.")
         : "Dein Handy meldet sich " + remindHours() + (remindHours() === 1 ? " Stunde" : " Stunden")
-          + " vor der Absagefrist, falls du dich noch nicht eingetragen hast."));
+          + " vor der Absagefrist, falls du dich noch nicht eingetragen hast, und wenn ein Training ausfällt oder sich Zeit oder Ort ändern."));
       if (Notification.permission === "denied" && !pushInfo.on) {
         card.appendChild(el("p","hint warn","Mitteilungen sind für diese Seite blockiert. Erlaube sie in den Einstellungen des Browsers oder Handys."));
       }
