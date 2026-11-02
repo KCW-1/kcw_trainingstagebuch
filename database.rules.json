@@ -254,6 +254,35 @@
           ".validate": false
         }
       }
+    },
+    "plan": {
+      "$k": {
+        ".read": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child($k).val() === true))",
+        ".write": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child($k).val() === true))"
+      }
+    },
+    "perf": {
+      "$k": {
+        ".read": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child($k).val() === true))",
+        ".write": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child($k).val() === true))"
+      }
+    },
+    "pub": {
+      ".read": "(auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid)",
+      "$k": {
+        ".write": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child($k).val() === true))"
+      }
+    },
+    "pubc": {
+      ".read": "(auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid)",
+      "$k": {
+        "$item": {
+          "$cid": {
+            ".write": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid)) && ((!data.exists() && newData.child('t').val() === root.child('users').child(auth.uid).child('t').val()) || (data.exists() && !newData.exists() && (data.child('t').val() === root.child('users').child(auth.uid).child('t').val() || (((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child($k).val() === true))))))",
+            ".validate": "newData.hasChildren(['t','x','ts']) && newData.child('t').isString() && newData.child('x').isString() && newData.child('x').val().length <= 500 && newData.child('ts').isNumber()"
+          }
+        }
+      }
     }
   }
 }
