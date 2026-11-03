@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-PdVDT/yzz1xB88J+hQ9N4XJX1dMvZQzNMqMi5WMlW00=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-ZBNQ4Q3SLXlfcL+J+7nl/wUqUkDygwRoa45QExFR74Y=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Trainingsbeteiligung</title>
@@ -443,6 +443,18 @@ window.TB_ICONS = {
   .badge.got .pin{background:var(--surface-brand);color:var(--text-on-brand);}
   .badge .bt{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px;}
   .seg{flex-wrap:wrap;}
+  .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
+  .pupload label.btn{cursor:pointer;}
+  .pupload input[type=file]:focus-visible+label{outline:1px solid var(--surface-brand);box-shadow:var(--ring-focus);}
+  .pfiles{display:flex;flex-direction:column;gap:4px;}
+  .pblock .pfiles{grid-column:1/-1;}
+  .pfile{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;}
+  .psec{border:1px solid var(--border-subtle);border-radius:var(--radius-card);background:var(--surface-card);padding:12px;display:flex;flex-direction:column;gap:8px;}
+  .psechead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+  .psechead b{font:700 15px/1.2 var(--font-sans);color:var(--text-strong);}
+  .psec .pblock{background:var(--surface-sunken);}
+  .psum{font-weight:600;}
+  .pmove{height:30px;font-size:12.5px;padding:0 28px 0 8px;background-position:calc(100% - 14px) 13px,calc(100% - 9px) 13px;}
   .planbody{margin-top:16px;display:flex;flex-direction:column;gap:12px;}
   .planbody h2{margin-top:12px;}
   .prow{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--border-subtle);flex-wrap:wrap;}
@@ -457,9 +469,10 @@ window.TB_ICONS = {
   .peditor input[type=text],.peditor select{width:100%;}
   .pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;}
   .pblocks{display:flex;flex-direction:column;gap:8px;}
-  .pblock{display:grid;grid-template-columns:130px minmax(140px,1fr) minmax(120px,1fr) 84px minmax(140px,1.4fr) auto;gap:6px;align-items:center;
+  .pblock{display:grid;grid-template-columns:minmax(150px,1fr) minmax(130px,1fr) 84px auto;gap:6px;align-items:center;
     padding:8px;border:1px solid var(--border-subtle);border-radius:var(--radius-control);background:var(--surface-card);}
   .pblock .pexd{grid-column:1/-1;margin:0;}
+  .pblock .pnote{grid-column:1/-1;}
   .pblock input[type=text],.pblock select{width:100%;}
   .pblock input[hidden]{display:none;}
   .ptools{display:flex;gap:2px;}
@@ -486,7 +499,7 @@ window.TB_ICONS = {
   .linkbtn{border:0;background:none;padding:0;font:600 14px/1.3 var(--font-sans);color:var(--text-strong);text-decoration:underline;cursor:pointer;}
   @media (max-width:700px){
     .pblock{grid-template-columns:1fr 1fr;}
-    .pblock .ptools,.pblock .pnote{grid-column:1/-1;}
+    .pblock .ptools{grid-column:1/-1;}
   }
   .badge .bbar{height:6px;margin-top:6px;border-radius:var(--radius-pill);background:var(--surface-sunken);overflow:hidden;}
   .badge .bbar i{display:block;height:100%;border-radius:var(--radius-pill);background:var(--surface-brand);}
@@ -6160,6 +6173,133 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     paintIcons();
   }
 
+  /* ---------- Dateien an Einheiten und Übungen (seit Version 17) ----------
+     Der Inhalt liegt base64-kodiert unter files/<team>/<fid> = { n, t, s, b, pub, ts, by },
+     an der Einheit oder Übung steht nur die Liste f = { <fid>: { n, t, s } }. So lädt die
+     Planungsansicht keine großen Dateien mit, heruntergeladen wird erst beim Antippen.
+     Veröffentlichte Dateien (pub) dürfen alle Trainer lesen. Grenze: 3 MB je Datei. */
+  var FILE_MAX = 3 * 1024 * 1024;
+  var FILE_ACCEPT = ".pdf,.doc,.docx,.odt,.rtf,.txt,.xls,.xlsx,.ods,.csv,.ppt,.pptx,.odp,.jpg,.jpeg,.png,.gif,.webp,.heic";
+  var fileBusy = {};
+  function fmtSize(n){ return n >= 1048576 ? (Math.round(n / 104857.6) / 10).toString().replace(".", ",") + " MB" : Math.max(1, Math.round(n / 1024)) + " KB"; }
+  function fileMap(f){ return (f && typeof f === "object") ? f : {}; }
+  function downloadFile(k, fid, meta){
+    fileBusy[fid] = "lädt"; renderPlan(true);
+    db().ref("files/" + k + "/" + fid).once("value").then(function(sn){
+      var v = sn.val();
+      delete fileBusy[fid];
+      if (!v || typeof v.b !== "string") { planMsgOk = false; planMsg = "Die Datei ist nicht mehr da."; renderPlan(true); return; }
+      var bin = atob(v.b), arr = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      var url = URL.createObjectURL(new Blob([arr], { type: v.t || "application/octet-stream" }));
+      var a = document.createElement("a"); a.href = url; a.download = v.n || meta.n || "Datei";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 30000);
+      renderPlan(true);
+    }, function(){ delete fileBusy[fid]; planMsgOk = false; planMsg = "Die Datei konnte nicht geladen werden."; renderPlan(true); });
+  }
+  /* Liste mit Herunterladen, optional mit Entfernen (owner = { kind, id }) */
+  function fileList(f, k, owner){
+    var m = fileMap(f), ids = Object.keys(m);
+    var box = el("div","pfiles");
+    ids.sort(function(a,b){ return String(m[a].n).localeCompare(String(m[b].n), "de"); }).forEach(function(fid){
+      var meta = m[fid] || {};
+      var row = el("div","pfile");
+      var b = el("button","linkbtn", meta.n || "Datei"); b.type = "button";
+      b.title = "herunterladen";
+      b.addEventListener("click", function(){ downloadFile(k, fid, meta); });
+      row.appendChild(b);
+      row.appendChild(el("span","hint", fileBusy[fid] ? fileBusy[fid] + " …" : (meta.s ? fmtSize(meta.s) : "")));
+      if (owner) {
+        var armF = !!armed && armed.k === "file" && armed.id === fid;
+        var x = el("button","btn quiet small" + (armF ? " confirm" : ""), armF ? "wirklich entfernen?" : "entfernen"); x.type = "button";
+        x.addEventListener("click", function(){
+          if (!armF) { armed = { k:"file", id:fid }; renderPlan(true); return; }
+          armed = null;
+          var up = {};
+          up["files/" + activeTeamKey + "/" + fid] = null;
+          up["plan/" + activeTeamKey + "/" + owner.kind + "/" + owner.id + "/f/" + fid] = null;
+          var rec = PLAN[owner.kind] && PLAN[owner.kind][owner.id];
+          if (rec && rec.pub) up["pub/" + activeTeamKey + "/" + owner.kind + "/" + owner.id + "/f/" + fid] = null;
+          db().ref().update(up);
+        });
+        row.appendChild(x);
+      }
+      box.appendChild(row);
+    });
+    return box;
+  }
+  /* Hochladen an eine Einheit (kind "ses") oder Übung (kind "ex") */
+  function uploadBox(kind, id){
+    var wrap = el("div","pupload");
+    var rec = PLAN[kind][id];
+    wrap.appendChild(el("p","eyebrow","Dateien"));
+    if (rec && rec.f && Object.keys(rec.f).length) wrap.appendChild(fileList(rec.f, activeTeamKey, { kind: kind, id: id }));
+    var r = el("div","row");
+    var inp = el("input"); inp.type = "file"; inp.accept = FILE_ACCEPT; inp.multiple = true;
+    inp.id = "up-" + kind + "-" + id; inp.className = "visually-hidden";
+    var lb = el("label","btn", fileBusy["up-" + id] ? "wird hochgeladen …" : "Datei hochladen");
+    lb.setAttribute("for", inp.id);
+    inp.addEventListener("change", function(){
+      var files = Array.prototype.slice.call(inp.files || []);
+      inp.value = "";
+      if (!files.length) return;
+      var big = files.filter(function(f){ return f.size > FILE_MAX; });
+      if (big.length) { planMsgOk = false; planMsg = big.map(function(f){ return f.name; }).join(", ") + " ist größer als 3 MB. Bitte verkleinern oder als PDF speichern."; renderPlan(true); return; }
+      fileBusy["up-" + id] = true; renderPlan(true);
+      files.reduce(function(p, f){ return p.then(function(){ return uploadOne(kind, id, f); }); }, Promise.resolve()).then(function(){
+        delete fileBusy["up-" + id]; planMsgOk = true; planMsg = files.length === 1 ? "„" + files[0].name + "“ hochgeladen." : files.length + " Dateien hochgeladen."; renderPlan(true);
+      }, function(){
+        delete fileBusy["up-" + id]; planMsgOk = false; planMsg = "Hochladen hat nicht geklappt. Bitte Verbindung prüfen."; renderPlan(true);
+      });
+    });
+    r.appendChild(inp); r.appendChild(lb);
+    r.appendChild(el("span","hint","PDF, Word, Excel, Fotos, bis 3 MB je Datei"));
+    wrap.appendChild(r);
+    return wrap;
+  }
+  function readB64(file){
+    return new Promise(function(res, rej){
+      var fr = new FileReader();
+      fr.onload = function(){ var s = String(fr.result || ""); res(s.slice(s.indexOf(",") + 1)); };
+      fr.onerror = function(){ rej(fr.error); };
+      fr.readAsDataURL(file);
+    });
+  }
+  function uploadOne(kind, id, file){
+    return readB64(file).then(function(b64){
+      var fid = uid("f"), rec = PLAN[kind][id] || {}, pub = !!rec.pub;
+      var meta = { n: clip(file.name, 120) || "Datei", t: clip(file.type, 100) || "application/octet-stream", s: file.size };
+      var up = {};
+      up["files/" + activeTeamKey + "/" + fid] = { n: meta.n, t: meta.t, s: meta.s, b: b64, pub: pub, ts: Date.now(), by: me.id };
+      up["plan/" + activeTeamKey + "/" + kind + "/" + id + "/f/" + fid] = meta;
+      if (pub) up["pub/" + activeTeamKey + "/" + kind + "/" + id + "/f/" + fid] = meta;
+      return db().ref().update(up);
+    });
+  }
+  /* pub-Kennzeichen aller Dateien eines Eintrags angleichen */
+  function filePubUpdates(up, f, pub){
+    Object.keys(fileMap(f)).forEach(function(fid){ up["files/" + activeTeamKey + "/" + fid + "/pub"] = !!pub; });
+  }
+  function fileDeletes(up, f){
+    Object.keys(fileMap(f)).forEach(function(fid){ up["files/" + activeTeamKey + "/" + fid] = null; });
+  }
+  /* Dateien eines veröffentlichten Eintrags aus einem anderen Team ins eigene kopieren */
+  function copyFiles(k, f){
+    var m = fileMap(f), out = {};
+    return Object.keys(m).reduce(function(p, fid){
+      return p.then(function(){
+        return db().ref("files/" + k + "/" + fid).once("value").then(function(sn){
+          var v = sn.val();
+          if (!v || typeof v.b !== "string") return;
+          var nid = uid("f");
+          out[nid] = { n: clip(v.n, 120) || "Datei", t: clip(v.t, 100) || "application/octet-stream", s: +v.s || 0 };
+          return db().ref("files/" + activeTeamKey + "/" + nid).set({ n: out[nid].n, t: out[nid].t, s: out[nid].s, b: v.b, pub: false, ts: Date.now(), by: me.id });
+        });
+      });
+    }, Promise.resolve()).then(function(){ return out; });
+  }
+
   /* ---------- Einheiten ---------- */
   function planSessions(){
     var t = todayISO();
@@ -6182,8 +6322,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         var tags = el("div","ptags");
         if (s.cancelled) tags.appendChild(el("span","sptag","abgesagt"));
         if (p) {
-          var bl = blocksOf(p);
-          tags.appendChild(el("span","chip yes", "geplant · " + sumMin(bl) + " Min"));
+          var bl = blocksOf(p), nf = Object.keys(fileMap(p.f)).length;
+          if (bl.length) tags.appendChild(el("span","chip yes", "geplant · " + sumMin(bl) + " Min"));
+          if (nf) tags.appendChild(el("span","chip yes", nf === 1 ? "1 Datei" : nf + " Dateien"));
           if (p.g) tags.appendChild(el("span","hint", p.g));
           if (p.pub) tags.appendChild(el("span","sptag","veröffentlicht"));
           var cc = commentsOf(activeTeamKey, "ses_" + s.id).length;
@@ -6217,60 +6358,85 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     gl.appendChild(gi); r1.appendChild(gl); ed.appendChild(r1);
     gl.style.display = "flex"; gl.style.flexDirection = "column"; gl.style.gap = "4px"; gl.style.flex = "1";
 
-    ed.appendChild(el("p","eyebrow","Ablauf"));
-    var list = el("div","pblocks");
+    /* Drei feste Abschnitte: Aufwärmen, Hauptteil, Abschluss. Jeder Punkt gehört zu genau einem. */
     var exIds = Object.keys(PLAN.ex).sort(function(a,b){ return String(PLAN.ex[a].n).localeCompare(String(PLAN.ex[b].n), "de"); });
-    d.b.forEach(function(bk, i){
-      var r = el("div","pblock");
-      var ps = el("select"); ps.setAttribute("aria-label","Teil");
-      PARTS.forEach(function(nm){ var o = el("option", null, nm); o.value = nm; ps.appendChild(o); });
-      ps.value = bk.p || "Hauptteil";
-      ps.addEventListener("change", function(){ bk.p = ps.value; });
-      var es = el("select"); es.setAttribute("aria-label","Übung");
-      var o0 = el("option", null, "eigener Punkt"); o0.value = ""; es.appendChild(o0);
-      exIds.forEach(function(id){ var o = el("option", null, PLAN.ex[id].n); o.value = id; es.appendChild(o); });
-      es.value = bk.e && PLAN.ex[bk.e] ? bk.e : "";
-      var ti = el("input"); ti.type = "text"; ti.maxLength = 120; ti.placeholder = "Titel"; ti.value = bk.t || "";
-      ti.setAttribute("aria-label","Titel");
-      if (es.value) { ti.style.visibility = "hidden"; ti.tabIndex = -1; }
-      es.addEventListener("change", function(){
-        bk.e = es.value || null;
-        if (bk.e) { var x = PLAN.ex[bk.e]; if (x && x.m && !bk.m) bk.m = x.m; }
-        renderPlan();
-      });
-      ti.addEventListener("input", function(){ bk.t = ti.value; });
-      var mi = el("input"); mi.type = "number"; mi.min = "0"; mi.max = "300"; mi.step = "5"; mi.value = bk.m || "";
-      mi.placeholder = "Min"; mi.style.width = "84px"; mi.setAttribute("aria-label","Minuten");
-      mi.addEventListener("input", function(){ bk.m = parseInt(mi.value, 10) || 0; sumEl.textContent = sumText(); });
-      var ni = el("input","pnote"); ni.type = "text"; ni.maxLength = 300; ni.placeholder = "Notiz (Gruppen, Schwerpunkt …)"; ni.value = bk.x || "";
-      ni.setAttribute("aria-label","Notiz");
-      ni.addEventListener("input", function(){ bk.x = ni.value; });
-      var tools = el("div","ptools");
-      [["↑","nach oben", -1],["↓","nach unten", 1]].forEach(function(t){
-        var mb = el("button","btn quiet small", t[0]); mb.type = "button"; mb.title = t[1]; mb.setAttribute("aria-label", t[1]);
-        mb.disabled = (t[2] < 0 && i === 0) || (t[2] > 0 && i === d.b.length - 1);
-        mb.addEventListener("click", function(){ var j = i + t[2]; var tmp = d.b[i]; d.b[i] = d.b[j]; d.b[j] = tmp; renderPlan(); });
-        tools.appendChild(mb);
-      });
-      var xb = el("button","btn quiet small","entfernen"); xb.type = "button";
-      xb.addEventListener("click", function(){ d.b.splice(i, 1); renderPlan(); });
-      tools.appendChild(xb);
-      [ps, es, ti, mi, ni, tools].forEach(function(n){ r.appendChild(n); });
-      if (bk.e && PLAN.ex[bk.e] && PLAN.ex[bk.e].d) r.appendChild(el("p","hint pexd", PLAN.ex[bk.e].d));
-      list.appendChild(r);
-    });
-    if (!d.b.length) list.appendChild(el("p","hint","Noch kein Punkt im Ablauf."));
-    ed.appendChild(list);
-    var add = el("button","btn","+ Punkt"); add.type = "button";
-    add.addEventListener("click", function(){
-      var last = d.b.length ? d.b[d.b.length-1].p : "Aufwärmen";
-      d.b.push({ p: d.b.length ? (last === "Aufwärmen" ? "Hauptteil" : last) : "Aufwärmen", e:null, t:"", m:0, x:"" });
-      renderPlan();
-    });
+    d.b.forEach(function(bk){ if (PARTS.indexOf(bk.p) === -1) bk.p = "Hauptteil"; });
     var len = minOf(s);
-    function sumText(){ var n = sumMin(d.b); return "Summe " + n + " Min" + (len ? " von " + len + " Min Trainingszeit" + (n > len ? ", " + (n - len) + " Min zu viel" : "") : ""); }
-    var sumEl = el("span","hint", sumText());
-    var ra = el("div","row"); ra.appendChild(add); ra.appendChild(sumEl); ed.appendChild(ra);
+    function sumText(){ var n = sumMin(d.b); return "Gesamt " + n + " Min" + (len ? " von " + len + " Min Trainingszeit" + (n > len ? ", " + (n - len) + " Min zu viel" : "") : ""); }
+    var sumEl = el("p","hint psum", sumText());
+    var secSums = {};
+    function secText(part){ return sumMin(d.b.filter(function(b){ return b.p === part; })) + " Min"; }
+    PARTS.forEach(function(part){
+      var sec = el("div","psec");
+      var sh = el("div","psechead");
+      sh.appendChild(el("b", null, part));
+      var ss = el("span","hint", secText(part)); secSums[part] = ss;
+      sh.appendChild(ss);
+      sec.appendChild(sh);
+      var idx = [];
+      d.b.forEach(function(b, i){ if (b.p === part) idx.push(i); });
+      idx.forEach(function(i, pos){
+        var bk = d.b[i];
+        var r = el("div","pblock");
+        var es = el("select"); es.setAttribute("aria-label","Übung");
+        var o0 = el("option", null, "freier Punkt (ohne Übung)"); o0.value = ""; es.appendChild(o0);
+        exIds.forEach(function(id){ var o = el("option", null, PLAN.ex[id].n); o.value = id; es.appendChild(o); });
+        es.value = bk.e && PLAN.ex[bk.e] ? bk.e : "";
+        var ti = el("input"); ti.type = "text"; ti.maxLength = 120; ti.placeholder = "Titel, z. B. Einpaddeln"; ti.value = bk.t || "";
+        ti.setAttribute("aria-label","Titel");
+        if (es.value) { ti.style.visibility = "hidden"; ti.tabIndex = -1; }
+        es.addEventListener("change", function(){
+          bk.e = es.value || null;
+          if (bk.e) { var x = PLAN.ex[bk.e]; if (x && x.m && !bk.m) bk.m = x.m; }
+          renderPlan(true);
+        });
+        ti.addEventListener("input", function(){ bk.t = ti.value; });
+        var mi = el("input"); mi.type = "number"; mi.min = "0"; mi.max = "300"; mi.step = "5"; mi.value = bk.m || "";
+        mi.placeholder = "Min"; mi.style.width = "84px"; mi.setAttribute("aria-label","Minuten");
+        mi.addEventListener("input", function(){ bk.m = parseInt(mi.value, 10) || 0; sumEl.textContent = sumText(); secSums[part].textContent = secText(part); });
+        var ni = el("input","pnote"); ni.type = "text"; ni.maxLength = 300; ni.placeholder = "Notiz (Gruppen, Schwerpunkt …)"; ni.value = bk.x || "";
+        ni.setAttribute("aria-label","Notiz");
+        ni.addEventListener("input", function(){ bk.x = ni.value; });
+        var tools = el("div","ptools");
+        [["↑","nach oben", -1],["↓","nach unten", 1]].forEach(function(t){
+          var mb = el("button","btn quiet small", t[0]); mb.type = "button"; mb.title = t[1]; mb.setAttribute("aria-label", t[1]);
+          var j = idx[pos + t[2]];
+          mb.disabled = j === undefined;
+          mb.addEventListener("click", function(){ var tmp = d.b[i]; d.b[i] = d.b[j]; d.b[j] = tmp; renderPlan(true); });
+          tools.appendChild(mb);
+        });
+        var mv = el("select","pmove"); mv.setAttribute("aria-label","in anderen Abschnitt verschieben");
+        var m0 = el("option", null, "verschieben nach …"); m0.value = ""; mv.appendChild(m0);
+        PARTS.forEach(function(p2){ if (p2 !== part) { var o = el("option", null, p2); o.value = p2; mv.appendChild(o); } });
+        mv.addEventListener("change", function(){ if (!mv.value) return; var it = d.b.splice(i, 1)[0]; it.p = mv.value; d.b.push(it); renderPlan(true); });
+        tools.appendChild(mv);
+        var xb = el("button","btn quiet small","entfernen"); xb.type = "button";
+        xb.addEventListener("click", function(){ d.b.splice(i, 1); renderPlan(true); });
+        tools.appendChild(xb);
+        [es, ti, mi, tools, ni].forEach(function(n){ r.appendChild(n); });
+        if (bk.e && PLAN.ex[bk.e] && PLAN.ex[bk.e].d) r.appendChild(el("p","hint pexd", PLAN.ex[bk.e].d));
+        if (bk.e && PLAN.ex[bk.e] && PLAN.ex[bk.e].f) r.appendChild(fileList(PLAN.ex[bk.e].f, activeTeamKey, null));
+        sec.appendChild(r);
+      });
+      if (!idx.length) sec.appendChild(el("p","hint","Noch nichts im " + part + "."));
+      var ar = el("div","row");
+      var ae = el("select"); ae.setAttribute("aria-label", "Übung zu " + part + " hinzufügen");
+      var a0 = el("option", null, exIds.length ? "+ Übung aus der Bibliothek" : "keine Übungen in der Bibliothek"); a0.value = ""; ae.appendChild(a0);
+      exIds.forEach(function(id){ var o = el("option", null, PLAN.ex[id].n); o.value = id; ae.appendChild(o); });
+      ae.disabled = !exIds.length;
+      ae.addEventListener("change", function(){
+        if (!ae.value) return;
+        var x = PLAN.ex[ae.value];
+        d.b.push({ p: part, e: ae.value, t:"", m: (x && x.m) || 0, x:"" });
+        renderPlan(true);
+      });
+      var af = el("button","btn quiet small","+ freier Punkt"); af.type = "button";
+      af.addEventListener("click", function(){ d.b.push({ p: part, e:null, t:"", m:0, x:"" }); renderPlan(true); });
+      ar.appendChild(ae); ar.appendChild(af);
+      sec.appendChild(ar);
+      ed.appendChild(sec);
+    });
+    ed.appendChild(sumEl);
 
     var r2 = el("div","row");
     var ml = el("label", null, "Material");
@@ -6286,6 +6452,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     rt.addEventListener("input", function(){ d.r = rt.value; });
     rl.style.display = "flex"; rl.style.flexDirection = "column"; rl.style.gap = "4px"; rl.style.marginTop = "10px";
     rl.appendChild(rt); ed.appendChild(rl);
+
+    ed.appendChild(uploadBox("ses", s.id));
 
     var pubL = el("label","check");
     var pc = el("input"); pc.type = "checkbox"; pc.checked = !!d.pub;
@@ -6307,6 +6475,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         if (!armedP) { armed = { k:"plan", id:s.id }; renderPlan(); return; }
         armed = null;
         var up = {}; up["plan/" + activeTeamKey + "/ses/" + s.id] = null; up["pub/" + activeTeamKey + "/ses/" + s.id] = null;
+        fileDeletes(up, PLAN.ses[s.id].f);
         db().ref().update(up).then(function(){ planEdit = null; renderPlan(); });
       });
       r3.appendChild(del);
@@ -6316,6 +6485,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     return ed;
   }
   function cleanBlocks(list){
+    list = list.map(function(b, i){ return { b:b, i:i }; }).sort(function(a, c){
+      var pa = PARTS.indexOf(a.b.p), pc = PARTS.indexOf(c.b.p);
+      return (pa < 0 ? 1 : pa) - (pc < 0 ? 1 : pc) || a.i - c.i;
+    }).map(function(x){ return x.b; });
     return list.map(function(b){
       var o = { p: PARTS.indexOf(b.p) >= 0 ? b.p : "Hauptteil", m: Math.max(0, Math.min(300, parseInt(b.m, 10) || 0)) };
       if (b.e && PLAN.ex[b.e]) o.e = b.e; else o.t = clip(b.t, 120) || "ohne Titel";
@@ -6331,12 +6504,17 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
                if (b.x) o.x = b.x;
                if (x && x.d) o.d = clip(x.d, 1500);
                if (x && x.c) o.c = x.c;
+               if (x && x.f) o.f = x.f;
                return o; }),
-             tn: state.team || "", by: myTrainerName(), ts: Date.now() };
+             f: rec.f || null, tn: state.team || "", by: myTrainerName(), ts: Date.now() };
   }
   function savePlan(s, d){
+    var old = PLAN.ses[s.id] || {};
     var rec = { g: clip(d.g, 200), mat: clip(d.mat, 200), r: clip(d.r, 1500), pub: !!d.pub, b: cleanBlocks(d.b), ts: Date.now(), by: me.id };
+    if (old.f) rec.f = old.f;
+    if (old.src) rec.src = old.src;
     var up = {};
+    filePubUpdates(up, rec.f, rec.pub);
     up["plan/" + activeTeamKey + "/ses/" + s.id] = rec;
     up["pub/" + activeTeamKey + "/ses/" + s.id] = rec.pub ? pubPlanRec(s, rec) : null;
     db().ref().update(up).then(function(){ planEdit = null; planMsg = ""; renderPlan(); },
@@ -6378,6 +6556,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       tags.appendChild(el("span","sptag", x.c || "Sonstiges"));
       if (x.m) tags.appendChild(el("span","hint", x.m + " Min"));
       if (x.pub) tags.appendChild(el("span","sptag","veröffentlicht"));
+      var nfx = Object.keys(fileMap(x.f)).length;
+      if (nfx) tags.appendChild(el("span","sptag", nfx === 1 ? "1 Datei" : nfx + " Dateien"));
       if (x.src && x.src.tn) tags.appendChild(el("span","hint","von " + x.src.tn));
       var cc = commentsOf(activeTeamKey, "ex_" + id).length;
       if (cc) tags.appendChild(el("span","sptag", cc + (cc === 1 ? " Kommentar" : " Kommentare")));
@@ -6426,6 +6606,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     dt.placeholder = "Ablauf, Aufbau, Coaching-Punkte, Varianten";
     dt.addEventListener("input", function(){ d.d = dt.value; });
     var dl = lbl("Beschreibung", dt); dl.style.marginTop = "10px"; ed.appendChild(dl);
+    if (id) ed.appendChild(uploadBox("ex", id));
+    else ed.appendChild(el("p","hint","Dateien (zum Beispiel eine Skizze) kannst du nach dem ersten Speichern anhängen."));
+
     var pubL = el("label","check");
     var pc = el("input"); pc.type = "checkbox"; pc.checked = !!d.pub;
     pc.addEventListener("change", function(){ d.pub = pc.checked; });
@@ -6444,10 +6627,12 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var rec = { n: n, c: EX_CATS.indexOf(d.c) >= 0 ? d.c : "Sonstiges", m: Math.max(0, Math.min(300, d.m || 0)), sp: clip(d.sp, 60),
                   mat: clip(d.mat, 200), d: clip(d.d, 1500), u: u, pub: !!d.pub, ts: Date.now(), by: me.id };
       if (old.src) rec.src = old.src;
+      if (old.f) rec.f = old.f;
       var up = {};
+      filePubUpdates(up, rec.f, rec.pub);
       up["plan/" + activeTeamKey + "/ex/" + key] = rec;
       up["pub/" + activeTeamKey + "/ex/" + key] = rec.pub ? { n: rec.n, c: rec.c, m: rec.m, sp: rec.sp, mat: rec.mat, d: rec.d, u: rec.u,
-                                                              tn: state.team || "", by: myTrainerName(), ts: rec.ts } : null;
+                                                              f: rec.f || null, tn: state.team || "", by: myTrainerName(), ts: rec.ts } : null;
       db().ref().update(up).then(function(){ exEdit = null; planMsg = ""; renderPlan(); },
         function(){ planMsgOk = false; planMsg = "Speichern hat nicht geklappt. Bitte Verbindung prüfen."; renderPlan(); });
     });
@@ -6461,6 +6646,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         if (!armedX) { armed = { k:"ex", id:id }; renderPlan(); return; }
         armed = null;
         var up = {}; up["plan/" + activeTeamKey + "/ex/" + id] = null; up["pub/" + activeTeamKey + "/ex/" + id] = null;
+        fileDeletes(up, PLAN.ex[id] && PLAN.ex[id].f);
         db().ref().update(up).then(function(){ exEdit = null; renderPlan(); });
       });
       r3.appendChild(del);
@@ -6749,15 +6935,22 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       head.appendChild(el("b", null, (x.tn || teamDisplayName(it.k)) + " · " + fmtShort(x.d) + (x.tm ? ", " + x.tm + " Uhr" : "") + "  " + (x.l || "Training")));
       head.appendChild(el("span","hint", (x.g ? "Ziel: " + x.g + " · " : "") + sumMin(bl) + " Min · von " + (x.by || "Trainer")));
       wrap.appendChild(head);
-      var ol = el("ol","pplist");
-      bl.forEach(function(b){
-        var li = el("li");
-        li.appendChild(el("b", null, (b.p || "") + ": " + (b.t || "") + (b.m ? " (" + b.m + " Min)" : "")));
-        if (b.x) li.appendChild(el("span","hint"," " + b.x));
-        if (b.d) li.appendChild(el("p","hint pexd", b.d));
-        ol.appendChild(li);
+      PARTS.forEach(function(part){
+        var inPart = bl.filter(function(b){ return (PARTS.indexOf(b.p) >= 0 ? b.p : "Hauptteil") === part; });
+        if (!inPart.length) return;
+        wrap.appendChild(el("p","eyebrow", part + " · " + sumMin(inPart) + " Min"));
+        var ol = el("ol","pplist");
+        inPart.forEach(function(b){
+          var li = el("li");
+          li.appendChild(el("b", null, (b.t || "") + (b.m ? " (" + b.m + " Min)" : "")));
+          if (b.x) li.appendChild(el("span","hint"," " + b.x));
+          if (b.d) li.appendChild(el("p","hint pexd", b.d));
+          if (b.f) li.appendChild(fileList(b.f, it.k, null));
+          ol.appendChild(li);
+        });
+        wrap.appendChild(ol);
       });
-      wrap.appendChild(ol);
+      if (x.f && Object.keys(x.f).length) { wrap.appendChild(el("p","eyebrow","Dateien")); wrap.appendChild(fileList(x.f, it.k, null)); }
       if (x.mat) wrap.appendChild(el("p","hint","Material: " + x.mat));
       var cr = el("div","row");
       var sel = el("select"); sel.setAttribute("aria-label","in welchen Termin kopieren");
@@ -6782,12 +6975,22 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
           if (note) o.x = clip(note, 300);
           return o;
         });
-        var rec = { g: clip(x.g, 200), mat: clip(x.mat, 200), r: "", pub: false, b: blocks, ts: Date.now(), by: me.id,
-                    src: { k: it.k, id: it.id, tn: clip(x.tn, 80) } };
-        pWrite("plan/" + activeTeamKey + "/ses/" + s.id, rec).then(function(){
+        var allF = {};
+        Object.keys(fileMap(x.f)).forEach(function(fid){ allF[fid] = x.f[fid]; });
+        bl.forEach(function(b){ Object.keys(fileMap(b.f)).forEach(function(fid){ allF[fid] = b.f[fid]; }); });
+        var oldF = (PLAN.ses[s.id] || {}).f;
+        copyFiles(it.k, allF).then(function(nf){
+          var rec = { g: clip(x.g, 200), mat: clip(x.mat, 200), r: "", pub: false, b: blocks, ts: Date.now(), by: me.id,
+                      src: { k: it.k, id: it.id, tn: clip(x.tn, 80) } };
+          if (Object.keys(nf).length) rec.f = nf;
+          var up = {};
+          fileDeletes(up, oldF);
+          up["plan/" + activeTeamKey + "/ses/" + s.id] = rec;
+          return db().ref().update(up);
+        }).then(function(){
           planMsg = "Plan in deinen Termin am " + fmtShort(s.date) + " kopiert. Du findest ihn unter Einheiten."; planMsgOk = true;
           renderPlan();
-        });
+        }, function(){ planMsgOk = false; planMsg = "Kopieren hat nicht geklappt. Bitte Verbindung prüfen."; renderPlan(); });
       });
       cr.appendChild(sel); cr.appendChild(cb);
       wrap.appendChild(cr);
@@ -6813,6 +7016,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       wrap.appendChild(head);
       if (x.d) wrap.appendChild(el("p","hint pexd", x.d));
       if (x.sp || x.mat) wrap.appendChild(el("p","hint", [x.sp ? "Spieler: " + x.sp : "", x.mat ? "Material: " + x.mat : ""].filter(Boolean).join(" · ")));
+      if (x.f && Object.keys(x.f).length) wrap.appendChild(fileList(x.f, it.k, null));
       if (x.u && /^https:\/\//i.test(x.u)) {
         var a = el("a", null, "Link öffnen"); a.href = x.u; a.target = "_blank"; a.rel = "noopener noreferrer";
         wrap.appendChild(a);
@@ -6822,9 +7026,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       cb.disabled = have;
       cb.addEventListener("click", function(){
         var u = /^https:\/\//i.test(x.u || "") ? clip(x.u, 300) : "";
-        pWrite("plan/" + activeTeamKey + "/ex/" + uid("x"), { n: clip(x.n, 120) || "Übung", c: EX_CATS.indexOf(x.c) >= 0 ? x.c : "Sonstiges",
-          m: Math.max(0, Math.min(300, +x.m || 0)), sp: clip(x.sp, 60), mat: clip(x.mat, 200), d: clip(x.d, 1500), u: u,
-          pub: false, ts: Date.now(), by: me.id, src: { k: it.k, id: it.id, tn: clip(x.tn, 80) } }).then(function(){
+        copyFiles(it.k, x.f).then(function(nf){
+          var rec = { n: clip(x.n, 120) || "Übung", c: EX_CATS.indexOf(x.c) >= 0 ? x.c : "Sonstiges",
+            m: Math.max(0, Math.min(300, +x.m || 0)), sp: clip(x.sp, 60), mat: clip(x.mat, 200), d: clip(x.d, 1500), u: u,
+            pub: false, ts: Date.now(), by: me.id, src: { k: it.k, id: it.id, tn: clip(x.tn, 80) } };
+          if (Object.keys(nf).length) rec.f = nf;
+          return pWrite("plan/" + activeTeamKey + "/ex/" + uid("x"), rec);
+        }).then(function(){
           planMsg = "„" + x.n + "“ steht jetzt in deinen Übungen."; planMsgOk = true; renderPlan();
         });
       });
