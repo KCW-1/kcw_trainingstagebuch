@@ -283,6 +283,15 @@
           }
         }
       }
+    },
+    "files": {
+      "$k": {
+        "$fid": {
+          ".read": "(((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child($k).val() === true))) || (((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid)) && data.child('pub').val() === true)",
+          ".write": "((auth != null && root.child('users').child(auth.uid).child('t').isString() && root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('login').child('uid').val() === auth.uid) && (root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('admin').val() === true || root.child('catalog').child('trainers').child(root.child('users').child(auth.uid).child('t').val()).child('teams').child($k).val() === true))",
+          ".validate": "newData.hasChildren(['n','b']) && newData.child('n').isString() && newData.child('n').val().length <= 120 && newData.child('b').isString() && newData.child('b').val().length <= 4300000"
+        }
+      }
     }
   }
 }
