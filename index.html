@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-SycUmbhpm/+eSU0EQySfHAumI0j9VL7q7gD0RxwpO1s=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-H8Z+ZJmp8+z9t6TQ8JFU+gQQdNeLDzibux/2wCtnnG0=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Trainingsbeteiligung</title>
@@ -435,6 +435,19 @@ window.TB_ICONS = {
   .prank .pinfo em{font-style:normal;font-size:12.5px;color:var(--text-muted);font-variant-numeric:tabular-nums;}
 
   .badges{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));}
+  .badges>[hidden]{display:none !important;}
+  .badgetoggle{display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:100%;margin-top:10px;position:relative;
+    padding:14px 46px 14px 18px;border:1px solid var(--border-strong);border-radius:var(--radius-card);background:var(--surface-card, transparent);
+    color:var(--text-body);cursor:pointer;text-align:left;font:inherit;}
+  .badgetoggle .rt{font:600 14px/1.2 var(--font-sans);color:var(--text-body);}
+  .badgetoggle .rs{font:400 13px/1.4 var(--font-sans);color:var(--text-muted);}
+  .badgetoggle::after{content:"";position:absolute;right:20px;top:22px;width:8px;height:8px;border-right:2px solid var(--text-muted);
+    border-bottom:2px solid var(--text-muted);transform:rotate(45deg);transition:transform .15s;}
+  .badgetoggle[aria-expanded="true"]::after{transform:rotate(-135deg);top:26px;}
+  .bname{display:inline-flex;align-items:center;gap:6px;}
+  .brow .bname{min-width:186px;}
+  .brow .bname .bon{min-width:0;}
+  .bcfghead{display:flex;align-items:center;gap:6px;}
   .badge{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:var(--radius-card);
     border:1px solid var(--border-subtle);background:var(--surface-card);}
   .badge .pin{width:34px;height:34px;flex:none;border-radius:var(--radius-pill);display:grid;place-items:center;
@@ -1120,7 +1133,10 @@ Das ist ein einmaliger Stand, kein Abo: Kommen neue Termine dazu oder ändert si
 
         <section>
           <h2 id="badgeHead">Abzeichen</h2>
-          <div class="badges" id="badgeBox"></div>
+          <div class="badgefold">
+            <div class="badges" id="badgeBox"></div>
+            <button type="button" class="badgetoggle" id="badgeToggle" aria-controls="badgeBox" aria-expanded="false"><span class="rt">Alle Abzeichen anzeigen</span><span class="rs"></span></button>
+          </div>
         </section>
 
         <section id="pushSection">
@@ -2843,6 +2859,12 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var box = $("badgeCfgBox");
     if (!box) return;
     box.innerHTML = "";
+    var bh = el("p","hint bcfghead");
+    bh.appendChild(document.createTextNode("Abzeichen an- und ausschalten, Schwellen festlegen "));
+    bh.appendChild(info("Gezählt werden nur gewertete Einheiten ab dem Saison-Stichtag, Sondertermine nur beim Abzeichen Sondertermine.\n"
+      + "Spieler, die aus einem anderen Team gewechselt sind, bringen ihre Einheiten von dort mit.\n"
+      + "Die Spieler sehen unter Mein Profil bei jedem gestuften Abzeichen einen Balken bis zur nächsten Stufe.", "Abzeichen"));
+    box.appendChild(bh);
     BADGE_DEFS.forEach(function(d){
       var on = badgeOn(d.k), t = badgeT(d.k);
       var row = el("div","brow" + (on ? "" : " off"));
@@ -2851,7 +2873,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       cb.addEventListener("change", function(){ setBadge(d.k, { on: cb.checked }); });
       lab.appendChild(cb);
       lab.appendChild(document.createTextNode(d.name));
-      row.appendChild(lab);
+      var nameWrap = el("span","bname");
+      nameWrap.appendChild(lab);
+      nameWrap.appendChild(info(function(){
+        var tt = badgeT(d.k);
+        return d.desc + "\nBronze ab " + tt[0] + ", Silber ab " + tt[1] + ", Gold ab " + tt[2] + " " + d.unit + "." + (badgeOn(d.k) ? "" : "\nGerade ausgeschaltet.");
+      }, d.name));
+      row.appendChild(nameWrap);
       var f = el("div","bfields"), inputs = [];
       ["Bronze","Silber","Gold"].forEach(function(nm, i){
         var l = el("label", null, nm);
@@ -2877,7 +2905,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       cb.addEventListener("change", function(){ setBadge(d.k, { on: cb.checked }); });
       l.appendChild(cb);
       l.appendChild(document.createTextNode(d.name));
-      sg.appendChild(l);
+      var sw = el("span","bname");
+      sw.appendChild(l);
+      sw.appendChild(info(function(){ return singleDesc(d.k) + (badgeOn(d.k) ? "" : "\nGerade ausgeschaltet."); }, d.name + " (einmalig)"));
+      sg.appendChild(sw);
     });
     box.appendChild(sg);
 
@@ -2923,25 +2954,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     wb.appendChild(wm);
     box.appendChild(wb);
 
-    /* Erklärung für den Trainer: was jedes Abzeichen zählt */
-    var ex = el("details","rules");
-    ex.style.marginTop = "14px";
-    ex.appendChild(el("summary", null, "Was die Abzeichen bedeuten"));
-    var exb = el("div","rbody"), ul = el("ul");
-    BADGE_DEFS.forEach(function(d){
-      var t = badgeT(d.k);
-      ul.appendChild(el("li", null, d.name + ": " + d.desc + " Bronze ab " + t[0] + ", Silber ab " + t[1] + ", Gold ab " + t[2] + " " + d.unit
-        + "." + (badgeOn(d.k) ? "" : " Gerade ausgeschaltet.")));
-    });
-    SINGLE_DEFS.forEach(function(d){
-      ul.appendChild(el("li", null, d.name + " (einmalig): " + singleDesc(d.k) + (badgeOn(d.k) ? "" : " Gerade ausgeschaltet.")));
-    });
-    ul.appendChild(el("li", null, "Gezählt werden nur gewertete Einheiten ab dem Saison-Stichtag, Sondertermine nur beim Abzeichen Sondertermine. "
-      + "Spieler, die aus einem anderen Team gewechselt sind, bringen ihre Einheiten von dort mit. "
-      + "Die Spieler sehen unter Ich bei jedem gestuften Abzeichen einen Balken bis zur nächsten Stufe."));
-    exb.appendChild(ul);
-    ex.appendChild(exb);
-    box.appendChild(ex);
+
   }
 
   /* ---------- Reglement ---------- */
@@ -4459,7 +4472,11 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     /* Abzeichen */
     var bb = $("badgeBox");
     bb.innerHTML = "";
-    badgesOf(me.id).forEach(function(b){
+    /* Erreichte zuerst: Gold, Silber, Bronze, dann erreichte einmalige, danach der Rest wie gehabt */
+    var blist = badgesOf(me.id).map(function(b, i){ return { b:b, i:i, r: b.single ? (b.got ? 0.5 : 0) : b.level }; })
+      .sort(function(x, y){ return (y.r - x.r) || (x.i - y.i); }).map(function(x){ return x.b; });
+    var gotN = blist.filter(function(b){ return b.single ? b.got : b.level > 0; }).length;
+    blist.forEach(function(b){
       var c = el("div","badge" + (b.single ? (b.got ? " got" : "") : (b.level ? " t" + b.level + " got" : "")));
       var pin = el("div","pin");
       pin.appendChild(icon(b.single && b.got ? "check" : b.icon));
@@ -4498,7 +4515,26 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       c.appendChild(bt);
       bb.appendChild(c);
     });
+    var tg = $("badgeToggle");
+    if (tg) {
+      tg.hidden = !blist.length;
+      tg.querySelector(".rt").textContent = badgesOpen ? "Weniger anzeigen" : "Alle Abzeichen anzeigen";
+      tg.querySelector(".rs").textContent = gotN + " von " + blist.length + " erreicht";
+      tg.setAttribute("aria-expanded", badgesOpen ? "true" : "false");
+    }
+    foldBadges();
     paintIcons();
+  }
+  /* Abzeichen zugeklappt: nur die erste Reihe, so viele wie nebeneinander passen */
+  var badgesOpen = false;
+  function foldBadges(){
+    var bb = $("badgeBox");
+    if (!bb) return;
+    var kids = Array.prototype.slice.call(bb.children);
+    kids.forEach(function(k){ k.hidden = false; });
+    if (badgesOpen || !kids.length) return;
+    var cols = safe(function(){ return getComputedStyle(bb).gridTemplateColumns.split(" ").filter(Boolean).length; }, 1) || 1;
+    kids.forEach(function(k, i){ k.hidden = i >= cols; });
   }
 
   /* ---------- Trainerbereich ---------- */
@@ -6144,6 +6180,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     document.addEventListener("click", closePop);
     document.addEventListener("keydown", function(e){ if (e.key === "Escape") closePop(); });
     window.addEventListener("resize", placePop);
+    window.addEventListener("resize", foldBadges);
+    $("badgeToggle").addEventListener("click", function(){ badgesOpen = !badgesOpen; renderIch(); });
     window.addEventListener("scroll", placePop, true);
   }
 
