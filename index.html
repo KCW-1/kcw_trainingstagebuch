@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-ZBNQ4Q3SLXlfcL+J+7nl/wUqUkDygwRoa45QExFR74Y=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-SycUmbhpm/+eSU0EQySfHAumI0j9VL7q7gD0RxwpO1s=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Trainingsbeteiligung</title>
@@ -1522,7 +1522,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     { k:"streak",   name:"Serie",              unit:"Einheiten in Folge", def:[5,10,20],  max:500,
       desc:"Deine längste Serie in Folge." },
     { k:"reliable", name:"Zuverlässig",        unit:"Monate",             def:[1,3,6],    max:120,
-      desc:"Monate ohne eine einzige fehlende Rückmeldung." },
+      desc:"Abgeschlossene Monate ohne eine einzige fehlende Rückmeldung (mindestens drei Einheiten)." },
     { k:"early",    name:"Frühmelder",         unit:"Rückmeldungen",      def:[10,25,50], max:500,
       desc:"Rückmeldungen vor der Bonusfrist." },
     { k:"punctual", name:"Pünktlich in Folge", unit:"in Folge",           def:[5,12,25],  max:500,
@@ -1546,11 +1546,42 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   var SINGLE_DESC = {
     first:"Einmal anwesend gewesen.",
     comeback:"Nach vier Wochen Pause wieder dreimal in Folge dabei.",
-    winter:"Alle Einheiten im Winter (Dezember bis Februar, mindestens fünf) mitgemacht oder rechtzeitig abgesagt.",
+    winter:"Alle Einheiten eines Winters (Dezember bis Februar, mindestens fünf) mitgemacht oder rechtzeitig abgesagt. Vergeben wird es nach Ende Februar.",
     newyear:"Zwischen dem 27. Dezember und dem 6. Januar auf dem Wasser.",
     jubilee:"Deine 100. Einheit.",
     seasonstart:"Bei der ersten Einheit der Saison dabei. Ohne Saison-Stichtag zählt die erste Einheit eines Jahres."
   };
+  /* Winter für das Abzeichen Wintertraining: der Trainer trägt je Winter einen Zeitraum ein
+     (winters = [{ from, to }]). Ohne Eintrag gilt jedes Jahr Dezember bis Februar. */
+  function cleanWinters(w){
+    var list = Array.isArray(w) ? w : (w && typeof w === "object" ? Object.keys(w).map(function(k){ return w[k]; }) : []);
+    var re = /^\d{4}-\d{2}-\d{2}$/;
+    return list.filter(function(x){ return x && re.test(x.from) && re.test(x.to) && x.from <= x.to; })
+      .map(function(x){ return { from:x.from, to:x.to }; })
+      .sort(function(a,b){ return a.from < b.from ? -1 : 1; });
+  }
+  function winterSet(){ return cleanWinters(state && state.winters).length > 0; }
+  function lastFeb(y){ return new Date(y, 2, 0).getDate(); }
+  function winterPeriods(){
+    var own = cleanWinters(state && state.winters);
+    if (own.length) return own;
+    var y1 = new Date().getFullYear(), y0 = y1 - 1;
+    (state && state.sessions || []).forEach(function(s){ var y = +String(s.date).slice(0,4) - 1; if (y && y < y0) y0 = y; });
+    var out = [];
+    for (var y = y0; y <= y1; y++) out.push({ from: y + "-12-01", to: (y+1) + "-02-" + lastFeb(y+1) });
+    return out;
+  }
+  function fmtDM(iso){ var d = parseISO(iso); return d.getDate() + "." + (d.getMonth()+1) + "." + d.getFullYear(); }
+  function winterText(){
+    if (!winterSet()) return "Dezember bis Februar";
+    var t = todayISO(), list = winterPeriods();
+    var cur = list.filter(function(w){ return w.to >= t; })[0] || list[list.length-1];
+    return fmtDM(cur.from) + " bis " + fmtDM(cur.to);
+  }
+  function singleDesc(k){
+    if (k === "winter") return "Alle Einheiten eines Winters (" + winterText() + ", mindestens fünf) mitgemacht oder rechtzeitig abgesagt. Vergeben wird es nach Ende des Winters.";
+    return SINGLE_DESC[k] || "";
+  }
   var DEFAULT_GOAL = 85;
   var DEFAULT_EXC = 0;      /* Stunden vor Beginn, bis wann eine Absage Punkte gibt */
   var DEFAULT_BONUS = 24;   /* Stunden vor Beginn, bis wann es Bonuspunkte gibt */
@@ -1566,6 +1597,9 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   /* Ab diesem Termin setzt auch eine rechtzeitige Absage die Serie zurück (ein Joker kann sie
      retten). Ältere rechtzeitige Absagen pausieren die Serie weiterhin, wie bisher. */
   var EXC_RESET_FROM = "2026-11-02";
+  /* Einführung mit der echten Mannschaft: Termine vor diesem Tag trägt der Trainer nach. Seine
+     Einträge zählen dort wie rechtzeitige eigene Rückmeldungen (Bonus, Absagepunkte). */
+  var TRAINER_CATCHUP_BEFORE = "2026-11-05";
 
   var NAV = [
     { k:"heute",   label:"Heute",   icon:"calendar-check" },
@@ -1959,6 +1993,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       st.jokers = op.st.jokers;
       st.jokerFrom = op.st.jokerFrom;
       st.seasonFrom = op.st.seasonFrom;
+      st.winters = op.st.winters || [];
       st.teamCode = op.st.teamCode;
       st.trainerPin = op.st.trainerPin;
       st.noScore = op.st.noScore || {};
@@ -2163,7 +2198,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         lateOn: !!op.st.lateOn, latePts: op.st.latePts, excPts: op.st.excPts,
         lvGold: op.st.lvGold, lvSilver: op.st.lvSilver, lvBronze: op.st.lvBronze,
         levelMin: op.st.levelMin, badges: op.st.badges || {},
-        jokers: op.st.jokers, jokerFrom: op.st.jokerFrom || "", seasonFrom: op.st.seasonFrom || "",
+        jokers: op.st.jokers, jokerFrom: op.st.jokerFrom || "", seasonFrom: op.st.seasonFrom || "", winters: op.st.winters || [],
         teamCode: (rawTeam && rawTeam.teamCode) || "",
         compareWith: (rawTeam && rawTeam.compareWith) || {},
         noScore: op.st.noScore || {},
@@ -2226,7 +2261,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       lateOn: v.lateOn, latePts: v.latePts, excPts: v.excPts,
       lvGold: v.lvGold, lvSilver: v.lvSilver, lvBronze: v.lvBronze,
       levelMin: v.levelMin, badges: v.badges,
-      jokers: v.jokers, jokerFrom: v.jokerFrom, seasonFrom: v.seasonFrom, teamCode: v.teamCode,
+      jokers: v.jokers, jokerFrom: v.jokerFrom, seasonFrom: v.seasonFrom, winters: v.winters, teamCode: v.teamCode,
       trainerPin: v.trainerPin || null, compareWith: v.compareWith || {}, noScore: v.noScore || {},
       players: players, sessions: sessions, att: att, joker: JSON.parse(JSON.stringify(v.joker || {})) });
   }
@@ -2303,7 +2338,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
      Sondertermine. Sondertermine (sp) stehen komplett außerhalb der Wertung. */
   function heldSessions(){
     var t = todayISO(), from = seasonFrom();
-    return byDate(state.sessions).filter(function(s){ return !s.cancelled && !s.sp && s.date <= t && s.date >= from; });
+    return byDate(state.sessions).filter(function(s){ return !s.cancelled && !s.sp && s.date <= t && started(s) && s.date >= from; });
   }
   /* Mitgebrachte Termine aus früheren Teams (players/<pid>/hist), als Pseudo-Termine mit
      der Kennung "h:<sid>". Sie zählen nur für die persönlichen Werte (Punkte, Serie, Quote,
@@ -2339,13 +2374,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function mySpecials(pid){
     var t = todayISO();
     return byDate(state.sessions.concat(histAll(pid))).filter(function(s){
-      return s.sp && !s.cancelled && s.date <= t && invited(s, pid) && present(entry(s.id, pid));
+      return s.sp && !s.cancelled && s.date <= t && (s.hist || started(s)) && invited(s, pid) && present(entry(s.id, pid));
     });
   }
   /* Für die Anzeige: alle begonnenen Termine inklusive Sondertermine */
   function pastSessions(){
     var t = todayISO(), from = seasonFrom();
-    return byDate(state.sessions).filter(function(s){ return !s.cancelled && s.date <= t && (s.sp || s.date >= from) && seesSess(s); });
+    return byDate(state.sessions).filter(function(s){ return !s.cancelled && s.date <= t && started(s) && (s.sp || s.date >= from) && seesSess(s); });
   }
   function upcoming(){
     var t = todayISO();
@@ -2409,7 +2444,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function foreignQuota(st){
     if (st.demo) return { pct:null, name: st.team, tot:0 };
     var t = todayISO(), from = typeof st.seasonFrom === "string" ? st.seasonFrom : "";
-    var held = st.sessions.filter(function(s){ return !s.cancelled && !s.sp && s.date <= t && s.date >= from; });
+    var held = st.sessions.filter(function(s){ return !s.cancelled && !s.sp && s.date <= t && Date.now() >= startMs(s) && s.date >= from; });
     var y = 0, tot = 0;
     st.players.forEach(function(p){
       held.forEach(function(s){
@@ -2495,7 +2530,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   /* Einträge ohne Zeitstempel sind Altbestand oder vom Trainer gesetzt: sie gelten als rechtzeitig. */
   function beforeDeadline(e, s, hours){
     if (!e) return false;
-    if (!e.ts) return e.by !== "t0";   /* t0: vom Trainer gesetzt, ohne eigene Rückmeldung (seit Version 15) */
+    if (!e.ts) return e.by !== "t0" || (!!s && s.date < TRAINER_CATCHUP_BEFORE);   /* t0: vom Trainer gesetzt, ohne eigene Rückmeldung (seit Version 15) */
     return e.ts <= deadlineMs(s, hours);
   }
   /* Joker */
@@ -2625,7 +2660,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     if (!out.ready || q.pct === null) { out.next = LV[LV.length-1]; return out; }
     for (var i=0;i<LV.length;i++) if (q.pct >= LV[i].min) { out.name = LV[i].name; break; }
     for (var j=LV.length-1;j>=0;j--) if (q.pct < LV[j].min) { out.next = LV[j]; break; }
-    if (out.next) {
+    if (out.next && out.next.min < 100) {
       var n = Math.ceil((out.next.min * q.tot - 100 * q.y) / (100 - out.next.min));
       out.need = n > 0 ? n : 1;
     }
@@ -2656,9 +2691,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     });
     var st = streakOf(pid);
 
-    var months = {};
+    var months = {}, curMonth = todayISO().slice(0,7);
     held.forEach(function(s){
       var key = s.date.slice(0,7);
+      if (key >= curMonth) return;   /* nur abgeschlossene Monate */
       if (!months[key]) months[key] = { tot:0, miss:0 };
       months[key].tot++;
       if (!firm(entry(s.id, pid))) months[key].miss++;
@@ -2666,15 +2702,27 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     var cleanMonths = 0;
     Object.keys(months).forEach(function(k){ if (months[k].tot >= 3 && months[k].miss === 0) cleanMonths++; });
 
-    /* Winter: alle Einheiten im Dezember, Januar, Februar mitgemacht oder rechtzeitig abgesagt */
-    var win = 0, winBad = 0;
+    /* Winter: alle Einheiten eines Winters (Dezember bis Februar) mitgemacht oder rechtzeitig
+       abgesagt, mindestens fünf. Jeder Winter zählt für sich und wird erst nach seinem Ende
+       vergeben, damit ein erreichtes Abzeichen nicht wieder verschwindet. */
+    var today0 = todayISO();
+    var wlist = winterPeriods().map(function(w){ return { from:w.from, to:w.to, n:0, bad:0 }; });
     held.forEach(function(s){
-      var m = +s.date.slice(5,7);
-      if (m !== 12 && m !== 1 && m !== 2) return;
-      win++;
-      var e = entry(s.id, pid);
-      if (!e || effV(e, s, pid) === "no" || lateExc(e, s)) winBad++;
+      wlist.forEach(function(w){
+        if (s.date < w.from || s.date > w.to) return;
+        w.n++;
+        var e = entry(s.id, pid);
+        if (!e || effV(e, s, pid) === "no" || lateExc(e, s)) w.bad++;
+      });
     });
+    var winGot = wlist.some(function(w){ return w.to < today0 && w.n >= 5 && w.bad === 0; });
+    var cw = wlist.filter(function(w){ return w.from <= today0 && w.to >= today0; })[0] || null;
+    var nw = wlist.filter(function(w){ return w.from > today0; })[0] || null;
+    var winNote = winGot ? "" : cw
+      ? (cw.bad ? "in diesem Winter nicht mehr möglich"
+        : cw.n + (cw.n === 1 ? " Wintereinheit" : " Wintereinheiten") + " bisher ohne Fehlen, vergeben nach dem " + fmtDM(cw.to) + (cw.n < 5 ? " (mindestens 5)" : ""))
+      : nw ? "nächster Winter: " + fmtDM(nw.from) + " bis " + fmtDM(nw.to)
+      : winterSet() ? "der nächste Winter ist noch nicht eingetragen" : "nächste Chance: Dezember bis Februar";
 
     /* Pünktlichkeitsserie: fünf Rückmeldungen in Folge vor der Bonusfrist */
     var pc = 0, pcBest = 0;
@@ -2722,9 +2770,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     Object.keys(pm).forEach(function(k){ if (pm[k].tot >= 3 && pm[k].yes === pm[k].tot) perfMonths++; });
 
     /* Saisonstart: erste gewertete Einheit der Saison, ohne Stichtag die erste jedes Jahres */
+    /* Gemeint ist die erste Einheit des Teams, nicht die erste eigene (sonst bekäme jeder Neuzugang es) */
     var firsts = {};
-    held.forEach(function(s){ var y = seasonFrom() ? "s" : s.date.slice(0,4); if (!firsts[y]) firsts[y] = s; });
-    var seasonStart = Object.keys(firsts).some(function(y){ return present(entry(firsts[y].id, pid)); });
+    heldSessions().forEach(function(s){ var y = seasonFrom() ? "s" : s.date.slice(0,4); if (!firsts[y]) firsts[y] = s; });
+    var seasonStart = Object.keys(firsts).some(function(y){ return invited(firsts[y], pid) && present(entry(firsts[y].id, pid)); });
 
     var cur = { units:yes, streak:st.best, reliable:cleanMonths, early:early, punctual:pcBest,
                 points: scoreIn(pid, held), perfmonth: perfMonths, special: mySpecials(pid).length };
@@ -2737,8 +2786,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     });
     if (badgeOn("first")) out.push(single("Erste Einheit", SINGLE_DESC.first, yes >= 1, "check"));
     if (badgeOn("comeback")) out.push(single("Comeback", SINGLE_DESC.comeback, comeback, "chart-column"));
-    if (badgeOn("winter")) out.push(single("Wintertraining", "Alle Einheiten im Winter mitgemacht oder rechtzeitig abgesagt.",
-      win >= 5 && winBad === 0, "waves", win < 5, win ? win + " von 5 Wintereinheiten im Plan" : "noch keine Wintereinheit im Plan"));
+    if (badgeOn("winter")) out.push(single("Wintertraining", "Alle Einheiten eines Winters (" + winterText() + ") mitgemacht oder rechtzeitig abgesagt.",
+      winGot, "waves", !winGot, winNote));
     if (badgeOn("newyear")) out.push(single("Jahreswechsel", SINGLE_DESC.newyear, turn, "trophy"));
     if (badgeOn("jubilee")) {
       var jb = single("Jubiläum", SINGLE_DESC.jubilee, yes >= 100, "trophy");
@@ -2782,7 +2831,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     setInfo("badgeHead",
       "Abzeichen sammelst du nebenbei. Die gestuften gibt es in Bronze, Silber und Gold, die Schwellen legt euer Trainer fest, sie stehen unter jedem Abzeichen.\n"
       + "Die einzelnen gibt es nur einmal, für besondere Anlässe.\n"
-      + "Was du einmal hast, bleibt dir. Alle Schwellen stehen auch im Reglement.",
+      + "Gezählt wird nur, was schon feststeht, zum Beispiel abgeschlossene Monate und Winter. Ändern kann sich ein Abzeichen nur, wenn der Trainer nachträglich einen Eintrag korrigiert oder die Schwellen ändert. Alle Schwellen stehen auch im Reglement.",
       "Abzeichen");
     setInfo("ruleHead",
       "Das vollständige Reglement, aufgeteilt in Abschnitte. Alle Zahlen darin kommen aus den Einstellungen eures Trainers, es bleibt also von selbst aktuell.",
@@ -2832,6 +2881,48 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     });
     box.appendChild(sg);
 
+    /* Zeitraum des Winters für das Abzeichen Wintertraining */
+    var wb = el("div","winterbox");
+    wb.style.marginTop = "14px";
+    wb.appendChild(el("b", null, "Winter für Wintertraining"));
+    wb.appendChild(el("p","hint", winterSet()
+      ? "Je Winter ein Zeitraum. Vergeben wird das Abzeichen nach dem Ende des Zeitraums."
+      : "Noch kein Zeitraum eingetragen, deshalb gilt jedes Jahr Dezember bis Februar. Trag hier den Winter für dieses Jahr ein."));
+    var wl = el("div","row");
+    cleanWinters(state.winters).forEach(function(w, i){
+      var chip = el("span","rchip");
+      chip.appendChild(document.createTextNode(fmtDM(w.from) + " bis " + fmtDM(w.to)));
+      var x = el("button", null, "×"); x.type = "button"; x.disabled = readOnly;
+      x.title = "Diesen Winter entfernen";
+      x.setAttribute("aria-label", "Winter " + fmtDM(w.from) + " bis " + fmtDM(w.to) + " entfernen");
+      x.addEventListener("click", function(){
+        var next = cleanWinters(state.winters); next.splice(i, 1);
+        mutate({ t:"cfg", k:"winters", v: next });
+      });
+      chip.appendChild(x);
+      wl.appendChild(chip);
+    });
+    wb.appendChild(wl);
+    var wr = el("div","row");
+    var wf = el("input"); wf.type = "date"; wf.setAttribute("aria-label","Winter von");
+    var wt = el("input"); wt.type = "date"; wt.setAttribute("aria-label","Winter bis");
+    var wa = el("button","btn","Winter hinzufügen"); wa.type = "button"; wa.disabled = readOnly;
+    var wm = el("p","msg");
+    wa.addEventListener("click", function(){
+      if (!wf.value || !wt.value) { wm.textContent = "Bitte beide Tage angeben."; return; }
+      if (wt.value < wf.value) { wm.textContent = "Das Ende liegt vor dem Anfang."; return; }
+      var list = cleanWinters(state.winters);
+      if (list.some(function(w){ return wf.value <= w.to && wt.value >= w.from; })) { wm.textContent = "Dieser Zeitraum überschneidet sich mit einem eingetragenen Winter."; return; }
+      list.push({ from: wf.value, to: wt.value });
+      mutate({ t:"cfg", k:"winters", v: cleanWinters(list) });
+    });
+    wr.appendChild(el("label", null, "von")); wr.appendChild(wf);
+    wr.appendChild(el("label", null, "bis")); wr.appendChild(wt);
+    wr.appendChild(wa);
+    wb.appendChild(wr);
+    wb.appendChild(wm);
+    box.appendChild(wb);
+
     /* Erklärung für den Trainer: was jedes Abzeichen zählt */
     var ex = el("details","rules");
     ex.style.marginTop = "14px";
@@ -2843,7 +2934,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         + "." + (badgeOn(d.k) ? "" : " Gerade ausgeschaltet.")));
     });
     SINGLE_DEFS.forEach(function(d){
-      ul.appendChild(el("li", null, d.name + " (einmalig): " + (SINGLE_DESC[d.k] || "") + (badgeOn(d.k) ? "" : " Gerade ausgeschaltet.")));
+      ul.appendChild(el("li", null, d.name + " (einmalig): " + singleDesc(d.k) + (badgeOn(d.k) ? "" : " Gerade ausgeschaltet.")));
     });
     ul.appendChild(el("li", null, "Gezählt werden nur gewertete Einheiten ab dem Saison-Stichtag, Sondertermine nur beim Abzeichen Sondertermine. "
       + "Spieler, die aus einem anderen Team gewechselt sind, bringen ihre Einheiten von dort mit. "
@@ -2891,7 +2982,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       "Wer seine Rückmeldung nach der Bonusfrist noch einmal ändert, verliert die " + BONUS
         + " Bonuspunkte für diesen Termin. Gezählt wird der Zeitpunkt der letzten Änderung.",
       "Einen Grund nachzutragen oder zu berichtigen kostet den Bonus nicht.",
-      "Ältere Einträge ohne Zeitstempel und Korrekturen des Trainers gelten als rechtzeitig."
+      "Ältere Einträge ohne Zeitstempel gelten als rechtzeitig. Was für Einträge und Korrekturen des Trainers gilt, steht unter Punkte."
     ];
     if (remindOn()) fristen.push("Erinnerung: " + remindHours() + (remindHours() === 1 ? " Stunde" : " Stunden")
       + " vor der Absagefrist bekommt jeder ohne Rückmeldung oder mit vielleicht eine Push-Nachricht, sofern er Erinnerungen unter Mein Profil eingeschaltet hat. Ebenso kommt eine Nachricht, wenn sich in den nächsten 14 Tagen ein Termin ändert, ausfällt oder neu dazukommt."
@@ -2928,7 +3019,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       stufen.push(d.name + ": " + d.desc + " Bronze ab " + t[0] + ", Silber ab " + t[1] + ", Gold ab " + t[2] + " " + d.unit + ".");
     });
     SINGLE_DEFS.filter(function(d){ return badgeOn(d.k); }).forEach(function(d){
-      stufen.push(d.name + " (einmalig): " + (SINGLE_DESC[d.k] || ""));
+      stufen.push(d.name + " (einmalig): " + singleDesc(d.k));
     });
     if (!stufen.length) stufen.push("Abzeichen sind bei euch abgeschaltet.");
 
@@ -3040,7 +3131,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function weekStats(){
     var r = weekRange();
     var inWeek = byDate(state.sessions).filter(function(s){ return !s.cancelled && s.date >= r.from && s.date <= r.to; });
-    var held = inWeek.filter(function(s){ return s.date <= todayISO(); });
+    var held = inWeek.filter(function(s){ return started(s); });
     var yes = 0, poss = 0;
     held.forEach(function(s){ var c = teamCounts(s); yes += c.yes; poss += c.n; });
     return { sessions: inWeek.length, held: held.length, yes: yes, poss: poss,
@@ -3714,7 +3805,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
     tile(box, "Punkte", String(points(me.id)), null, "diesen Monat: " + monthPoints(me.id));
     tile(box, "Quote", q.pct === null ? "–" : q.pct + " %", null, q.y + " von " + q.tot + " anwesend");
     tile(box, "Stufe", lv.name || "–", null, lv.name
-      ? (lv.next ? "noch " + lv.need + " bis " + lv.next.name : "höchste Stufe")
+      ? (lv.next ? (lv.need ? "noch " + lv.need + " bis " + lv.next.name : lv.next.name + " ab " + lv.next.min + " Prozent") : "höchste Stufe")
       : (lv.ready ? "ab " + levelDefs()[2].min + " Prozent Bronze" : "ab " + levelMin() + " gewerteten Einheiten"));
   }
 
@@ -3752,7 +3843,13 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       b.addEventListener("click", function(){
         var e = entry(sid, pid);
         if (pend) { pendingExc = null; render(); return; }
-        if (e && e.v === v) { pendingExc = null; mutate({ t:"att", sid:sid, pid:pid, v:null }); return; }
+        if (e && e.v === v) {
+          var who = isTrainer() && pid !== me.id ? "den Eintrag von " + ((player(pid) || {}).name || "diesem Spieler") : "deine Rückmeldung";
+          var warnTxt = (s && !s.sp && s.date >= AUTO_FROM && !closed(s)) ? " Ohne Rückmeldung bis zur Frist zählt das als unentschuldigt." : "";
+          var ok = safe(function(){ return window.confirm("Willst du " + who + " (" + pickWord(v) + ") wirklich löschen?" + warnTxt); }, true);
+          if (!ok) return;
+          pendingExc = null; mutate({ t:"att", sid:sid, pid:pid, v:null }); return;
+        }
         if (v === "exc") {
           /* Ohne Grund wird nichts gespeichert: erst das Feld, dann der Eintrag. */
           pendingExc = { sid:sid, pid:pid };
@@ -4291,8 +4388,10 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       goalRow(lc, lv.next ? "Fortschritt bis " + lv.next.name : "Höchste Stufe erreicht",
         (q.pct === null ? "–" : q.pct + " %"), q.pct || 0, lv.next ? lv.next.min : null);
       lc.appendChild(el("p","hint", lv.next
-        ? "Noch " + lv.need + (lv.need === 1 ? " Einheit" : " Einheiten") + " in Folge anwesend, dann steht " + lv.next.name + "."
-        : "Mehr geht nicht. Halte die Quote über 90 Prozent."));
+        ? (lv.need
+          ? "Noch " + lv.need + (lv.need === 1 ? " Einheit" : " Einheiten") + " in Folge anwesend, dann steht " + lv.next.name + "."
+          : lv.next.name + " gibt es ab " + lv.next.min + " Prozent.")
+        : "Mehr geht nicht. Halte die Quote bei mindestens " + levelDefs()[0].min + " Prozent."));
     }
 
     buildRules($("ruleBox"));
@@ -5376,7 +5475,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       lateOn: lateOn(), latePts: latePts(), excPts: excPts(),
       lvGold: levelDefs()[0].min, lvSilver: levelDefs()[1].min, lvBronze: levelDefs()[2].min,
       levelMin: levelMin(), badges: badgeCfg(),
-      jokers: jokerBudget(), jokerFrom: jokerFrom(), seasonFrom: seasonFrom(), teamCode: state.teamCode || "",
+      jokers: jokerBudget(), jokerFrom: jokerFrom(), seasonFrom: seasonFrom(), winters: state.winters || [], teamCode: state.teamCode || "",
       trainerPin: mode === "fb" ? null : state.trainerPin,
       players: mode === "fb" ? state.players.map(function(p){
         var o = { id: p.id, name: p.name, since: p.since || "" };
@@ -5395,7 +5494,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       lateOn: raw.lateOn, latePts: raw.latePts, excPts: raw.excPts,
       lvGold: raw.lvGold, lvSilver: raw.lvSilver, lvBronze: raw.lvBronze,
       levelMin: raw.levelMin, badges: raw.badges,
-      jokers: raw.jokers, jokerFrom: raw.jokerFrom, seasonFrom: raw.seasonFrom, teamCode: raw.teamCode,
+      jokers: raw.jokers, jokerFrom: raw.jokerFrom, seasonFrom: raw.seasonFrom, winters: raw.winters, teamCode: raw.teamCode,
       trainerPin: raw.trainerPin, noScore: raw.noScore,
       players: raw.players, sessions: raw.sessions, att: raw.att, joker: raw.joker });
     if (!st.players.length && !st.sessions.length) { msg.className = "msg"; msg.textContent = "Die Datei enthält weder Kader noch Termine."; return; }
@@ -7051,7 +7150,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
   function previewState(){
     var d = normalize(demoSeed());
     ["team","goal","excHours","bonusHours","remindOn","remindHours","lateOn","latePts","excPts",
-     "lvGold","lvSilver","lvBronze","levelMin","badges","jokers"].forEach(function(k){
+     "lvGold","lvSilver","lvBronze","levelMin","badges","jokers","winters"].forEach(function(k){
       if (state[k] !== undefined) d[k] = JSON.parse(JSON.stringify(state[k]));
     });
     d.demo = false;
@@ -7159,6 +7258,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       jokers: isNaN(jk) ? DEFAULT_JOKERS : Math.max(0, Math.min(20, jk)),
       jokerFrom: typeof st.jokerFrom === "string" ? st.jokerFrom : "",
       seasonFrom: typeof st.seasonFrom === "string" ? st.seasonFrom : "",
+      winters: cleanWinters(st.winters),
       teamCode: typeof st.teamCode === "string" ? st.teamCode : "",
       trainerPin: typeof st.trainerPin === "string" ? st.trainerPin : null,
       compareWith: st.compareWith && typeof st.compareWith === "object" ? st.compareWith : {},
@@ -7191,6 +7291,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       seeded.jokers = out.jokers;
       seeded.jokerFrom = out.jokerFrom;
       seeded.seasonFrom = out.seasonFrom;
+      seeded.winters = out.winters;
       seeded.teamCode = out.teamCode;
       seeded.trainerPin = out.trainerPin;
       seeded.compareWith = out.compareWith;
