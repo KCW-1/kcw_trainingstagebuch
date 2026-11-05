@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-H8Z+ZJmp8+z9t6TQ8JFU+gQQdNeLDzibux/2wCtnnG0=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-gcMd1cnDgR6VqQCqrZlKpjbFaPEzKQ37/xidkW8UxoA=' 'sha256-DiHfCrzjZ3fhP84kbpvKJtnBFb0BbAXilwnJIb5ygE4=' 'sha256-xWGxvJzfCnNjixmy6D+DVVeVKH8Dk4SIXa7SjuaB+3Y=' https://www.gstatic.com/firebasejs/10.14.1/ https://unpkg.com/lucide@0.544.0/ https://*.firebasedatabase.app https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://unpkg.com https://www.gstatic.com; frame-src https://kcw-trainingstagebuch.firebaseapp.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Trainingsbeteiligung</title>
@@ -713,6 +713,11 @@ window.TB_ICONS = {
   .rchip .pinless{font:600 11px/1 var(--font-narrow);letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);}
   .rchip button{border:0;background:transparent;color:var(--text-muted);cursor:pointer;font-size:13px;padding:3px 5px;border-radius:var(--radius-pill);}
   .rchip button:hover{color:var(--status-absent);background:var(--status-absent-soft);}
+  .rchip.rename{flex-wrap:wrap;padding:4px 6px 4px 6px;border-color:var(--border-strong);}
+  .rchip.rename input{font:inherit;font-size:14px;padding:4px 10px;border:1px solid var(--border-subtle);border-radius:var(--radius-pill);
+    background:var(--surface-card);color:var(--text-strong);min-width:0;width:150px;flex:1 1 120px;max-width:100%;}
+  .rchip.rename button.confirm{color:var(--text-strong);background:var(--surface-card);}
+  .rchip .rmsg{flex-basis:100%;font-size:12px;color:var(--status-absent);padding:2px 6px;}
   .rchip button.confirm,.btn.confirm{color:var(--status-absent);background:var(--status-absent-soft);
     font:700 12px/1 var(--font-sans);padding:5px 9px;}
   .btn.confirm{height:32px;}
@@ -1331,6 +1336,7 @@ Der Code muss mindestens 6 Zeichen haben und darf keinem anderen Team gehören. 
           <h3 data-info="Wer hier steht, kann sich anmelden und sich selbst eintragen. Ohne PIN heißt: hat sich noch nie angemeldet, die PIN legt jeder bei der ersten Anmeldung selbst fest.
 Mit × nimmst du einen Spieler aus dem Kader. Er bleibt als ehemalig erhalten, damit die alten Team-Zahlen gleich bleiben, und kann sich nicht mehr anmelden. Unter Ehemalige kannst du ihn wieder aufnehmen oder endgültig löschen. Endgültig löschen entfernt alle seine Einträge, dadurch ändern sich auch die alten Team-Zahlen.
 Aus Wertung nimmt einen Spieler ab heute aus den Team-Zahlen: Team-Quote, Mannschaftsziel, Team-Serie, Podium und Duell. Seine eigenen Punkte, Serie und Abzeichen laufen weiter, eintragen kann er sich wie bisher. Wieder werten gilt ab heute, vergangene Termine bleiben so gewertet wie vorher.
+Mit dem Stift änderst du den Namen, zum Beispiel bei einem Tippfehler. Alle Einträge, Punkte, Konto und PIN bleiben, der Spieler meldet sich danach unter dem neuen Namen an.
 Team wechseln verschiebt einen Spieler in ein anderes Team, bei dem du auch etwas ändern darfst. Seine persönliche Wertung (Punkte, Serie, Quote, Abzeichen, Rekorde, Joker) nimmt er mit, Konto und PIN bleiben gleich. Hier bleibt er als ehemalig stehen, die alten Team-Zahlen ändern sich dadurch nicht.">Kader</h3>
           <div class="roster" id="rosterList"></div>
           <p class="msg ok" id="rosterMsg"></p>
@@ -1972,6 +1978,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var dup = false;
       for (var j=0;j<st.players.length;j++) if (st.players[j].id === op.id) dup = true;
       if (!dup) st.players.push({ id: op.id, name: op.name, pin: null, since: op.since || "" });
+    } else if (op.t === "renamePlayer") {
+      for (var ri=0;ri<st.players.length;ri++) if (st.players[ri].id === op.id) st.players[ri].name = op.name;
     } else if (op.t === "archivePlayer" || op.t === "unarchivePlayer") {
       for (var ai=0;ai<st.players.length;ai++) if (st.players[ai].id === op.id) {
         st.players[ai].left = op.t === "archivePlayer" ? op.d : "";
@@ -2178,6 +2186,8 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var prec = { name: String(op.name).slice(0, 60) };
       if (op.since) prec.since = op.since;
       fbDo(FB.child("players/" + op.id).set(prec));
+    } else if (op.t === "renamePlayer") {
+      fbDo(FB.child("players/" + op.id + "/name").set(String(op.name).slice(0, 60)));
     } else if (op.t === "archivePlayer") {
       var aup = {};
       aup["teams/" + activeTeamKey + "/players/" + op.id + "/left"] = op.d;
@@ -4566,6 +4576,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
      Konto, Push-Abos und ein Umzugsvermerk moved/<uid> gehen mit, damit sein Gerät beim
      nächsten Öffnen von selbst ins neue Team wechselt. */
   var moveDlg = null;   /* { pid, k, msg, busy } */
+  var renameDlg = null; /* { pid, v, msg } */
   function moveTargets(){
     if (!isTrainer()) return [];
     return allowedTeamsFor(me.id).filter(function(k){ return k !== activeTeamKey; });
@@ -4968,7 +4979,60 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
 
     var r = $("rosterList");
     r.innerHTML = "";
+    if (renameDlg && !player(renameDlg.pid)) renameDlg = null;
+    function renameBtn(p, chip){
+      var rb = el("button", "pen", "\u270E");
+      rb.type = "button";
+      rb.title = "Namen von " + p.name + " ändern";
+      rb.setAttribute("aria-label", "Namen von " + p.name + " ändern");
+      rb.addEventListener("click", function(){ armed = null; renameDlg = { pid: p.id, v: p.name, msg: "", shown: false, pos: null }; renderAdmin(); });
+      chip.appendChild(rb);
+    }
+    function renameBox(p){
+      var box = el("span","rchip rename");
+      var inp = el("input");
+      inp.type = "text"; inp.maxLength = 60; inp.value = renameDlg.v;
+      inp.setAttribute("aria-label", "Neuer Name für " + p.name);
+      inp.addEventListener("input", function(){ renameDlg.v = inp.value; });
+      function save(){
+        var nn = inp.value.replace(/\s+/g, " ").trim();
+        if (!nn) { renameDlg.msg = "Bitte einen Namen eingeben."; renderAdmin(); return; }
+        if (nn === p.name) { renameDlg = null; renderAdmin(); return; }
+        var clash = state.players.some(function(o){ return o.id !== p.id && o.name.toLocaleLowerCase("de") === nn.toLocaleLowerCase("de"); });
+        if (clash && renameDlg.msg.indexOf("gibt es schon") < 0) {
+          renameDlg.v = nn; renameDlg.msg = "Den Namen " + nn + " gibt es schon im Team. Zum Speichern trotzdem nochmal auf Speichern tippen.";
+          renderAdmin(); return;
+        }
+        var old = p.name;
+        renameDlg = null;
+        mutate({ t:"renamePlayer", id: p.id, name: nn.slice(0, 60) });
+        var rm = $("rosterMsg");
+        if (rm) { rm.className = "msg ok"; rm.textContent = old + " heißt jetzt " + nn + "."; }
+      }
+      inp.addEventListener("keydown", function(e){
+        if (e.key === "Enter") { e.preventDefault(); save(); }
+        else if (e.key === "Escape") { e.preventDefault(); renameDlg = null; renderAdmin(); }
+      });
+      var ok = el("button","confirm","Speichern"); ok.type = "button";
+      ok.addEventListener("click", save);
+      var no = el("button", null, "Abbrechen"); no.type = "button";
+      no.addEventListener("click", function(){ renameDlg = null; renderAdmin(); });
+      box.appendChild(inp); box.appendChild(ok); box.appendChild(no);
+      if (renameDlg.msg) { var m = el("span","rmsg", renameDlg.msg); box.appendChild(m); }
+      var first = !renameDlg.shown; renameDlg.shown = true;
+      var pos = renameDlg.pos;
+      inp.addEventListener("blur", function(){ if (renameDlg) renameDlg.pos = null; });
+      inp.addEventListener("keyup", function(){ if (renameDlg) renameDlg.pos = inp.selectionStart; });
+      inp.addEventListener("click", function(){ if (renameDlg) renameDlg.pos = inp.selectionStart; });
+      setTimeout(function(){
+        if (!inp.isConnected) return;
+        if (first) { inp.focus(); inp.select(); }
+        else if (pos !== null && pos !== undefined) { inp.focus(); inp.setSelectionRange(pos, pos); }
+      }, 0);
+      return box;
+    }
     kader().forEach(function(p){
+      if (renameDlg && renameDlg.pid === p.id) { r.appendChild(renameBox(p)); return; }
       var chip = el("span","rchip");
       chip.appendChild(document.createTextNode(p.name));
       if (!p.pin) chip.appendChild(el("span","pinless","ohne PIN"));
@@ -4980,6 +5044,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
                     : p.name + " ab heute aus der Team-Wertung nehmen (Team-Quote, Ziel, Team-Serie, Podium, Duell)";
       nb.addEventListener("click", function(){ setNoScore(p.id, !ns); });
       chip.appendChild(nb);
+      renameBtn(p, chip);
       if (mode === "fb" && moveTargets().length) {
         var mv = el("button", null, "Team wechseln");
         mv.type = "button";
@@ -5011,6 +5076,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
       var fw = el("div","former");
       fw.appendChild(el("p","hint", "Ehemalige: nicht mehr im Kader, ihre alten Einträge zählen weiter in den vergangenen Team-Zahlen."));
       former.forEach(function(p){
+        if (renameDlg && renameDlg.pid === p.id) { fw.appendChild(renameBox(p)); return; }
         var fc = el("span","rchip ns");
         fc.appendChild(document.createTextNode(p.name));
         fc.appendChild(el("span","pinless", "seit " + fmtShort(p.left)));
@@ -5018,6 +5084,7 @@ Einspielen ersetzt alles, was gerade in der Datenbank steht, und fragt vorher na
         back.title = p.name + " wieder in den Kader nehmen. Für die Anmeldung legt " + p.name + " eine neue PIN fest.";
         back.addEventListener("click", function(){ mutate({ t:"unarchivePlayer", id: p.id }); });
         fc.appendChild(back);
+        renameBtn(p, fc);
         var arm2 = !!armed && armed.k === "pdel" && armed.id === p.id;
         var del = el("button", arm2 ? "confirm" : null, arm2 ? "mit allen Einträgen löschen?" : "endgültig löschen"); del.type = "button";
         del.title = "Löscht " + p.name + " samt allen Einträgen. Alte Team-Zahlen ändern sich dadurch.";
